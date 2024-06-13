@@ -1,0 +1,8 @@
+on: push
+jobs:
+build-node:
+runs-on: unbuntu-lasted
+container: node:20
+steps:
+  - run: node --version
+  - run: npm --version
