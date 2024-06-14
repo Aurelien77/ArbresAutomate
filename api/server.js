@@ -24,7 +24,25 @@ app.use(express.static('public'));
 
 // Route pour la racine
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    const filePath = req.query.filePath;
+    if (!filePath) {
+        res.status(400).send('Chemin du fichier non spécifié');
+        console.log(`Requête reçue : ${req.method} ${req.url}`);
+        console.log(filePath, "FILE PATH OK")
+        return;
+    }
+
+    const absoluteFilePath = path.join(__dirname, filePath);
+
+    fs.readFile(absoluteFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Erreur lors de la lecture du fichier :', err);
+            res.status(404).send('File not found');
+        } else {
+            console.log('Fichier lu avec succès :', absoluteFilePath);
+            res.send(data);
+        }
+    });
 });
 
 // Route pour récupérer le contenu d'un fichier
