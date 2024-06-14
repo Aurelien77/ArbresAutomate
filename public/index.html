@@ -97,7 +97,7 @@ async function loadFileContent(filePath) {
         }
 
         const fileContent = await response.text();
-        console.log(fileContent, "aaaaaaaaaaaaa")
+
         const fileContentPre = document.getElementById("fileContent");
         fileContentPre.textContent = fileContent;
         fileContentPre.classList.add('file');

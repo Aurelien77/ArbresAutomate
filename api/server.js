@@ -25,7 +25,11 @@ app.use((req, res, next) => {
    
     next();
 });
-//
+
+
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+  });
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath; // Chemin du fichier provenant de la requête
     if (!filePath) {
