@@ -22,18 +22,12 @@ function getFolderStructure(dirPath) {
 // Route pour servir les fichiers statiques
 app.use(express.static('public'));
 
-// Route pour la racine
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
-
-// Route pour récupérer le contenu d'un fichier
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;
     if (!filePath) {
         res.status(400).send('Chemin du fichier non spécifié');
         console.log(`Requête reçue : ${req.method} ${req.url}`);
-        console.log(filePath, "FILE PATH OK")
+        console.log(filePath, "FILE PATH OK");
         return;
     }
 
@@ -52,7 +46,7 @@ app.get('/file-content', (req, res) => {
 
 // Route pour récupérer la structure des dossiers
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure('./'); // Chemin de votre répertoire racine
+    const folderStructure = getFolderStructure('./');
     res.json(folderStructure);
     console.log(`Requête reçue : ${req.method} ${req.url}`);
 });
