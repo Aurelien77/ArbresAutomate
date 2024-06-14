@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Fonction pour récupérer l'arborescence des fichiers
 function getFolderStructure(dirPath) {
@@ -21,17 +21,15 @@ function getFolderStructure(dirPath) {
 
 // Route pour servir les fichiers statiques
 app.use(express.static('public'));
-app.use((req, res, next) => {
-   
-    next();
-});
 
-
+// Route pour la racine
 app.get('/', (req, res) => {
     res.send('Hello World!');
-  });
+});
+
+// Route pour récupérer le contenu d'un fichier
 app.get('/file-content', (req, res) => {
-    const filePath = req.query.filePath; // Chemin du fichier provenant de la requête
+    const filePath = req.query.filePath;
     if (!filePath) {
         res.status(400).send('Chemin du fichier non spécifié');
         console.log(`Requête reçue : ${req.method} ${req.url}`);
