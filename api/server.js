@@ -37,8 +37,7 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    // Utilisez path.join pour construire le chemin absolu en fonction de la racine du projet
-    const absoluteFilePath = path.join(process.cwd(), filePath);
+    const absoluteFilePath = path.join(__dirname, '../', filePath);
 
     fs.readFile(absoluteFilePath, 'utf8', (err, data) => {
         if (err) {
@@ -53,7 +52,7 @@ app.get('/file-content', (req, res) => {
 
 // Route pour récupérer la structure des dossiers
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure(process.cwd()); // Utilisez process.cwd() pour obtenir le chemin de la racine du projet
+    const folderStructure = getFolderStructure(path.join(__dirname, '../')); // Chemin de votre répertoire racine
     res.json(folderStructure);
     console.log(`Requête reçue : ${req.method} ${req.url}`);
 });
