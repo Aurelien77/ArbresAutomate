@@ -20,11 +20,11 @@ function getFolderStructure(dirPath) {
 }
 
 // Route pour servir les fichiers statiques
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Route pour la racine
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Route pour récupérer le contenu d'un fichier
@@ -37,7 +37,8 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    const absoluteFilePath = path.join(__dirname, filePath);
+    // Construire le chemin du fichier correctement
+    const absoluteFilePath = path.join(__dirname, '../', filePath);
 
     fs.readFile(absoluteFilePath, 'utf8', (err, data) => {
         if (err) {
@@ -52,7 +53,7 @@ app.get('/file-content', (req, res) => {
 
 // Route pour récupérer la structure des dossiers
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure('./'); // Chemin de votre répertoire racine
+    const folderStructure = getFolderStructure(path.join(__dirname, '../')); // Chemin de votre répertoire racine
     res.json(folderStructure);
     console.log(`Requête reçue : ${req.method} ${req.url}`);
 });
@@ -60,3 +61,5 @@ app.get('/folder-structure', (req, res) => {
 app.listen(port, () => {
     console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
 });
+
+module.exports = app;
