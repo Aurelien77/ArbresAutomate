@@ -3,109 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/code.css">
     <title>Arbre de choix</title>
+    
+    <style>
+        .icon {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .nested {
+            display: none;
+            margin-left: 20px;
+        }
+
+        .file {
+            background-color: black;
+            border: 1px solid gold;
+            color: white;
+            border-radius: 1%;
+            padding: 3%;
+            box-shadow: rgb(114, 114, 155) 1px 1px 1px;
+            font-size: 1.2rem;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .ajustementright {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            align-content: flex-start;
+            justify-content: flex-start;
+            justify-items: center;
+        }
+
+        .menu {
+            color: red;
+            margin: 1%;
+            font-size: 1.2rem;
+        }
+
+        .display {
+            left: 20%;
+        }
+    </style>
 </head>
 <body>
-<div class="ajustementright">
-<div id="fileExplorer" class="menu">L'appli est en ligne</div>
-<pre id="fileContent" class="display"></pre>
-</div>
-<script>
-function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
-    var ul = document.createElement('ul');
-    parentElement.appendChild(ul);
+    <div class="ajustementright">
+        <div id="fileExplorer" class="menu">L'appli est en ligne</div>
+        <pre id="fileContent" class="display"></pre>
+    </div>
 
-    data.forEach(item => {
-        var li = document.createElement('li');
-        const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+    <script>
+        function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
+            var ul = document.createElement('ul');
+            parentElement.appendChild(ul);
 
-        if (item.type === 'dossier') {
-            li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
-            li.classList.add('folder');
+            data.forEach(item => {
+                var li = document.createElement('li');
+                const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
 
-            li.isOpen = isOpen;
+                if (item.type === 'dossier') {
+                    li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
+                    li.classList.add('folder');
 
-            li.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.isOpen = !this.isOpen; 
-                this.querySelector('.nested').classList.toggle('active');
-                this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
+                    li.isOpen = isOpen;
+
+                    li.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.isOpen = !this.isOpen; 
+                        this.querySelector('.nested').classList.toggle('active');
+                        this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
+                    });
+                } else if (item.type === 'fichier') {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.textContent = item.name;
+
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        loadFileContent(itemPath);
+                    });
+                    li.appendChild(link);
+                }
+
+                ul.appendChild(li);
+
+                if (item.contenu && item.contenu.length > 0) {
+                    const nestedUl = document.createElement('ul');
+                    nestedUl.classList.add('nested');
+
+                    if (li.isOpen) {
+                        nestedUl.classList.add('active');
+                    }
+
+                    li.appendChild(nestedUl);
+                    loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
+                }
             });
-        } else if (item.type === 'fichier') {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.textContent = item.name;
-
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                loadFileContent(itemPath);
-            });
-            li.appendChild(link);
         }
 
-        ul.appendChild(li);
+        async function loadFolderStructure() {
+            try {
+                const response = await fetch("/folder-structure");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-        if (item.contenu && item.contenu.length > 0) {
-            const nestedUl = document.createElement('ul');
-            nestedUl.classList.add('nested');
-
-            if (li.isOpen) {
-                nestedUl.classList.add('active');
+                const folderStructure = await response.json();
+                return folderStructure;
+            } catch (error) {
+                console.error("Erreur lors du chargement de la structure des dossiers :", error);
             }
-
-            li.appendChild(nestedUl);
-            loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
-        }
-    });
-}
-
-async function loadFolderStructure() {
-    try {
-        const response = await fetch("/folder-structure");
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const folderStructure = await response.json();
-        return folderStructure;
-    } catch (error) {
-        console.error("Erreur lors du chargement de la structure des dossiers :", error);
-    }
-}
-
-function displayFolderStructure(folderStructure) {
-    var fileExplorer = document.getElementById("fileExplorer");
-    fileExplorer.innerHTML = '';
-    loadFilesAndFolders(folderStructure, fileExplorer, '');
-}
-
-async function loadFileContent(filePath) {
-    try {
-        const response = await fetch(`/file-content?filePath=${filePath}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        function displayFolderStructure(folderStructure) {
+            var fileExplorer = document.getElementById("fileExplorer");
+            fileExplorer.innerHTML = '';
+            loadFilesAndFolders(folderStructure, fileExplorer, '');
         }
 
-        const fileContent = await response.text();
-        const fileContentPre = document.getElementById("fileContent");
-        fileContentPre.textContent = fileContent;
-        fileContentPre.classList.add('file');
-    } catch (error) {
-        console.error("Erreur lors du chargement du contenu du fichier :", error);
-    }
-}
+        async function loadFileContent(filePath) {
+            try {
+                const response = await fetch(`/file-content?filePath=${filePath}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-window.onload = async function() {
-    const folderStructure = await loadFolderStructure();
-    if (folderStructure) {
-        displayFolderStructure(folderStructure);
-    } else {
-        console.error("La structure des dossiers n'a pas pu être chargée.");
-    }
-};
-</script>
+                const fileContent = await response.text();
+                const fileContentPre = document.getElementById("fileContent");
+                fileContentPre.textContent = fileContent;
+                fileContentPre.classList.add('file');
+            } catch (error) {
+                console.error("Erreur lors du chargement du contenu du fichier :", error);
+            }
+        }
 
+        window.onload = async function() {
+            const folderStructure = await loadFolderStructure();
+            if (folderStructure) {
+                displayFolderStructure(folderStructure);
+            } else {
+                console.error("La structure des dossiers n'a pas pu être chargée.");
+            }
+        };
+    </script>
 </body>
 </html>
