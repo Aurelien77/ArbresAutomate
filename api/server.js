@@ -33,7 +33,7 @@ app.get('/file-content', (req, res) => {
     if (!filePath) {
         res.status(400).send('Chemin du fichier non spécifié');
         console.log(`Requête reçue : ${req.method} ${req.url}`);
-        console.log(filePath, "FILE PATH OK")
+        console.log(filePath, "FILE PATH OK");
         return;
     }
 
