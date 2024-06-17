@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./code.css">
+    <link rel="stylesheet" href="/code.css">
     <title>Arbre de choix</title>
 </head>
 <body>
@@ -24,27 +24,26 @@ function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
             li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
             li.classList.add('folder');
 
-            // Ajoutez un attribut isOpen à chaque élément pour suivre son état d'ouverture ou de fermeture
             li.isOpen = isOpen;
 
             li.addEventListener('click', function(e) {
                 e.stopPropagation();
-                this.isOpen = !this.isOpen; // Inversez l'état isOpen lors du clic
+                this.isOpen = !this.isOpen; 
                 this.querySelector('.nested').classList.toggle('active');
                 this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
             });
-        }else if (item.type === 'fichier') {
-    const link = document.createElement('a');
-    link.href = '#';
-    link.textContent = item.name;
-   
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation(); // Empêche la propagation de l'événement de clic aux éléments parents pour ne pas que le folder se ferme apres le click sur un fichier
-        loadFileContent(itemPath);
-    });
-    li.appendChild(link);
-}
+        } else if (item.type === 'fichier') {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.textContent = item.name;
+
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                loadFileContent(itemPath);
+            });
+            li.appendChild(link);
+        }
 
         ul.appendChild(li);
 
@@ -52,23 +51,19 @@ function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
             const nestedUl = document.createElement('ul');
             nestedUl.classList.add('nested');
 
-            // Appliquez la classe active si le dossier est ouvert
             if (li.isOpen) {
                 nestedUl.classList.add('active');
             }
 
             li.appendChild(nestedUl);
-            loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen); // Récursion pour les sous-dossiers
+            loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
         }
     });
 }
 
-
-// Fonction pour charger la structure des dossiers et fichiers depuis le serveur
 async function loadFolderStructure() {
     try {
         const response = await fetch("/folder-structure");
-        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -79,25 +74,21 @@ async function loadFolderStructure() {
         console.error("Erreur lors du chargement de la structure des dossiers :", error);
     }
 }
-// Fonction pour afficher la structure des dossiers et fichiers
+
 function displayFolderStructure(folderStructure) {
     var fileExplorer = document.getElementById("fileExplorer");
-    fileExplorer.innerHTML = ''; // Clear the file explorer
+    fileExplorer.innerHTML = '';
     loadFilesAndFolders(folderStructure, fileExplorer, '');
 }
 
-// Fonction pour charger le contenu d'un fichier
 async function loadFileContent(filePath) {
     try {
-        //requette vers backend + objet filePath passé dans l'url
         const response = await fetch(`/file-content?filePath=${filePath}`);
-        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const fileContent = await response.text();
-
         const fileContentPre = document.getElementById("fileContent");
         fileContentPre.textContent = fileContent;
         fileContentPre.classList.add('file');
@@ -105,7 +96,7 @@ async function loadFileContent(filePath) {
         console.error("Erreur lors du chargement du contenu du fichier :", error);
     }
 }
-// Charger la structure des dossiers et fichiers au chargement de la page
+
 window.onload = async function() {
     const folderStructure = await loadFolderStructure();
     if (folderStructure) {
