@@ -37,7 +37,6 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    // Construire le chemin du fichier correctement
     const absoluteFilePath = path.join(__dirname, '../', filePath);
 
     fs.readFile(absoluteFilePath, 'utf8', (err, data) => {
