@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const mime = require('mime-types');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,13 +22,18 @@ app.get('/file-content', (req, res) => {
 
     const absoluteFilePath = path.join(process.cwd(), filePath);
 
-    fs.readFile(absoluteFilePath, 'utf8', (err, data) => {
-        if (err) {
+    fs.stat(absoluteFilePath, (err, stats) => {
+        if (err || !stats.isFile()) {
             console.error('Erreur lors de la lecture du fichier :', err);
             res.status(404).send('File not found');
-        } else {
-            res.send(data);
+            return;
         }
+
+        const mimeType = mime.lookup(absoluteFilePath) || 'application/octet-stream';
+        res.setHeader('Content-Type', mimeType);
+
+        const readStream = fs.createReadStream(absoluteFilePath);
+        readStream.pipe(res);
     });
 });
 
