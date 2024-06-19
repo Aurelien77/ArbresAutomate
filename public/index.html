@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/ico" href="./code_book.ico"/>
     <title>Arbre de choix</title>
-    
     <style>
         .icon {
             margin-right: 8px;
             cursor: pointer;
+            color: aqua;
         }
 
         .nested {
@@ -24,6 +25,7 @@
             padding: 3%;
             box-shadow: rgb(114, 114, 155) 1px 1px 1px;
             font-size: 1.2rem;
+            text-shadow: rgb(255, 81, 0) 0.2px 0.2px 0.2px;
         }
 
         .active {
@@ -40,13 +42,24 @@
         }
 
         .menu {
-            color: red;
+            color: black;
+            text-shadow: blue 0.2px 0.2px 0.2px;
             margin: 1%;
             font-size: 1.2rem;
         }
 
         .display {
             left: 20%;
+        }
+
+        .file-link {
+            color: red;
+        }
+
+        .media-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -55,7 +68,6 @@
         <div id="fileExplorer" class="menu">...Chargement des dossiers</div>
         <pre id="fileContent" class="display"></pre>
     </div>
-
     <script>
         function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
             var ul = document.createElement('ul');
@@ -73,7 +85,7 @@
 
                     li.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        this.isOpen = !this.isOpen; 
+                        this.isOpen = !this.isOpen;
                         this.querySelector('.nested').classList.toggle('active');
                         this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
                     });
@@ -81,6 +93,7 @@
                     const link = document.createElement('a');
                     link.href = '#';
                     link.textContent = item.name;
+                    link.classList.add('file-link');
 
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -133,9 +146,18 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const fileContent = await response.text();
+                const fileExtension = filePath.split('.').pop().toLowerCase();
                 const fileContentPre = document.getElementById("fileContent");
-                fileContentPre.textContent = fileContent;
+
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+                    const fileBlob = await response.blob();
+                    const objectURL = URL.createObjectURL(fileBlob);
+                    fileContentPre.innerHTML = `<div class="media-content"><img src="${objectURL}" alt="${filePath}"></div>`;
+                } else {
+                    const fileContent = await response.text();
+                    fileContentPre.textContent = fileContent;
+                }
+
                 fileContentPre.classList.add('file');
             } catch (error) {
                 console.error("Erreur lors du chargement du contenu du fichier :", error);
