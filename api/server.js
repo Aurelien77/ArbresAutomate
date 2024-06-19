@@ -2,7 +2,6 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
-import { SpeedInsights } from "@vercel/speed-insights/next";
 const app = express();
 const port = process.env.PORT || 3000;
 
