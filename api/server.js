@@ -38,7 +38,7 @@ app.get('/file-content', (req, res) => {
 });
 
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure(path.join('../'));
+    const folderStructure = getFolderStructure(path.join('./'));
     res.json(folderStructure);
 });
 
