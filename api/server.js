@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -19,7 +20,7 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    const absoluteFilePath = path.join("./", filePath);
+    const absoluteFilePath = path.join(__dirname, '../', filePath);
 
     fs.stat(absoluteFilePath, (err, stats) => {
         if (err || !stats.isFile()) {
@@ -37,7 +38,7 @@ app.get('/file-content', (req, res) => {
 });
 
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure("./");
+    const folderStructure = getFolderStructure(path.join(__dirname, '../'));
     res.json(folderStructure);
 });
 
