@@ -20,7 +20,7 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    const absoluteFilePath = path.join(__dirname, '../', filePath);
+    const absoluteFilePath = path.join(process.cwd(), filePath);
 
     fs.stat(absoluteFilePath, (err, stats) => {
         if (err || !stats.isFile()) {
@@ -38,7 +38,7 @@ app.get('/file-content', (req, res) => {
 });
 
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure(path.join('./'));
+    const folderStructure = getFolderStructure(process.cwd());
     res.json(folderStructure);
 });
 
