@@ -53,7 +53,16 @@
         }
 
         .file-link {
-            color: red;
+            color: rgb(33, 37, 168);
+            text-decoration: none;
+        }
+
+        .image-link {
+            color: green;
+        }
+
+        .media-content {
+            color: rgb(39, 210, 90);
         }
 
         .media-content img {
@@ -69,55 +78,65 @@
         <pre id="fileContent" class="display"></pre>
     </div>
     <script>
-        function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
-            var ul = document.createElement('ul');
-            parentElement.appendChild(ul);
+     function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
+    var ul = document.createElement('ul');
+    parentElement.appendChild(ul);
 
-            data.forEach(item => {
-                var li = document.createElement('li');
-                const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+    data.forEach(item => {
+        var li = document.createElement('li');
+        const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
 
-                if (item.type === 'dossier') {
-                    li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
-                    li.classList.add('folder');
+        if (item.type === 'dossier') {
+            li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
+            li.classList.add('folder');
 
-                    li.isOpen = isOpen;
+            li.isOpen = isOpen;
 
-                    li.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        this.isOpen = !this.isOpen;
-                        this.querySelector('.nested').classList.toggle('active');
-                        this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
-                    });
-                } else if (item.type === 'fichier') {
-                    const link = document.createElement('a');
-                    link.href = '#';
-                    link.textContent = item.name;
-                    link.classList.add('file-link');
-
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        loadFileContent(itemPath);
-                    });
-                    li.appendChild(link);
-                }
-
-                ul.appendChild(li);
-
-                if (item.contenu && item.contenu.length > 0) {
-                    const nestedUl = document.createElement('ul');
-                    nestedUl.classList.add('nested');
-
-                    if (li.isOpen) {
-                        nestedUl.classList.add('active');
-                    }
-
-                    li.appendChild(nestedUl);
-                    loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
-                }
+            li.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.isOpen = !this.isOpen;
+                this.querySelector('.nested').classList.toggle('active');
+                this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
             });
+        } else if (item.type === 'fichier') {
+            const fileExtension = item.name.split('.').pop().toLowerCase();
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
+            const isVideo = ['mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'].includes(fileExtension);
+
+            const link = document.createElement('a');
+            link.href = '#';
+            link.innerHTML = `<span class="icon">${isImage ? '🖼️' : isVideo ? '🎦' : '📃'}</span>${item.name}`;
+            link.classList.add('file-link');
+
+            if (isImage) {
+                link.classList.add('image-link');
+            } else if (isVideo) {
+                link.classList.add('video-link');
+            }
+
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                loadFileContent(itemPath);
+            });
+            li.appendChild(link);
         }
+
+        ul.appendChild(li);
+
+        if (item.contenu && item.contenu.length > 0) {
+            const nestedUl = document.createElement('ul');
+            nestedUl.classList.add('nested');
+
+            if (li.isOpen) {
+                nestedUl.classList.add('active');
+            }
+
+            li.appendChild(nestedUl);
+            loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
+        }
+    });
+}
 
         async function loadFolderStructure() {
             try {
@@ -140,29 +159,33 @@
         }
 
         async function loadFileContent(filePath) {
-            try {
-                const response = await fetch(`/file-content?filePath=${filePath}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const fileExtension = filePath.split('.').pop().toLowerCase();
-                const fileContentPre = document.getElementById("fileContent");
-
-                if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
-                    const fileBlob = await response.blob();
-                    const objectURL = URL.createObjectURL(fileBlob);
-                    fileContentPre.innerHTML = `<div class="media-content"><img src="${objectURL}" alt="${filePath}"></div>`;
-                } else {
-                    const fileContent = await response.text();
-                    fileContentPre.textContent = fileContent;
-                }
-
-                fileContentPre.classList.add('file');
-            } catch (error) {
-                console.error("Erreur lors du chargement du contenu du fichier :", error);
-            }
+    try {
+        const response = await fetch(`/file-content?filePath=${filePath}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const fileExtension = filePath.split('.').pop().toLowerCase();
+        const fileContentPre = document.getElementById("fileContent");
+
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+            const fileBlob = await response.blob();
+            const objectURL = URL.createObjectURL(fileBlob);
+            fileContentPre.innerHTML = `<div class="media-content"><img src="${objectURL}" alt="${filePath}"></div>`;
+        } else if (['mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'].includes(fileExtension)) {
+            const fileBlob = await response.blob();
+            const objectURL = URL.createObjectURL(fileBlob);
+            fileContentPre.innerHTML = `<div class="media-content"><video controls><source src="${objectURL}" type="video/mp4"></video></div>`;
+        } else {
+            const fileContent = await response.text();
+            fileContentPre.textContent = fileContent;
+        }
+
+        fileContentPre.classList.add('file');
+    } catch (error) {
+        console.error("Erreur lors du chargement du contenu du fichier :", error);
+    }
+}
 
         window.onload = async function() {
             const folderStructure = await loadFolderStructure();
