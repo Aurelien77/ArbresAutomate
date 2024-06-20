@@ -6,11 +6,11 @@ const mime = require('mime-types');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files from the Projet directory
+app.use(express.static(path.join(__dirname, '../Projet')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, '../Projet/index.html'));
 });
 
 app.get('/file-content', (req, res) => {
@@ -19,8 +19,8 @@ app.get('/file-content', (req, res) => {
         res.status(400).send('Chemin du fichier non spécifié');
         return;
     }
-//Test
-    const absoluteFilePath = path.join(__dirname, '../', filePath);
+
+    const absoluteFilePath = path.join(__dirname, '../Projet', filePath);
 
     fs.stat(absoluteFilePath, (err, stats) => {
         if (err || !stats.isFile()) {
@@ -38,7 +38,7 @@ app.get('/file-content', (req, res) => {
 });
 
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure(path.join(__dirname, '../'));
+    const folderStructure = getFolderStructure(path.join(__dirname, '../Projet'));
     res.json(folderStructure);
 });
 
