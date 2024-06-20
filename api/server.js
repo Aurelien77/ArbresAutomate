@@ -19,7 +19,7 @@ app.get('/file-content', (req, res) => {
         res.status(400).send('Chemin du fichier non spécifié');
         return;
     }
-
+//Test
     const absoluteFilePath = path.join(__dirname, '../', filePath);
 
     fs.stat(absoluteFilePath, (err, stats) => {
