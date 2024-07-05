@@ -9,6 +9,7 @@
     { "src": "/file-content", "dest": "/api/server.js" },
     { "src": "/folder-structure", "dest": "/api/server.js" },
     { "src": "/roadcode", "dest": "/public/roadcode.html" },
-    { "src": "/codecss", "dest": "/public/code.css" }
+    { "src": "/codecss", "dest": "/public/code.css" },
+    { "src": "/style", "dest": "/public/style.css" }
   ]
 }
