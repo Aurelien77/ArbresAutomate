@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Arbre de choix</title>
+
+    <link rel="stylesheet" href="./code.css">
+    
+    <link rel="icon" href="./code_book.ico">
+    
+</head>
+<body>
+
+<div class="containeriframe"> 
+    
+    <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
+    <div class="menu flotant ">
+      
+        <ul>
+<li><a href="./app.html" target="_parent">Accueil</a></li>
+
+
+
+        </ul>
+   
+        <ul >
+            <li><a href="#" onclick="loadPage('./1reve/codeaccueil.html');loadMenu('./1reve/menu.html')">1reve</a></li>
+            <li><a href="#" onclick="loadPage('./1dream2pianos/codeaccueil.html');loadMenu('./1dream2pianos/menu.html')">1dream2pianos</a></li>
+            <li><a href="#" onclick="loadPage('./austral/codeaccueil.html');loadMenu('./austral/menu.html')">Austral</a></li>
+        </ul>
+    </div>
+    <div class="content">
+      
+
+        <iframe id="FrameMenu" frameborder="0" src="./softwares/1reve/menu.html"> 
+
+
+        </iframe>
+    
+        <iframe id="contentFrame" frameborder="0" src="./softwares/1reve/codeaccueil.html">      </iframe>
+    </div>
+   
+      
+    </div>
+</div>
+
+<script>
+    //Bouton Toogle menu 
+    document.getElementById('toggleMenuButton').addEventListener('click', function() {
+        var menu = document.querySelector('.menu');
+        menu.classList.toggle('collapsed');
+    });
+    function loadPage(url) {
+        // Charger la page dans l'iframe
+        document.getElementById('contentFrame').src = url;
+    }
+
+    function loadMenu(url) {
+        // Charger la page dans l'iframe
+        document.getElementById('FrameMenu').src = url;
+    }
+    function  refresh() {
+      
+        parent.location.reload();
+    }
+   
+
+ 
+</script>
+
+</body>
+</html>

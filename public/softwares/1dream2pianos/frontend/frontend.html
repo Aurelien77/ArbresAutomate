@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>1 Reve Frontend</title>
+
+<link rel="stylesheet" href="./1revefrontend.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+
+</head>
+<body>
+
+
+<div class="site-container">
+ 
+ 
+  <div class="flexfolderplan">
+<div class="menuplan">
+   <ul>
+    <li onclick="loadPageframe('./dossier1/plan.html')">🗺️Plan</li>
+    <li onclick="loadPageframe('./dossier1/files2.html')">📁Composant1 </li>
+<li><a href="">📁Composant2</a></li>
+<li><a href="">📁Composant3</a></li>
+<li><a href="">📁Composant4</a></li>
+<li><a href="">📋File 1</a></li>
+<li><a href="">📋File 2</a></li>
+   </ul>
+</div>
+
+<div> 
+    
+    
+    <iframe class="frame" id="contentFramefolder" frameborder="0" src="./dossier1/plan.html">      </iframe></div>
+
+</div>
+</div>
+</body>
+<script>
+    function loadPageframe(url) {
+        // Charger la page dans la deuxième frame de la page parente
+        document.getElementById('contentFramefolder').src = url;
+    }
+</script>
+
+</html>

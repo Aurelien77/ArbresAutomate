@@ -1,0 +1,128 @@
+
+.card.flipped {
+    background-image: url(./media/code.jpg);
+    background-position: 50% 50%;
+}
+
+.card2.flipped {
+    background-image: url(./media/code.jpg);
+}
+
+.card3.flipped {
+    background-image: url(./media/data.jpg);
+}
+
+.addlink {
+    display: flex;
+    color: white;
+    transform: rotateY(180deg);
+    border: 2px solid gold;
+    padding: 2%;
+    background-color: black;
+  height: 10vw;
+ 
+}
+.containerglobal {
+
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+width: 100%;
+height: 100%;
+justify-content: center;
+justify-items: center;
+align-items: center;
+align-content: center;
+background-size: 100%;
+
+}
+.card-container {
+
+    display: flex;
+justify-content: center;
+justify-items: center;
+align-items: center;
+width: 100%;
+
+
+}
+.cardstyle3 {
+    background: url(./media/int.jpg);
+    background-position: 100% 80%;
+
+background-size:calc(210%);
+background-repeat: no-repeat;
+color: white;
+}
+.cardstyle2 {
+    background: url(./media/int.jpg);
+    background-position: 0% 80%;
+background-size:calc(210%);
+background-repeat: no-repeat;
+color: white;
+}
+.cardstyle {
+    background: url(./media/codeaccueil.jpg);
+    background-position: 0% 100%;
+
+background-size:calc(200%);
+background-repeat: no-repeat;
+color: white;
+}
+ .card, .card2, .card3 {
+    position: relative;
+display: flex;
+align-content: center;
+justify-content: center;
+align-items: center;;
+width: 20vw;
+height: 20vw;
+margin: 1vw;
+    border: 1px solid red;
+    transition: transform 0.5s ease;
+    box-shadow: 5px 5px 10px rgb(155, 176, 183);
+    font-family: "Workbench", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    border-radius: 2%; 
+    animation: fly-in 1s backwards; 
+}
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+width: 100%;
+
+
+}
+.flipped {
+    transform: rotateY(180deg);
+}
+
+.add {
+    position: absolute;
+    bottom: 5px;
+    border-radius: 0 0 5% 5%;
+    left:0;
+display: flex;
+    width: 80%;
+padding: 0.2vw;
+    border: 2px solid red;
+    background-color: rgb(209, 15, 15) ;
+    color: white;
+}
+
+@keyframes fly-in {
+    0% {
+        transform: translate(-100%, -100%) rotate(45deg); /* Starting position */
+        opacity: 0; /* Starting opacity */
+    }
+    100% {
+        transform: translate(0, 0) rotate(0); /* Ending position */
+        opacity: 1; /* Ending opacity */
+    }
+}

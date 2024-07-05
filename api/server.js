@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Serve static files from the Projet directory
-app.use(express.static(path.join(__dirname, '../Projet')));
+app.use(express.static(path.join(__dirname, '../Projet/Tree')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
@@ -20,7 +20,7 @@ app.get('/file-content', (req, res) => {
         return;
     }
 
-    const absoluteFilePath = path.join(__dirname, '../Projet', filePath);
+    const absoluteFilePath = path.join(__dirname, '../Projet/Tree', filePath);
 
     fs.stat(absoluteFilePath, (err, stats) => {
         if (err || !stats.isFile()) {
@@ -38,7 +38,7 @@ app.get('/file-content', (req, res) => {
 });
 
 app.get('/folder-structure', (req, res) => {
-    const folderStructure = getFolderStructure(path.join(__dirname, '../Projet'));
+    const folderStructure = getFolderStructure(path.join(__dirname, '../Projet/Tree'));
     res.json(folderStructure);
 });
 
