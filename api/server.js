@@ -12,6 +12,9 @@ app.use(express.static(path.join(__dirname, '..//tree')));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
+app.get('/roadcode', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/roadcode.html'));
+});
 
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;
