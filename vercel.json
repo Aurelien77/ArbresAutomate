@@ -11,7 +11,7 @@
     { "src": "/roadcode", "dest": "/public/roadcode.html" },
     { "src": "/codecss", "dest": "/public/code.css" },
     { "src": "/style", "dest": "/public/style.css" },
-    { "src": "/scriptturn", "dest": "/public/scripts/script_turn_cards.js" }
+    { "src": "/scriptturn", "dest": "/public/scripts/script_turn_cards.js" },
     { "src": "/icon", "dest": "/public/media/code_book.ico" }
   ]
 }
