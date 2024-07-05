@@ -3,250 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
-    <title>{ |\||I||/||||__\\||||\||\||I||/||||\/||||\| }</title>
-
- 
-
+    <title>{ |\|I||/||__\\||||}</title>
     <link rel="icon" href="/icon">
- <!--    Import font  -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
-<!-- Script css  -->
-<style>
-    .card.flipped {
-        background-image: url(./media/code.jpg);
-        background-position: 50% 50%;
-    }
-    
-    .card2.flipped {
-        background-image: url(./media/code.jpg);
-    }
-    
-    .card3.flipped {
-        background-image: url(./media/data.jpg);
-    }
-    
-    .addlink {
-        display: flex;
-        color: white;
-        transform: rotateY(180deg);
-        border: 2px solid gold;
-        padding: 2%;
-        background-color: black;
-      height: 10vw;
-     
-    }
-    .containerglobal {
-    
-        display: flex;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
-    align-content: center;
-    background-size: 100%;
-    
-    }
-    .card-container {
-    
-        display: flex;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
-    width: 100%;
-    
-    
-    }
-    .cardstyle3 {
-        background: url(./media/int.jpg);
-        background-position: 100% 80%;
-    
-    background-size:calc(210%);
-    background-repeat: no-repeat;
-    color: white;
-    }
-    .cardstyle2 {
-        background: url(./media/int.jpg);
-        background-position: 0% 80%;
-    background-size:calc(210%);
-    background-repeat: no-repeat;
-    color: white;
-    }
-    .cardstyle {
-        background: url(./media/codeaccueil.jpg);
-        background-position: 0% 100%;
-    
-    background-size:calc(200%);
-    background-repeat: no-repeat;
-    color: white;
-    }
-     .card, .card2, .card3 {
-        position: relative;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    align-items: center;;
-    width: 20vw;
-    height: 20vw;
-    margin: 1vw;
-        border: 1px solid red;
-        transition: transform 0.5s ease;
-        box-shadow: 5px 5px 10px rgb(155, 176, 183);
-        font-family: "Workbench", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-        border-radius: 2%; 
-        animation: fly-in 1s backwards; 
-    }
-    .container{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    
-    width: 100%;
-    
-    
-    }
-    .flipped {
-        transform: rotateY(180deg);
-    }
-    
-    .add {
-        position: absolute;
-        bottom: 5px;
-        border-radius: 0 0 5% 5%;
-        left:0;
-    display: flex;
-        width: 80%;
-    padding: 0.2vw;
-        border: 2px solid red;
-        background-color: rgb(209, 15, 15) ;
-        color: white;
-    }
-    
-    @keyframes fly-in {
-        0% {
-            transform: translate(-100%, -100%) rotate(45deg); /* Starting position */
-            opacity: 0; /* Starting opacity */
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
+    <style>
+        .objet {
+            color: black;
         }
-        100% {
-            transform: translate(0, 0) rotate(0); /* Ending position */
-            opacity: 1; /* Ending opacity */
+        .card.flipped {
+            background-image: url(./media/code.jpg);
+            background-position: 50% 50%;
         }
-    }</style>
-
+        .card2.flipped {
+            background-image: url(./media/code.jpg);
+        }
+        .card3.flipped {
+            background-image: url(./media/data.jpg);
+        }
+        .addlink {
+            display: flex;
+            color: black;
+            transform: rotateY(180deg);
+            padding: 2%;
+            height: 10vw;
+        }
+        .containerglobal {
+            display: flex;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            background-size: 100%;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .cardstyle3 {
+            background: url(./media/int.jpg);
+            background-position: 100% 80%;
+            background-size: calc(210%);
+            background-repeat: no-repeat;
+            color: white;
+        }
+        .cardstyle2 {
+            background: url(./media/int.jpg);
+            background-position: 0% 80%;
+            background-size: calc(210%);
+            background-repeat: no-repeat;
+            color: white;
+        }
+        .cardstyle {
+            background: url(./media/codeaccueil.jpg);
+            background-position: 0% 100%;
+            background-size: calc(200%);
+            background-repeat: no-repeat;
+            color: white;
+        }
+        .card, .card2, .card3 {
+            position: relative;
+            display: flex;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+            width: 20vw;
+            height: 20vw;
+            margin: 1vw;
+            border: 1px solid red;
+            transition: transform 0.5s ease;
+            box-shadow: 5px 5px 10px rgb(155, 176, 183);
+            font-family: "Workbench", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            border-radius: 2%;
+            animation: fly-in 1s backwards;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .add {
+            position: absolute;
+            bottom: 5px;
+            border-radius: 0 0 5% 5%;
+            left: 0;
+            display: flex;
+            width: 80%;
+            padding: 0.2vw;
+            border: 2px solid red;
+            background-color: rgb(209, 15, 15);
+            color: white;
+            transition: transform 0.5s ease;
+        }
+        @keyframes fly-in {
+            0% {
+                transform: translate(-100%, -100%) rotate(45deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(0, 0) rotate(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-
 <div class="containerglobal">
-
     <div class="card-container">
-        <div class="card cardstyle"  style="animation-delay: 0s;">
-           
-                <div class="container">
+        <div class="card cardstyle" style="animation-delay: 0s;">
+            <div class="container">
                 <div class="objet" id="code">Code</div>
-                <div class="add" id="codeadd">Explore</div>
+                <div class="add" id="codeadd">Learn</div>
                 <a href="./roadcode" class="addlink" style="display: none;">
-           <!--          <br>
+                    <br>
                     <span>code=>(){$Voir}</span>
-                    <br>  <br>
-                    <span>Click here for see <br> my code softwares</span></a> -->
-           
+                    <br><br>
+                    <span>Click here to see my code software</span>
+                </a>
             </div>
         </div>
         <div class="card2 cardstyle2" style="animation-delay: 0.2s;">
-          
-                <div class="container">
+            <div class="container">
                 <div class="objet">Intégration</div>
                 <div class="add">Topics</div>
                 <a href="./categories/integration/integrationchoice.html" class="addlink" style="display: none;">
                     Click here for Integration page
-                
                 </a>
             </div>
         </div>
-        <div class="card3 cardstyle3"  style="animation-delay: 0.4s;">
-           
-                <div class="container">
+        <div class="card3 cardstyle3" style="animation-delay: 0.4s;">
+            <div class="container">
                 <div class="objet">DataBase</div>
                 <div class="add">Learn</div>
                 <a href="./categories/database/databasechoice.html" class="addlink" style="display: none;">Click here for DataBase page</a>
-        </div>
+            </div>
         </div>
     </div>
 </div>
-    <script>
-// Sélection des éléments de carte
-const card1 = document.querySelector('.card');
-const card2 = document.querySelector('.card2');
-const card3 = document.querySelector('.card3');
+<script>
+    // Sélection des éléments de carte
+    const cards = document.querySelectorAll('.card, .card2, .card3');
 
+    // Fonction pour retourner la carte et injecter un nouveau code
+    function flipCard(event) {
+        // Récupère la carte concernée
+        const currentCard = event.currentTarget;
 
+        // Retourne la carte
+        currentCard.classList.toggle('flipped');
 
-// Fonction pour retourner la carte et injecter un nouveau code
-function flipCard(event) {
-    // Récupère la carte concernée
-    const currentCard = event.currentTarget;
+        // Créer le lien
+        const link = currentCard.querySelector('.addlink');
+        // Récupère les éléments enfants de la carte
+        const originalElement = currentCard.querySelector('.objet');
+        const alternativeElement = currentCard.querySelector('.add');
 
-    // Retourne la carte
-    currentCard.classList.toggle('flipped');
-//Crer le lien 
-const link = currentCard.querySelector('.addlink');
-    // Récupère les éléments enfants de la carte
-    const children = currentCard.querySelectorAll('.container > *');
-
-    // Pour chaque élément enfant
-    children.forEach(child => {
         // Si la carte est retournée
         if (currentCard.classList.contains('flipped')) {
-            //créer link
+            // Affiche le lien
             link.style.display = 'block';
             // Cache l'élément original
-            const originalElement = currentCard.querySelector('.objet');
             originalElement.style.display = 'none';
-            // Affiche l'élément alternatif
-            const alternativeElement = currentCard.querySelector('.add');
+            // Change le texte alternatif en "Explore" et le rend visible
+            alternativeElement.textContent = 'Explore';
             alternativeElement.style.display = 'block';
             // Applique une rotation inverse au texte alternatif
             alternativeElement.style.transform = 'rotateY(180deg)';
         } else { // Si la carte n'est pas retournée
-            //enleve link
+            // Cache le lien
             link.style.display = 'none';
             // Affiche l'élément original
-            const originalElement = currentCard.querySelector('.objet');
             originalElement.style.display = 'block';
-            // Cache l'élément alternatif
-            const alternativeElement = currentCard.querySelector('.add');
-            alternativeElement.style.display = 'none';
+            // Change le texte alternatif en "Learn" et le rend visible
+            alternativeElement.textContent = 'Learn';
+            // Applique une rotation normale au texte alternatif
+            alternativeElement.style.transform = 'rotateY(0deg)';
         }
+    }
+
+    // Ajout d'un écouteur d'événement pour détecter quand la souris survole la carte
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', flipCard);
+        card.addEventListener('mouseleave', flipCard);
     });
-}
-
-// Ajout d'un écouteur d'événement pour détecter quand la souris survole la carte
-card1.addEventListener('mouseenter', flipCard);
-card2.addEventListener('mouseenter', flipCard);
-card3.addEventListener('mouseenter', flipCard);
-
-
-
-// Ajout d'un écouteur d'événement pour détecter quand la souris quitte la carte
-card1.addEventListener('mouseleave', flipCard);
-card2.addEventListener('mouseleave', flipCard);
-card3.addEventListener('mouseleave', flipCard);
-
-
-
-
-    </script>
-    
-    </body>
+</script>
+</body>
 </html>
