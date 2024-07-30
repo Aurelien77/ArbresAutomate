@@ -15,8 +15,12 @@ justify-content: space-around;
 align-items: center;
   gap: 10%;
 }
+.flex2 {
+    display: flex;
+    flex-direction:row;
 
-.flex img  {
+ }
+.flex2 img  {
 border: 2px solid gold;
    width: 20px;
    height: 20px; 
@@ -34,10 +38,10 @@ border: 2px solid gold;
 
 <div class="flex">  
     <a href="#" onclick="loadPage('/codeaccueil1reve')"> <div class="textimage">1reve </div></a>
-    <div div class="flex">
-       <a href="#" onclick="loadPage('/roadcode')"><img src="/logo1reve" class="image">
+    <div class="flex">
+      <div class="flex2"><a href="#" onclick="loadPage('/roadcode')"><img src="/logo1reve" class="image">
        <p>Afficher le Plan</p> </div>
-   
+    </div> 
     </a>
 
    <!--  <a href="#" onclick="loadPage('./1reve/frontend/1revefrontend.html')"> <div class="frontend"> Frontend </div></a>
