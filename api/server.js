@@ -30,6 +30,13 @@ app.get('/codeaccueil1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
 });
 
+app.get('/1revemiddle', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/softwares/1reve/1revemiddle.html'));
+});
+
+app.get('/observation', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/softwares/1reve/observation.html'));
+});
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;
     if (!filePath) {
