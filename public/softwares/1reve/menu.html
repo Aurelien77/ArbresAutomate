@@ -6,8 +6,17 @@
 
 
 
-<link rel="stylesheet" href="../code.css">
 <head>
+ <style>
+.flex {
+    display: flex;
+    flex-direction:row;
+justify-content: space-around;
+align-items: center;
+  gap: 10%;
+}
+
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -15,16 +24,15 @@
 
 </head>
 <body>
-    
-<div class="menu-entete"><div class="flex">
-    <a href="#" onclick="loadPage('./1reve/codeaccueil.html')"> <div class="textimage">1reve </div></a>
+
+<div class="flex">  
+    <a href="#" onclick="loadPage('/codeaccueil1reve')"> <div class="textimage">1reve </div></a>
     <div div class="flex">
-       <a href="#" onclick="loadPage('./1reve/generalplan.html')"><img src="../../../media/1reve.jpg" class="image">
+       <a href="#" onclick="loadPage('/roadcode')"><img src="../../../media/1reve.jpg" class="image">
        <p>Afficher le Plan</p> </div>
    
     </a>
-   
-</div>
+
    <!--  <a href="#" onclick="loadPage('./1reve/frontend/1revefrontend.html')"> <div class="frontend"> Frontend </div></a>
     <a href="#" onclick="loadPage('./1reve/backend/1revebackend.html')"> <div class="backend"> Backend </div></a> -->
     <a href="#" onclick="loadPage('./1reve/middleware/1revemiddle.html')"> <div class="backend"> Middleware <br>& BD </div></a>
@@ -34,7 +42,7 @@
 
 
 
-    <a href="https://bug-free-fishstick-7x6q49pp7xjfpgw.github.dev" target="_blank" >   <div class="observation">Espace code <br>(accès admin)</div></a>
+
     
 </div>
 <script>

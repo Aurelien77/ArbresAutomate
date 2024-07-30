@@ -15,6 +15,20 @@ app.get('/', (req, res) => {
 app.get('/roadcode', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/roadcode.html'));
 });
+app.get('/codeschoice', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/codesotwarechoice.html'));
+});
+//Choix des applications ( code )
+app.get('/applichoice', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/applichoice.html'));
+});
+
+app.get('/menu1reve', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/softwares/1reve/menu.html'));
+});
+app.get('/codeaccueil1reve', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
+});
 
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;

@@ -12,24 +12,7 @@ border-bottom: 1px solid gold;
     border-radius: 0% 10% 10% 10%;
     box-shadow: rgb(11, 11, 11) 1.5px 1.5px 1.5px;
 }
-.menu.collapsed {
-    width: 50px;
- 
-}
 
-.menu.collapsed  {
-    display: none;
-    
-}
-.toggleMenuButton {
-    position: absolute;
-    top:5;left: 5;
-    z-index: 2;
-
-    width: 30px;
-    height: 30px;
-    border-radius: 0% 10% 10% 10%;
-}
 .container{
     display: flex;
         flex-direction: row;
@@ -37,32 +20,6 @@ border-bottom: 1px solid gold;
         font-size: 1.5rem;
     gap: 2vw;
     }
-.menu-entete {
-    display: flex;
-align-items: center;
-justify-content: center;
-}
-    .content {
-display: flex;
-flex-direction: column;
-align-items: center;
-        height: 100%;
-          width: 100%;
-          background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);
-        border-left: 1px solid red;
-            
-        }
-        .flex {
-text-align: center;
-            display: flex;
-        flex-direction: row;
-        align-items: center;
-color: white;
-        }
-        .flex:hover {
-
-            transform: scale(1.05);
-        }
         .image {
         margin-top: 3px;
             width: 6vw;
@@ -121,17 +78,6 @@ pre {
 
 
 /* // Partie frame  */
-.containeriframe {
-
-    height: 55vw;
-        display: flex;
-        flex-direction: row;
-        background-color: antiquewhite;
-        background-repeat: no-repeat;
-        background-size: cover;
-        color: white;
-        
-    }
 
 .plan {
 
@@ -153,11 +99,6 @@ pre {
         }
         
 
-#FrameMenu {
-
-
-    width: 100%;
-}
 
 .menu {
     background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);

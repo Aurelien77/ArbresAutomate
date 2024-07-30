@@ -3,71 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
     <title>Arbre de choix</title>
+    <style>
 
-    <link rel="stylesheet" href="./code.css">
-    
+        a:active {
+            text-decoration: none;
+            color: white;
+        }
+        a:visited {
+            text-decoration: none;
+            color: white;
+        }
+        li {
+            margin: 1vh;
+        }
+        .containeriframe {
+            display: flex;
+            flex-direction: row;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            
+        }
+        #contentFrame {
+            width: 100%;
+            border: none;
+        }
+        .menu {
+            z-index: 2;
+        }
+        .menu.collapsed {
+            display: none;
+        }
+        .toggleMenuButton {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+            border-radius: 0% 10% 10% 10%;
+        }
+        .framemenu {
+            width: 100vw;
+            border: none;
+        }
+        .content {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            
+        }
+        .content iframe {
+            display: flex;
+            flex-direction: column;
+       
+        }
+        .flex:hover {
+            transform: scale(1.05);
+        }
+        .framebody {
+position: absolute;
+top: 10%;
+
+            overflow-x: none;
+            overflow-y: none;
+        }
+
+        .nav {
+            z-index: 2;
+    position: absolute;
+            top: 2%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+
+}
+    </style>
     <link rel="icon" href="./code_book.ico">
-    
 </head>
 <body>
-
-<div class="containeriframe"> 
-    
-    <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
-    <div class="menu flotant ">
-      
-        <ul>
-<li><a href="./app.html" target="_parent">Accueil</a></li>
-
-
-
-        </ul>
-   
-        <ul >
-            <li><a href="#" onclick="loadPage('./1reve/codeaccueil.html');loadMenu('./1reve/menu.html')">1reve</a></li>
-            <li><a href="#" onclick="loadPage('./1dream2pianos/codeaccueil.html');loadMenu('./1dream2pianos/menu.html')">1dream2pianos</a></li>
-            <li><a href="#" onclick="loadPage('./austral/codeaccueil.html');loadMenu('./austral/menu.html')">Austral</a></li>
-        </ul>
+<div class=""> 
+    <div class="nav">
+        <h1>Bienvenue</h1>     <button onclick="location.href='/applichoice'">Choix Applications</button> <button onclick="location.href='/'">Accueil</button> </div>
     </div>
     <div class="content">
-      
-
-        <iframe id="FrameMenu" frameborder="0" src="./softwares/1reve/menu.html"> 
-
-
-        </iframe>
-    
-        <iframe id="contentFrame" frameborder="0" src="./softwares/1reve/codeaccueil.html">      </iframe>
-    </div>
-   
-      
+        <iframe class="framemenu" id="FrameMenu" frameborder="0" src="/menu1reve"></iframe>
+        <iframe id="contentFrame" class="framebody" frameborder="0" src="/codeaccueil1reve"></iframe>
     </div>
 </div>
 
 <script>
-    //Bouton Toogle menu 
+    function adjustIframeHeight() {
+        var iframes = document.querySelectorAll('iframe');
+        iframes.forEach(function(iframe) {
+            iframe.style.height = window.innerHeight + 'px';
+        });
+    }
+
+    window.addEventListener('resize', adjustIframeHeight);
+    window.addEventListener('load', adjustIframeHeight);
+
     document.getElementById('toggleMenuButton').addEventListener('click', function() {
         var menu = document.querySelector('.menu');
         menu.classList.toggle('collapsed');
     });
+
     function loadPage(url) {
-        // Charger la page dans l'iframe
         document.getElementById('contentFrame').src = url;
     }
 
     function loadMenu(url) {
-        // Charger la page dans l'iframe
         document.getElementById('FrameMenu').src = url;
     }
-    function  refresh() {
-      
+
+    function refresh() {
         parent.location.reload();
     }
-   
-
- 
 </script>
 
 </body>
