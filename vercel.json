@@ -11,6 +11,7 @@
     { "src": "/roadcode", "dest": "/public/roadcode.html" },
     { "src": "/codecss", "dest": "/public/code.css" },
     { "src": "/codeschoice", "dest": "/public/codesotwarechoice.html" },
-    { "src": "/icon", "dest": "/public/media/code_book.ico" }
+    { "src": "/icon", "dest": "/public/media/code_book.ico" },
+    { "src": "/applichoice", "dest": "/public/c/applichoice.html" }
   ]
 }
