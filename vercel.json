@@ -14,6 +14,7 @@
     { "src": "/icon", "dest": "/public/media/code_book.ico" },
     { "src": "/applichoice", "dest": "/public/applichoice.html" },
     { "src": "/menu1reve", "dest": "/public/softwares/1reve/menu.html" },
-    { "src": "/codeaccueil1reve", "dest": "/public/softwares/1reve/codeaccueil.html" }
+    { "src": "/codeaccueil1reve", "dest": "/public/softwares/1reve/codeaccueil.html" },
+    { "src": "/logo1reve", "dest": "/public/media/1reve.jpg" }
   ]
 }
