@@ -5,7 +5,7 @@
     { "src": "public/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/", "dest": "/public/app.html" },
+    { "src": "/", "dest": "/public/applichoice.html" },
     { "src": "/file-content", "dest": "/api/server.js" },
     { "src": "/folder-structure", "dest": "/api/server.js" },
     { "src": "/roadcode", "dest": "/public/roadcode.html" },
