@@ -15,6 +15,10 @@ app.get('/', (req, res) => {
 app.get('/roadcode', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/roadcode.html'));
 });
+
+app.get('/1reve', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
+}); 
 app.get('/codeschoice', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/codesotwarechoice.html'));
 });
@@ -36,6 +40,9 @@ app.get('/1revemiddle', (req, res) => {
 
 app.get('/observation', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/observation.html'));
+});
+app.get('/logo1reve', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
 });
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;
@@ -65,6 +72,8 @@ app.get('/folder-structure', (req, res) => {
     const folderStructure = getFolderStructure(path.join(__dirname, '../tree'));
     res.json(folderStructure);
 });
+
+
 
 app.listen(port, () => {
     console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);

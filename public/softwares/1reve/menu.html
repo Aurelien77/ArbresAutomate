@@ -11,9 +11,13 @@
 .flex{
     display: flex;
     flex-direction:row;
-justify-content: space-around;
+justify-content: space-between;
 align-items: center;
-  gap: 10%;
+
+}
+.date {
+
+ color:red;
 }
 .flex2 {
     display: flex;
@@ -21,7 +25,16 @@ align-items: center;
     flex-direction:row;
     
  }
-.flex2 img  {
+
+ .plan {
+margin-left: -10vh;
+
+ }
+ .observation {
+
+    margin-left: -20vh;
+
+ }.flex2 img  {
 
    width: 40px;
    height: 40px; 
@@ -43,11 +56,11 @@ align-items: center;
 <div class="flex">  
     <a href="#" onclick="loadPage('/codeaccueil1reve')"> 
         <div class="textimage flex2">1reve <img src="/logo1reve" class="image"> </div></a>
-   
+   <div class="date">Aout 2024</div>
       <div class="flex2">
         <a href="#" onclick="loadPage('/roadcode')">
          
-      <div><p>Afficher le Plan</p></div>  </div>
+      <div class="plan"><p>Afficher le Plan</p></div>  </div>
      
     </a>
 

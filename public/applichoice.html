@@ -9,13 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
     <style>
+        
+      .add.color {
+    background-color: rgb(127, 161, 255);
+    text-shadow: #FC0 1px 0 10px;
+    color: black;
+    -webkit-text-stroke: black 0.2px;
+}
         .objet {
             color: black;
         }
         .card.flipped {
-            background-image: url(./media/code.jpg);
+            background-image: url(/logo1reve);
             background-position: 50% 50%;
+        background-size: cover;
+        
         }
+   
         .card2.flipped {
             background-image: url(./media/code.jpg);
         }
@@ -77,7 +87,7 @@
             width: 20vw;
             height: 20vw;
             margin: 1vw;
-            border: 1px solid red;
+           
             transition: transform 0.5s ease;
             box-shadow: 5px 5px 10px rgb(155, 176, 183);
             font-family: "Workbench", sans-serif;
@@ -86,6 +96,11 @@
             font-style: normal;
             border-radius: 2%;
             animation: fly-in 1s backwards;
+        }
+        a {
+
+            width: 100vw;
+            height: 100%;
         }
         .container {
             display: flex;
@@ -104,7 +119,7 @@
             display: flex;
             width: 80%;
             padding: 0.2vw;
-            border: 2px solid red;
+           
             background-color: rgb(209, 15, 15);
             color: white;
             transition: transform 0.5s ease;
@@ -129,17 +144,15 @@
                 <div class="objet" id="code">1Reve</div>
                 <div class="add" id="codeadd">Cartes</div>
                 <a href="/codeschoice" class="addlink" style="display: none;">
-                    <br>
-                    <span>code=>(){$Voir}</span>
-                    <br><br>
-                    <span>Click here to see my code software</span>
+                    
+                  <!--   <span>Click here to see my code software</span> -->
                 </a>
             </div>
         </div>
         <div class="card2 cardstyle2" style="animation-delay: 0.2s;">
             <div class="container">
                 <div class="objet">1Dream2Pianos</div>
-                <div class="add">Music</div>
+                <div class="add ">Music</div>
                 <a href="./categories/integration/integrationchoice.html" class="addlink" style="display: none;">
                     Click here for Integration page
                 </a>
@@ -155,51 +168,89 @@
     </div>
 </div>
 <script>
-    // Sélection des éléments de carte
-    const cards = document.querySelectorAll('.card, .card2, .card3');
+document.addEventListener('DOMContentLoaded', () => {
+    // Objet pour suivre l'état des cartes
+    const cardStates = {};
 
-    // Fonction pour retourner la carte et injecter un nouveau code
+    // Fonction pour retourner la carte
     function flipCard(event) {
         // Récupère la carte concernée
         const currentCard = event.currentTarget;
 
-        // Retourne la carte
-        currentCard.classList.toggle('flipped');
+        // Définir les textes alternatifs spécifiques pour chaque carte
+        let flippedText;
+        let defaultText;
+        
+        // Déterminer le texte alternatif basé sur la carte
+        if (currentCard.classList.contains('card2')) {
+            flippedText = 'Playlist';
+            defaultText = 'Music';
+        } else if (currentCard.classList.contains('card3')) {
+            flippedText = 'Presentation Read';
+            defaultText = 'Documents';
+        } else {
+            flippedText = 'Explore'; // Texte alternatif pour les autres cartes
+            defaultText = 'Learn'; // Texte par défaut pour les autres cartes
+        }
 
-        // Créer le lien
-        const link = currentCard.querySelector('.addlink');
         // Récupère les éléments enfants de la carte
+        const link = currentCard.querySelector('.addlink');
         const originalElement = currentCard.querySelector('.objet');
         const alternativeElement = currentCard.querySelector('.add');
+        
+        // Initialiser l'état de la carte si non défini
+        if (!cardStates[currentCard]) {
+            cardStates[currentCard] = false;
+        }
 
-        // Si la carte est retournée
-        if (currentCard.classList.contains('flipped')) {
-            // Affiche le lien
-            link.style.display = 'block';
-            // Cache l'élément original
-            originalElement.style.display = 'none';
-            // Change le texte alternatif en "Explore" et le rend visible
-            alternativeElement.textContent = 'Explore';
-            alternativeElement.style.display = 'block';
-            // Applique une rotation inverse au texte alternatif
-            alternativeElement.style.transform = 'rotateY(180deg)';
-        } else { // Si la carte n'est pas retournée
-            // Cache le lien
-            link.style.display = 'none';
-            // Affiche l'élément original
-            originalElement.style.display = 'block';
-            // Change le texte alternatif en "Learn" et le rend visible
-            alternativeElement.textContent = 'Learn';
-            // Applique une rotation normale au texte alternatif
+        // Vérifie si la carte est retournée
+        const isFlipped = cardStates[currentCard];
+
+        if (isFlipped) {
+            // Carte est retournée, donc la réinitialiser
+            currentCard.classList.remove('flipped');
+            
+            // Retirer la classe 'color' du texte alternatif
+            alternativeElement.classList.remove('color');
+
+            // Réinitialise le texte alternatif à son texte de base
+            alternativeElement.textContent = defaultText;
             alternativeElement.style.transform = 'rotateY(0deg)';
+            
+            // Cache le lien et affiche l'élément original
+            link.style.display = 'none';
+            originalElement.style.display = 'block';
+
+            // Met à jour l'état de la carte
+            cardStates[currentCard] = false;
+        } else {
+            // Carte n'est pas retournée, donc la retourner
+            currentCard.classList.add('flipped');
+            
+            // Ajouter la classe 'color' au texte alternatif
+            alternativeElement.classList.add('color');
+
+            // Change le texte alternatif en texte spécifique pour la carte retournée
+            alternativeElement.textContent = flippedText;
+            alternativeElement.style.transform = 'rotateY(180deg)';
+            
+            // Affiche le lien et cache l'élément original
+            link.style.display = 'block';
+            originalElement.style.display = 'none';
+
+            // Met à jour l'état de la carte
+            cardStates[currentCard] = true;
         }
     }
 
-    // Ajout d'un écouteur d'événement pour détecter quand la souris survole la carte
+    // Ajout d'un écouteur d'événement pour détecter le survol de la carte
+    const cards = document.querySelectorAll('.card, .card2, .card3');
     cards.forEach(card => {
         card.addEventListener('mouseenter', flipCard);
         card.addEventListener('mouseleave', flipCard);
     });
+});
+
 </script>
 </body>
 </html>
