@@ -5,30 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arbre de choix</title>
     <style>
+        /* Le document prend toute la hauteur et empêche le défilement */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Désactive le scroll */
+        }
+        
         a:active, a:visited {
             text-decoration: none;
             color: white;
         }
+        
         li {
             margin: 1vh;
         }
+
+        /* Container principal qui prend toute la hauteur */
         .containeriframe {
             display: flex;
             flex-direction: row;
             background-repeat: no-repeat;
             background-size: cover;
             color: white;
+            height: 100%; /* Prend toute la hauteur disponible */
+            width: 100%;
         }
+
         #contentFrame {
             width: 100%;
             border: none;
         }
+
         .menu {
             z-index: 2;
         }
+
         .menu.collapsed {
             display: none;
         }
+
         .toggleMenuButton {
             position: absolute;
             top: 5px;
@@ -38,32 +55,37 @@
             height: 30px;
             border-radius: 0% 10% 10% 10%;
         }
+
         .framemenu {
             width: 100vw;
             border: none;
         }
+
         .content {
-            position: absolute;
-            top: 0;
-            right: 0;
+            position: relative;
             height: 100%;
             width: 100%;
             display: flex;
             flex-direction: column;
         }
+
         .content iframe {
             display: flex;
             flex-direction: column;
         }
+
         .flex:hover {
             transform: scale(1.05);
         }
+
         .framebody {
             position: absolute;
             top: 10%;
-            overflow-x: hidden;
-            overflow-y: hidden;
+            height: 90%; /* Ajuste la hauteur pour remplir l’espace sans scroll */
+            width: 100%;
+            overflow: hidden; /* Cache tout débordement */
         }
+
         .nav {
             z-index: 2;
             position: absolute;
@@ -76,14 +98,7 @@
 </head>
 <body>
 <div class="containeriframe"> 
-    <!-- Bouton pour basculer l'affichage du menu -->
-    <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
-    
-    <div class="nav">
-        <h1>Bienvenue</h1>     
-        <button onclick="location.href='/applichoice'">Choix Applications</button>
-    </div>
-    
+
     <div class="content">
         <iframe class="framemenu" id="FrameMenu" frameborder="0" src="/menu1reve"></iframe>
         <iframe id="contentFrame" class="framebody" frameborder="0" src="/codeaccueil1reve"></iframe>
@@ -100,17 +115,6 @@
 
     window.addEventListener('resize', adjustIframeHeight);
     window.addEventListener('load', adjustIframeHeight);
-
-    // Ajoute un écouteur d'événement uniquement si le bouton toggleMenuButton existe
-    var toggleButton = document.getElementById('toggleMenuButton');
-    if (toggleButton) {
-        toggleButton.addEventListener('click', function() {
-            var menu = document.querySelector('.menu');
-            if (menu) {
-                menu.classList.toggle('collapsed');
-            }
-        });
-    }
 
     function loadPage(url) {
         document.getElementById('contentFrame').src = url;

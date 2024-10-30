@@ -1,87 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
 <head>
- <style>
-.flex{
-    display: flex;
-    flex-direction:row;
-justify-content: space-between;
-align-items: center;
-
-}
-.date {
-
- color:red;
-}
-.flex2 {
-    display: flex;
-
-    flex-direction:row;
-    
- }
-
- .plan {
-margin-left: -10vh;
-
- }
- .observation {
-
-    margin-left: -20vh;
-
- }.flex2 img  {
-
-   width: 40px;
-   height: 40px; 
-   border-radius: 20%;
-   margin-left: 1%;
-   margin-right: 1%;
-   padding: 5%;
-}
-
-    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>1reve</title>
-
+    <style>
+        .flex {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+         width: 100%;
+        }
+        .date {
+            color: green;
+            font-size: 1rem;
+        }
+        .flex2 {
+            display: flex;
+            flex-direction: row;
+        }
+     
+        .flex2 img {
+        
+            width: 40px;
+            height: 40px;
+            border-radius: 20%;
+            margin-left: 1%;
+            margin-right: 1%;
+            padding: 5%;
+        }
+        /* Styles pour le menu toggle */
+        .toggleMenuButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .categoryMenu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .categoryMenu a {
+            display: block;
+            color: black;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+        .categoryMenu a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
 <div class="flex">  
-    <a href="#" onclick="loadPage('/codeaccueil1reve')"> 
-        <div class="textimage flex2">1reve <img src="/logo1reve" class="image"> </div></a>
-   <div class="date">Aout 2024</div>
-      <div class="flex2">
-        <a href="#" onclick="loadPage('/roadcode')">
-         
-      <div class="plan"><p>Afficher le Plan</p></div>  </div>
-     
+    <a href="#" onclick="loadPage('/codeaccueil1reve')">
+        <button class="textimage flex2">1reve </button>
     </a>
+    <H2 class="date">Aout 2024</H2>
+    <div class="flex2">
+        <a href="#" onclick="loadPage('/roadcode')">
+            <button class="plan"><img src="/logo1reve" class="image"><p>Afficher le Plan</p></button>
+        </a>
+      
+    </div>
+</div>
+<div>
+<!-- Bouton pour afficher/masquer le menu des catégories -->
+<button id="toggleMenuButton" class="toggleMenuButton">☰</button>
 
-   <!--  <a href="#" onclick="loadPage('./1reve/frontend/1revefrontend.html')"> <div class="frontend"> Frontend </div></a>
-    <a href="#" onclick="loadPage('./1reve/backend/1revebackend.html')"> <div class="backend"> Backend </div></a> -->
-    <a href="#" onclick="loadPage('/1revemiddle')"> <div class="backend"> Middleware <br>& BD </div></a>
-    <a href="#" onclick="loadPage('/observation')"> <div class="observation"> 🖊️ Observations </div>
- 
+<!-- Menu des catégories à afficher/masquer -->
+<div id="categoryMenu" class="categoryMenu">
 
-
-
-
-
-    
+    <a href="#" onclick="loadPage('/1revemiddle')">🗝️ Middleware /  BD</a>
+    <a href="#" onclick="loadPage('/observation')">🖊️ Observations</a>
+   
+</div>
 </div>
 <script>
-
-function loadPage(url) {
+    function loadPage(url) {
         // Charger la page dans l'iframe
         parent.document.getElementById('contentFrame').src = url;
     }
+
+    // Toggle pour afficher ou masquer le menu des catégories
+    document.getElementById('toggleMenuButton').addEventListener('click', function() {
+        var categoryMenu = document.getElementById('categoryMenu');
+        if (categoryMenu.style.display === "none" || categoryMenu.style.display === "") {
+            categoryMenu.style.display = "block";
+        } else {
+            categoryMenu.style.display = "none";
+        }
+    });
 </script>
+
 </body>
 </html>
