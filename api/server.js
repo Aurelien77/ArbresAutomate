@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 app.get('/roadcode', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/roadcode.html'));
 });
-
+/* --------------------------------------------------------- */
 app.get('/1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
 }); 
@@ -41,6 +41,10 @@ app.get('/1revemiddle', (req, res) => {
 app.get('/observation', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/observation.html'));
 });
+
+/* --------------------------------------------------------- */
+
+
 app.get('/logo1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
 });
