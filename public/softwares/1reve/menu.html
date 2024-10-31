@@ -78,30 +78,40 @@
             text-decoration: underline;
         }
     
-        /* Media queries pour les petits écrans */
-        @media (max-width: 600px) {
+        /* Media queries */
+        @media (max-width: 800px) {
             .flex {
-                flex-direction: column; /* Passer à la colonne */
-                align-items: flex-start; /* Alignement à gauche */
+                flex-direction: column; /
+                align-items: center; 
             }
     
             .flex2 {
-                flex-direction: column; /* Passer à la colonne */
+                flex-direction: column; 
             }
     
             .toggleMenuButton {
-                left: 5px; /* Ajuster la position si nécessaire */
+                left: 0px; 
             }
     
             .categoryMenu {
-                top: 5px; /* Ajuster pour plus d'espace */
-                width: 90%; /* Ajuster la largeur du menu pour les petits écrans */
+                text-align: center;
+                top: 5px; 
+                width: 80%; 
             }
     
             .categoryMenu a {
                 padding: 0.5rem; /* Ajuster le padding pour la lisibilité */
                 font-size: 0.9rem; /* Ajuster la taille de la police */
             }
+
+            .toggleMenuButton.active {
+            position: absolute;
+            top: 0px; 
+            left: 0%; 
+            transform: translateX(0%); 
+            background-color: aliceblue;
+        }
+        
         }
     </style>
 </head>
@@ -113,7 +123,7 @@
     </a>
     <H2 class="date">Aout 2024</H2>
     <div class="flex2">
-        <a href="#" onclick="loadPage('/roadcode')">
+        <a href="#" onclick="loadPage('/logicroadcode')">
             <button class="plan"><img src="/logo" class="image"><p>Afficher le Plan</p></button>
         </a>
       
@@ -124,9 +134,10 @@
 <!-- Menu des catégories à afficher/masquer -->
 <div>
     <div id="categoryMenu" class="categoryMenu">
-        <a href="#" onclick="loadPage('/middle')">🗝️ Middleware /  BD</a>
-        <a href="#" onclick="loadPage('/observation')">🖊️ Observations</a>
-        <a href="#" onclick="loadPage('/')"> 🏠 Accueil</a>
+        <a href="#" onclick="loadPage('/middle')">🗝️ Middleware/BD</a>
+        <a href="#" onclick="loadPage('/observation')">🖊️Observations</a>
+        <a href="/" onclick="">🏠 Accueil</a>
+
     </div>
 </div>
 
@@ -135,6 +146,13 @@
 
 </div>
 <script>
+
+    function navigateToHome(event) {
+    event.preventDefault(); // Empêche le comportement par défaut
+    window.location.href = "/"; // Redirige vers la racine
+    location.reload(); // Recharge la page pour assurer le chemin racine
+}
+
     function loadPage(url) {
         // Charger la page dans l'iframe
         parent.document.getElementById('contentFrame').src = url;

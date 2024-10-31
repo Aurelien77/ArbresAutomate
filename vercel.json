@@ -8,11 +8,11 @@
 
     { "src": "/", "dest": "/public/applichoice.html" },
 
-    { "src": "/codeschoice", "dest": "/public/codesotwarechoice.html" },
+    { "src": "/codeschoice", "dest": "/public/pagesotwarepresentation.html" },
 
     { "src": "/menu1reve", "dest": "/public/softwares/1reve/menu.html" },
     { "src": "/codeaccueil", "dest": "/public/softwares/1reve/codeaccueil.html" },
-    { "src": "/roadcode", "dest": "/public/roadcode.html" },
+    { "src": "/logicroadcode", "dest": "/public/logicroadcode.html" },
     { "src": "/middle", "dest": "/public/softwares/1reve/middle.html" },
     { "src": "/observation", "dest": "/public/softwares/1reve/observation.html" },
 

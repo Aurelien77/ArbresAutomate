@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 //choix de lappli 
 
 app.get('/codeschoice', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/codesotwarechoice.html'));
+    res.sendFile(path.join(__dirname, '../public/pagesotwarepresentation.html'));
 });
 
 // Menu1reve englobe =>  lien vers codeaccueil + lien vers folders 
@@ -32,8 +32,8 @@ app.get('/codeaccueil', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
 });
 
-app.get('/roadcode', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/roadcode.html'));
+app.get('/logicroadcode', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/logicroadcode.html'));
 });
 
 /* +  Toogle  */
