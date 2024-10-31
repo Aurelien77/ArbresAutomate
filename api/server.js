@@ -9,31 +9,34 @@ const port = process.env.PORT || 3000;
 // Serve static files from the Projet directory
 app.use(express.static(path.join(__dirname, '../apifolders/1reve')));
 
+// Affiche les applications
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/applichoice.html'));
 });
-app.get('/roadcode', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/roadcode.html'));
-});
-/* --------------------------------------------------------- */
-app.get('/1reve', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
-}); 
+
+//choix de lappli 
+
 app.get('/codeschoice', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/codesotwarechoice.html'));
 });
-//Choix des applications ( code )
-app.get('/applichoice', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/applichoice.html'));
-});
+
+// Menu1reve englobe =>  lien vers codeaccueil + lien vers folders 
 
 app.get('/menu1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/menu.html'));
 });
+
+/* => */ 
+
 app.get('/codeaccueil1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
 });
 
+app.get('/roadcode', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/roadcode.html'));
+});
+
+/* +  Toogle  */
 app.get('/1revemiddle', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/1revemiddle.html'));
 });
@@ -42,12 +45,23 @@ app.get('/observation', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/observation.html'));
 });
 
-/* --------------------------------------------------------- */
+/* Media--------------------------------------------------------- */
+app.get('/1reve', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
+}); 
 
 
 app.get('/logo1reve', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
 });
+
+
+
+
+/* Server de fichiers--------------------------------------------------------- */
+
+
+
 app.get('/file-content', (req, res) => {
     const filePath = req.query.filePath;
     if (!filePath) {
@@ -79,9 +93,7 @@ app.get('/folder-structure', (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
-});
+
 
 function getFolderStructure(dirPath) {
     const items = fs.readdirSync(dirPath);
@@ -95,5 +107,9 @@ function getFolderStructure(dirPath) {
         };
     });
 }
+/* Server Node.js--------------------------------------------------------- */
 
+app.listen(port, () => {
+    console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
+});
 module.exports = app;
