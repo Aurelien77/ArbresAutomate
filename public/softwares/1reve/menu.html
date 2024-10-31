@@ -7,10 +7,10 @@
     <style>
         .flex {
             display: flex;
-            flex-direction: row;
+            flex-direction: row; /* Par défaut : ligne */
             justify-content: space-around;
             align-items: center;
-         width: 100%;
+            width: 100%;
         }
         .date {
             color: green;
@@ -18,11 +18,10 @@
         }
         .flex2 {
             display: flex;
-            flex-direction: row;
+            flex-direction: row; /* Par défaut : ligne */
         }
-     
+    
         .flex2 img {
-        
             width: 40px;
             height: 40px;
             border-radius: 20%;
@@ -30,62 +29,110 @@
             margin-right: 1%;
             padding: 5%;
         }
+    
         /* Styles pour le menu toggle */
         .toggleMenuButton {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            left: 10px;
             width: 40px;
             height: 40px;
             font-size: 24px;
             cursor: pointer;
+            transition: left 0.3s; /* Transition pour un mouvement fluide */
         }
+
+        .toggleMenuButton.active {
+            position: absolute;
+            top: 10px; 
+            left: 30%; 
+            transform: translateX(-50%); 
+            background-color: aliceblue;
+        }
+        
         .categoryMenu {
+            z-index: 5;
             display: none;
             position: absolute;
-            top: 50px;
-            right: 10px;
+            top: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 10px;
             border-radius: 5px;
         }
+    
         .categoryMenu a {
-            display: block;
             color: black;
             text-decoration: none;
             margin-bottom: 8px;
+            left: 10px;
+            width: auto; /* Laisser la largeur s'ajuster automatiquement */
+            align-items: left;
+            padding: 0.5rem; /* Réduire le padding pour les petits écrans */
+            font-size: 0.8rem; /* Réduire la taille de la police pour les petits écrans */
         }
+    
         .categoryMenu a:hover {
             text-decoration: underline;
+        }
+    
+        /* Media queries pour les petits écrans */
+        @media (max-width: 600px) {
+            .flex {
+                flex-direction: column; /* Passer à la colonne */
+                align-items: flex-start; /* Alignement à gauche */
+            }
+    
+            .flex2 {
+                flex-direction: column; /* Passer à la colonne */
+            }
+    
+            .toggleMenuButton {
+                left: 5px; /* Ajuster la position si nécessaire */
+            }
+    
+            .categoryMenu {
+                top: 5px; /* Ajuster pour plus d'espace */
+                width: 90%; /* Ajuster la largeur du menu pour les petits écrans */
+            }
+    
+            .categoryMenu a {
+                padding: 0.5rem; /* Ajuster le padding pour la lisibilité */
+                font-size: 0.9rem; /* Ajuster la taille de la police */
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="flex">  
-    <a href="#" onclick="loadPage('/codeaccueil1reve')">
+    <a href="#" onclick="loadPage('/codeaccueil')">
         <button class="textimage flex2">1reve </button>
     </a>
     <H2 class="date">Aout 2024</H2>
     <div class="flex2">
         <a href="#" onclick="loadPage('/roadcode')">
-            <button class="plan"><img src="/logo1reve" class="image"><p>Afficher le Plan</p></button>
+            <button class="plan"><img src="/logo" class="image"><p>Afficher le Plan</p></button>
         </a>
       
     </div>
 </div>
 <div>
+
+<!-- Menu des catégories à afficher/masquer -->
+<div>
+    <div id="categoryMenu" class="categoryMenu">
+        <a href="#" onclick="loadPage('/middle')">🗝️ Middleware /  BD</a>
+        <a href="#" onclick="loadPage('/observation')">🖊️ Observations</a>
+        <a href="#" onclick="loadPage('/')"> 🏠 Accueil</a>
+    </div>
+</div>
+
 <!-- Bouton pour afficher/masquer le menu des catégories -->
 <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
 
-<!-- Menu des catégories à afficher/masquer -->
-<div id="categoryMenu" class="categoryMenu">
-
-    <a href="#" onclick="loadPage('/1revemiddle')">🗝️ Middleware /  BD</a>
-    <a href="#" onclick="loadPage('/observation')">🖊️ Observations</a>
-   
-</div>
 </div>
 <script>
     function loadPage(url) {
@@ -98,8 +145,10 @@
         var categoryMenu = document.getElementById('categoryMenu');
         if (categoryMenu.style.display === "none" || categoryMenu.style.display === "") {
             categoryMenu.style.display = "block";
+            this.classList.add('active'); // Ajouter la classe active
         } else {
             categoryMenu.style.display = "none";
+            this.classList.remove('active'); // Retirer la classe active
         }
     });
 </script>

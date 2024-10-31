@@ -28,7 +28,7 @@ app.get('/menu1reve', (req, res) => {
 
 /* => */ 
 
-app.get('/codeaccueil1reve', (req, res) => {
+app.get('/codeaccueil', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
 });
 
@@ -37,8 +37,8 @@ app.get('/roadcode', (req, res) => {
 });
 
 /* +  Toogle  */
-app.get('/1revemiddle', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/softwares/1reve/1revemiddle.html'));
+app.get('/middle', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/softwares/1reve/middle.html'));
 });
 
 app.get('/observation', (req, res) => {
@@ -46,12 +46,9 @@ app.get('/observation', (req, res) => {
 });
 
 /* Media--------------------------------------------------------- */
-app.get('/1reve', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
-}); 
 
 
-app.get('/logo1reve', (req, res) => {
+app.get('/logo', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/media/1reve.jpg'));
 });
 
