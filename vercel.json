@@ -10,11 +10,11 @@
 
     { "src": "/codeschoice", "dest": "/public/pagesotwarepresentation.html" },
 
-    { "src": "/menu1reve", "dest": "/public/softwares/1reve/menu.html" },
-    { "src": "/codeaccueil", "dest": "/public/softwares/1reve/codeaccueil.html" },
+    { "src": "/menu1reve", "dest": "/public/skeleton/menu.html" },
+    { "src": "/codeaccueil", "dest": "/public/skeleton/codeaccueil.html" },
     { "src": "/logicroadcode", "dest": "/public/logicroadcode.html" },
-    { "src": "/middle", "dest": "/public/softwares/1reve/middle.html" },
-    { "src": "/observation", "dest": "/public/softwares/1reve/observation.html" },
+    { "src": "/middle", "dest": "/public/skeleton/middle.html" },
+    { "src": "/observation", "dest": "/public/skeleton/observation.html" },
 
 
     { "src": "/file-content", "dest": "/api/server.js" },

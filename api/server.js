@@ -23,13 +23,13 @@ app.get('/codeschoice', (req, res) => {
 // Menu1reve englobe =>  lien vers codeaccueil + lien vers folders 
 
 app.get('/menu1reve', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/softwares/1reve/menu.html'));
+    res.sendFile(path.join(__dirname, '../public/skeleton/menu.html'));
 });
 
 /* => */ 
 
 app.get('/codeaccueil', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/softwares/1reve/codeaccueil.html'));
+    res.sendFile(path.join(__dirname, '../public/skeleton/codeaccueil.html'));
 });
 
 app.get('/logicroadcode', (req, res) => {
@@ -38,11 +38,11 @@ app.get('/logicroadcode', (req, res) => {
 
 /* +  Toogle  */
 app.get('/middle', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/softwares/1reve/middle.html'));
+    res.sendFile(path.join(__dirname, '../public/skeleton/middle.html'));
 });
 
 app.get('/observation', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/softwares/1reve/observation.html'));
+    res.sendFile(path.join(__dirname, '../public/skeleton/observation.html'));
 });
 
 /* Media--------------------------------------------------------- */
