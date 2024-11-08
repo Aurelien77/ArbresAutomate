@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1reve</title>
+    <style>
+        .flex {
+            display: flex;
+            flex-direction: row; /* Par défaut : ligne */
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+        .date {
+            color: green;
+            font-size: 1rem;
+        }
+        .flex2 {
+            display: flex;
+            flex-direction: row; 
+     
+        }
+    
+        .flex2 img {
+        
+          
+            border-radius: 20%;
+      
+            padding: 10px;
+
+        }
+        h2 {
+
+            position: absolute;
+            right: 10px;
+            top: 10px;
+
+        }
+        .plan {
+    position: absolute;
+    left: 50%; 
+    top: 8px; 
+    transform: translateX(-50%); 
+    width: 60px; 
+    height: 60px; 
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 4px 4px 2px 1px rgba(0, 0, 255, .2);
+    border-radius: 8px; 
+    overflow: hidden; 
+    cursor: pointer;
+    z-index: 1;
+}
+
+.plan:hover {
+    box-shadow: 2px 2px 2px 1px rgba(14, 14, 46, 0.2);
+}
+
+.plan:active {
+    box-shadow: 2px 2px 2px 1px rgba(153, 153, 219, 0.2);
+}
+
+
+.plan img {
+    width: 100%; 
+    height: auto; 
+    object-fit: contain; 
+}  /* Styles pour le menu toggle */
+        .toggleMenuButton {
+    position: fixed; /* Utilisez fixed pour garantir son positionnement */
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: aliceblue; /* Ajoutez une couleur de fond pour tester la visibilité */
+    z-index: 9999; /* Assurez-vous qu’il est au-dessus de tout */
+    transition: left 0.3s;
+}
+
+.toggleMenuButton.active {
+    top: 12px; 
+    left: 29.5%; 
+    transform: translateX(-50%); 
+    background-color: lightblue;
+    z-index: 9999;
+    border-radius: 10%;
+}
+        
+        .categoryMenu {
+            z-index: 10; 
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 0%;
+    width: 30%;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 2px 1px rgba(0, 0, 255, .2);
+    margin-left: -0.5%;
+        }
+    
+        .categoryMenu a {
+            
+            color: black;
+            text-decoration: none;
+            margin-bottom: 8px;
+            width: auto; /* Laisser la largeur s'ajuster automatiquement */
+            align-items: left;
+            padding: 0.5rem; /* Réduire le padding pour les petits écrans */
+            font-size: 0.8rem; /* Réduire la taille de la police pour les petits écrans */
+        }
+    
+        .categoryMenu a:hover {
+            text-decoration: underline;
+        }
+  
+
+        /* Media queries */
+        @media (max-width: 800px) {
+
+            .plan {
+    position: absolute;
+    right: 15px;
+    top:2px;
+    width: 60px; /* Ajustez cette largeur en fonction du design souhaité */
+    height: 60px; /* Assurez-vous que la hauteur est la même pour un carré */
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 4px 4px 2px 1px rgba(0, 0, 255, .2);
+    border-radius: 8px; /* Ajoute un arrondi au bouton */
+    overflow: hidden; /* Empêche le débordement de l'image */
+    cursor: pointer;
+    z-index: 1;
+    
+}
+
+            .flex {
+                flex-direction: column; 
+                align-items: center; 
+            }
+    
+            .flex2 {
+                flex-direction: column; 
+            }
+            .flex2 img {
+            width: 5vw;
+            height: 6vw;
+            border-radius: 20%;
+            margin-left: 1%;
+            margin-right: 1%;
+            padding: 3%;
+        }
+            .toggleMenuButton {
+                left: 0px; 
+          
+            }
+            .toggleMenuButton:active {
+       
+                font-size: 0.5rem;
+            }
+    
+            .categoryMenu {
+                position: fixed;
+                text-align:center;
+                top: 0px; 
+                left: 0%;
+                width: 105%; 
+                margin-left: -2%;
+                height: 10vw;
+            padding-right:0px;
+            z-index: 2;
+            }
+    
+            .categoryMenu a {
+                padding: 0.5rem;
+                font-size: 0.9rem; 
+            }
+
+            .toggleMenuButton.active {
+            position: absolute;
+            top: 0px; 
+            left: 0%; 
+            transform: translateX(0%); 
+            background-color: aliceblue;
+        }
+        
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex">  
+ 
+    <H2 class="date">Aout 2024</H2>
+    <div class="flex2">
+        <a href="#" onclick="loadPage('/logicroadcode')">
+            <img src="/logo" class="plan"><p></p>
+        </a>
+        
+    </div>
+</div>
+<div>
+
+<!-- Menu des catégories à afficher/masquer -->
+<div>
+    <div id="categoryMenu" class="categoryMenu">
+      
+        <button  onclick="loadPage('/middle')">🗝️ Middle/BD</button>
+        <button onclick="loadPage('/observation')">🖊️Obs</button>
+        <button onclick="loadPage('/codeaccueil')">
+          1reve </button>
+       
+
+    </div>
+</div>
+
+<!-- Bouton pour afficher/masquer le menu des catégories -->
+<button id="toggleMenuButton" class="toggleMenuButton">☰</button>
+
+</div>
+<script>
+
+
+
+    function loadPage(url) {
+        // Charger la page dans l'iframe
+        parent.document.getElementById('contentFrame').src = url;
+    }
+
+    // Toggle pour afficher ou masquer le menu des catégories
+    document.getElementById('toggleMenuButton').addEventListener('click', function() {
+    var categoryMenu = document.getElementById('categoryMenu');
+    var isMenuVisible = categoryMenu.style.display === "block";
+
+    // Toggle le menu
+    if (isMenuVisible) {
+        categoryMenu.style.display = "none";
+        this.classList.remove('active');
+    } else {
+        categoryMenu.style.display = "block";
+        this.classList.add('active');
+    }
+
+    // Envoyer un message à la page principale pour afficher ou masquer le bouton "home"
+    parent.postMessage({ action: isMenuVisible ? 'hideHome' : 'showHome' }, '*');
+});
+</script>
+
+</body>
+</html>
