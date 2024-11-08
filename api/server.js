@@ -22,7 +22,7 @@ app.get('/codeschoice', (req, res) => {
 
 // Menu1reve englobe =>  lien vers codeaccueil + lien vers folders 
 
-app.get('/menu1reve', (req, res) => {
+app.get('/menu', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/skeleton/menu.html'));
 });
 

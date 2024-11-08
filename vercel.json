@@ -10,7 +10,7 @@
 
     { "src": "/codeschoice", "dest": "/public/pagesotwarepresentation.html" },
 
-    { "src": "/menu1reve", "dest": "/public/skeleton/menu.html" },
+    { "src": "/menu", "dest": "/public/skeleton/menu.html" },
     { "src": "/codeaccueil", "dest": "/public/skeleton/codeaccueil.html" },
     { "src": "/logicroadcode", "dest": "/public/logicroadcode.html" },
     { "src": "/middle", "dest": "/public/skeleton/middle.html" },

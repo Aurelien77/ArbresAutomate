@@ -93,14 +93,22 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        .home {
+z-index: 0;
+            position: fixed;
+            right: 25%;
+            top: 5px;
+            font-size: 1.5rem;
+        }
     </style>
     <link rel="icon" href="./media/code_book.ico">
 </head>
 <body>
+    
 <div class="containeriframe"> 
-
+    <button onclick="loadHomePage()" class="home">🏠</button>
     <div class="content">
-        <iframe class="framemenu" id="FrameMenu" frameborder="0" src="/menu1reve"></iframe>
+        <iframe class="framemenu" id="FrameMenu" frameborder="0" src="/menu"></iframe>
         <iframe id="contentFrame" class="framebody" frameborder="0" src="/codeaccueil"></iframe>
     </div>
 </div>
@@ -126,6 +134,16 @@
 
     function refresh() {
         parent.location.reload();
+    }
+
+    function loadHomePage() {
+    // Remplacer l'URL actuelle sans recharger la page (retirer "codeschoice" de l'URL)
+    const currentUrl = window.location.href;
+    const newUrl = currentUrl.replace('/codeschoice', '/'); // Retire '/codeschoice' de l'URL
+    window.history.replaceState({}, '', newUrl);  // Met à jour l'URL sans recharger la page
+    
+   
+    location.reload();  
     }
 </script>
 

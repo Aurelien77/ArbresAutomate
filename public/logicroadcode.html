@@ -6,7 +6,7 @@
     <link rel="shortcut icon" type="image/ico" href="./media/code_book.ico"/>
     <title>Arbre de choix { |\||I||/||||__\\||||\||\||I||/||||\/||||\| }</title>
     <style>
-        /* Styles généraux pour une mise en page adaptative */
+        /* Styles généraux */
         body, html {
             margin: 0;
             padding: 0;
@@ -25,11 +25,11 @@
             padding: 1%;
         }
 
-        /* Menu qui reste dans l'écran */
+        /* Menu de navigation */
         .menu {
             flex: 1;
             min-width: 200px;
-            max-width: 30vw; /* Adaptation de la largeur du menu */
+            max-width: 30vw;
             overflow-y: auto;
             padding: 1%;
             color: black;
@@ -37,10 +37,10 @@
             font-size: 1.2rem;
         }
 
-        /* Contenu du fichier avec redimensionnement */
+        /* Affichage du contenu du fichier */
         .display {
             flex: 3;
-            max-width: 70vw; /* Adaptation pour rester dans l’écran */
+           /* max-width: 70vw;*/
             overflow-y: auto;
             padding: 1%;
             font-size: 1rem;
@@ -48,7 +48,6 @@
             box-sizing: border-box;
             display: flex;
             align-items: top;
-           
         }
 
         /* Style des fichiers */
@@ -65,109 +64,113 @@
             box-sizing: border-box;
         }
 
-        /* Contenu média adaptable */
+        /* Classe plein écran */
+        .fullscreen {
+            position: fixed;
+         /*    top: 0; */
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1000;
+            padding: 2%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        /* Style pour contenu média (images et vidéos) */
         .media-content img, .media-content video {
             max-width: 100%;
-            max-height: 90vh; /* Pour une bonne adaptation à l’écran */
+            max-height: 90vh;
             width: auto;
             height: auto;
             border-radius: 8px;
         }
-        /* Adaptation de l'interface en fonction de la taille de l'écran */
+
+        /* Styles pour petits écrans */
         @media (max-width: 768px) {
-            .menu {
-                font-size: 1rem;
-            }
-            .file {
-                font-size: 0.9rem;
-            }
+            .menu { font-size: 1rem; }
+            .file { font-size: 0.9rem; }
         }
 
         @media (max-width: 480px) {
-            .menu {
-                font-size: 0.9rem;
-            }
-            .display {
-                font-size: 0.8rem;
-                padding: 1%;
-            }
+            .menu { font-size: 0.9rem; }
+            .display { font-size: 0.8rem; padding: 1%; }
         }
     </style>
-
-
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
+    <button onclick="reveal()" id="fullscreen">Fullscreen</button>
     <div class="ajustementright">
         <div id="fileExplorer" class="menu">...Chargement des dossiers</div>
-        <pre id="fileContent" class="display"></pre>
+        <pre id="fileContent" class="display file"></pre>
     </div>
     <script>
-     function loadFilesAndFolders(data, parentElement, currentPath, isOpen) {
-    var ul = document.createElement('ul');
-    parentElement.appendChild(ul);
-
-    data.forEach(item => {
-        var li = document.createElement('li');
-        const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
-
-        if (item.type === 'dossier') {
-            li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
-            li.classList.add('folder');
-
-            li.isOpen = isOpen;
-
-            li.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.isOpen = !this.isOpen;
-                this.querySelector('.nested').classList.toggle('active');
-                this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
-            });
-        } else if (item.type === 'fichier') {
-            const fileExtension = item.name.split('.').pop().toLowerCase();
-            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
-            const isVideo = ['mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv'].includes(fileExtension);
-
-            const link = document.createElement('a');
-            link.href = '#';
-            link.innerHTML = `<span class="icon">${isImage ? '🖼️' : isVideo ? '🎦' : '📃'}</span>${item.name}`;
-            link.classList.add('file-link');
-
-            if (isImage) {
-                link.classList.add('image-link');
-            } else if (isVideo) {
-                link.classList.add('video-link');
-            }
-
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                loadFileContent(itemPath);
-            });
-            li.appendChild(link);
+        // Fonction pour basculer en plein écran
+        function reveal() {
+            const fileContent = document.getElementById('fileContent');
+            fileContent.classList.toggle('fullscreen');
         }
 
-        ul.appendChild(li);
-
-        if (item.contenu && item.contenu.length > 0) {
-            const nestedUl = document.createElement('ul');
-            nestedUl.classList.add('nested');
-
-            if (li.isOpen) {
-                nestedUl.classList.add('active');
+        // Chargement et affichage de l'arborescence des dossiers
+        async function loadFolderStructure() {
+            try {
+                const response = await fetch("/folder-structure");
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const folderStructure = await response.json();
+                displayFolderStructure(folderStructure);
+            } catch (error) {
+                console.error("Erreur lors du chargement de la structure des dossiers :", error);
             }
-
-            li.appendChild(nestedUl);
-            loadFilesAndFolders(item.contenu, nestedUl, itemPath, li.isOpen);
         }
-    });
-}
 
+        // Fonction pour afficher l'arborescence des dossiers
+        function displayFolderStructure(folderStructure) {
+            const fileExplorer = document.getElementById("fileExplorer");
+            fileExplorer.innerHTML = '';
+            loadFilesAndFolders(folderStructure, fileExplorer, '');
+        }
+
+        // Fonction pour créer et gérer l'affichage des dossiers et fichiers
+        function loadFilesAndFolders(data, parentElement, currentPath) {
+            const ul = document.createElement('ul');
+            parentElement.appendChild(ul);
+
+            data.forEach(item => {
+                const li = document.createElement('li');
+                const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+
+                if (item.type === 'dossier') {
+                    li.innerHTML = `<span class="icon">📁</span><span>${item.name}</span>`;
+                    li.classList.add('folder');
+                    li.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.querySelector('.nested').classList.toggle('active');
+                        this.querySelector('.icon').textContent = this.querySelector('.nested').classList.contains('active') ? '📂' : '📁';
+                    });
+                } else if (item.type === 'fichier') {
+                    const fileLink = document.createElement('a');
+                    fileLink.href = '#';
+                    fileLink.innerHTML = `<span class="icon">📃</span>${item.name}`;
+                    fileLink.classList.add('file-link');
+                    fileLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        loadFileContent(itemPath);
+                    });
+                    li.appendChild(fileLink);
+                }
+
+                ul.appendChild(li);
+
+                if (item.contenu && item.contenu.length > 0) {
+                    const nestedUl = document.createElement('ul');
+                    nestedUl.classList.add('nested');
+                    li.appendChild(nestedUl);
+                    loadFilesAndFolders(item.contenu, nestedUl, itemPath);
+                }
+            });
+        }
         async function loadFolderStructure() {
             try {
                 const response = await fetch("/folder-structure");
