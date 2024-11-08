@@ -4,7 +4,7 @@ const path = require('path');
 const mime = require('mime-types');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // Fonction pour récupérer la structure des dossiers
 function getFolderStructure(dirPath) {
@@ -54,7 +54,7 @@ function getFolderStructure(dirPath) {
         return structureItem;
     });
 }
-
+// 
 app.get('/', (req, res) => {
     const folderStructure = getFolderStructure(path.join(__dirname, '../apifolders'));
 
