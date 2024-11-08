@@ -24,6 +24,7 @@
 
         /* Container principal qui prend toute la hauteur */
         .containeriframe {
+       
             display: flex;
             flex-direction: row;
             background-repeat: no-repeat;
@@ -93,27 +94,52 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .home {
-z-index: 0;
-            position: fixed;
-            right: 25%;
-            top: 5px;
-            font-size: 1.5rem;
+        #home {
+          
+            width: 20px;
+            height: 20px;
+            display: none;
+            z-index: 2;
+    position: fixed;
+   left: 18.5%;
+    top: 13px;
+    font-size: 1.5rem;
+    border: none;
         }
+            /* Media queries */
+            @media (max-width: 800px) {
+                #home {
+            display: none;
+            z-index: 2;
+    position: fixed;
+    right: 0;
+    left: none;
+    top: 5px;
+    font-size: 1.5rem;
+
+border: none;
+        }
+            }
     </style>
     <link rel="icon" href="./media/code_book.ico">
 </head>
 <body>
     
 <div class="containeriframe"> 
-    <button onclick="loadHomePage()" class="home">🏠</button>
+    <button onclick="loadHomePage()" id="home">🏠</button>
     <div class="content">
         <iframe class="framemenu" id="FrameMenu" frameborder="0" src="/menu"></iframe>
         <iframe id="contentFrame" class="framebody" frameborder="0" src="/codeaccueil"></iframe>
     </div>
 </div>
-
-<script>
+<!-- Ecouteur d'evenements pour faire apparaitre le bouton home  -->
+<script>window.addEventListener('message', function(event) {
+    if (event.data.action === 'showHome') {
+        document.getElementById('home').style.display = 'block'; // Affiche le bouton
+    } else if (event.data.action === 'hideHome') {
+        document.getElementById('home').style.display = 'none'; // Masque le bouton
+    }
+})
     function adjustIframeHeight() {
         var iframes = document.querySelectorAll('iframe');
         iframes.forEach(function(iframe) {
