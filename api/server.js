@@ -5,19 +5,27 @@ const mime = require('mime-types');
 
 const app = express();
 const port = process.env.PORT || 3001;
-
+// Fonction pour récupérer les images dans un dossier
+function getImagesFromFolder(folderPath) {
+    try {
+        const files = fs.readdirSync(folderPath);
+        return files.filter(file => {
+            // Vérifier si le fichier est une image en fonction de son extension
+            return /\.(jpg|jpeg|png|gif|bmp)$/i.test(file);
+        });
+    } catch (err) {
+        console.error(`Erreur lors de la lecture du dossier ${folderPath}:`, err);
+        return [];  // Retourner un tableau vide en cas d'erreur
+    }
+}
 // Fonction pour récupérer la structure des dossiers
 function getFolderStructure(dirPath) {
-    console.log('Scanner le dossier :', dirPath);
-
     if (!fs.existsSync(dirPath)) {
         console.error('Le dossier n\'existe pas ou ne peut pas être accédé :', dirPath);
         return [];
     }
 
     const items = fs.readdirSync(dirPath);
-    console.log('Éléments trouvés dans', dirPath, items);
-
     return items.map(item => {
         const itemPath = path.join(dirPath, item);
         const isDirectory = fs.lstatSync(itemPath).isDirectory();
@@ -29,25 +37,6 @@ function getFolderStructure(dirPath) {
         };
 
         if (isDirectory) {
-            // Chercher l'image dans le dossier 'config2850/picture'
-            const pictureDir = path.join(itemPath, 'config2850', 'pictures2850');
-            let imageUrl = '';
-
-            if (fs.existsSync(pictureDir)) {
-                const filesInPictureDir = fs.readdirSync(pictureDir);
-                // Rechercher des images (vous pouvez ajuster les extensions que vous cherchez)
-                const imageFile = filesInPictureDir.find(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
-
-                if (imageFile) {
-                    imageUrl = `/apifolders/${item}/config2850/pictures2850/${imageFile}`;
-                }
-            }
-
-            structureItem.imageUrl = imageUrl;  // Ajout de l'image pour la carte
-            const indexPath = path.join(itemPath, 'index.html');
-            if (fs.existsSync(indexPath)) {
-                structureItem.url = `/apifolders/${item}/index.html`;
-            }
             structureItem.contenu = getFolderStructure(itemPath);
         }
 
@@ -55,20 +44,39 @@ function getFolderStructure(dirPath) {
     });
 }
 
-// Route principale pour afficher les applications (accueil)
+
+app.use('/app/:appName/config2850/pictures2850', (req, res, next) => {
+    const appName = req.params.appName;
+    const pictureFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'pictures2850');
+
+    if (!fs.existsSync(pictureFolderPath)) {
+        return res.status(404).send('Le dossier des images n\'existe pas');
+    }
+
+    express.static(pictureFolderPath)(req, res, next);
+});
+
 app.get('/', (req, res) => {
     const folderStructure = getFolderStructure(path.join(__dirname, '../apifolders'));
 
     let cardsHtml = '';
-
     folderStructure.forEach(item => {
         if (item.type === 'dossier') {
             const appUrl = `/app/${item.name}`;
-            const imageUrl = item.imageUrl ? `background-image: url('${item.imageUrl}');` : '';  // Si une image existe
-
-            // Génération du HTML pour chaque carte
+            const imageFolderPath = path.join(__dirname, '../apifolders', item.name, 'config2850', 'pictures2850');
+    
+            // Liste des fichiers image dans le dossier
+            const images = getImagesFromFolder(imageFolderPath);
+            let imageUrl = '';
+    
+            if (images.length > 0) {
+                // Utiliser la première image trouvée dans le dossier comme image de fond
+                imageUrl = `/app/${item.name}/config2850/pictures2850/${images[0]}`;
+            }
+    
+            // Ajouter l'image comme fond d'écran pour la carte
             cardsHtml += `
-                <div class="card" style="${imageUrl}">
+                <div class="card" style="background-image: url('${imageUrl}');">
                     <a href="${appUrl}">
                         <h2>${item.name}</h2>
                         <p>Voir la structure de l'application</p>
@@ -97,12 +105,12 @@ app.get('/', (req, res) => {
                 border-radius: 8px;
                 box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
                 transition: transform 0.3s ease-in-out;
-                background-size: cover; /* Pour ajuster l'image de fond */
-                background-position: center; /* Centrer l'image */
+                background-size: cover;
+                background-position: center;
             }
             .card h2 {
                 font-size: 1.5rem;
-                color: white;  /* Assurez-vous que le texte est visible */
+                color: white;
             }
             .card p {
                 font-size: 1rem;
@@ -122,6 +130,13 @@ app.get('/', (req, res) => {
     res.send(htmlContent);
 });
 
+
+app.use('/app/:appName/config2850', express.static(path.join(__dirname, '../apifolders')));
+
+
+
+
+
 // Route principale pour l'application avec menu et iframe
 app.get('/app/:appName', (req, res) => {
     const appName = req.params.appName;
@@ -131,7 +146,14 @@ app.get('/app/:appName', (req, res) => {
         return res.status(404).send('Application non trouvée');
     }
 
-    // On garde seulement le menu et l'iframe
+    // Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850
+    const configPath = path.join(appPath, 'config2850');
+    const configDirs = fs.existsSync(configPath) ? fs.readdirSync(configPath).filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory()) : [];
+
+    const menuButtonsHtml = configDirs.map(dir => {
+        return `<button onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</button>`;
+    }).join(' ');
+
     const htmlContent = `
        <style>
         .menu {
@@ -168,14 +190,10 @@ app.get('/app/:appName', (req, res) => {
        </style>
        <div class="menu">
            <h1>${appName}</h1>
-           <button onclick="loadPage('/app/${appName}/config2850/middle')">🗝️ Middle</button>
-           <button onclick="loadPage('/app/${appName}/folders/end')">🗝️ BD</button>
-           <button onclick="loadPage('/app/${appName}/config2850/observations')">🖊️ Obs</button>
-           <button onclick="loadPage('/app/${appName}/folders')">Arbre</button>
-
-
+           ${menuButtonsHtml}
+            <button onclick="loadPage('/app/${appName}/config2850')">Arbre</button>  
        </div>
-       <iframe id="content-frame" src="/app/${appName}/folders" frameborder="0"></iframe>
+       <iframe id="content-frame" src="/app/${appName}/config2850" frameborder="0"></iframe>
        <script>
            function loadPage(url) {
                document.getElementById('content-frame').src = url;
@@ -185,77 +203,19 @@ app.get('/app/:appName', (req, res) => {
 
     res.send(htmlContent);
 });
-// Route pour afficher les fichiers de middle
-app.get('/app/:appName/config2850/middle', (req, res) => {
+
+// Route pour afficher le contenu des sous-dossiers dans l'iframe (par défaut dans config2850)
+app.get('/app/:appName/config2850', (req, res) => {
     const appName = req.params.appName;
-    const middlePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'middle');
-
-    // Vérifiez si le répertoire existe et renvoyer son contenu
-    if (fs.existsSync(middlePath) && fs.lstatSync(middlePath).isDirectory()) {
-        const items = fs.readdirSync(middlePath);
-
-        let htmlContent = '<ul>';
-        items.forEach(item => {
-            htmlContent += `<li><a href="/app/${appName}/config2850/middle/${item}">${item}</a></li>`;
-        });
-        htmlContent += '</ul>';
-
-        res.send(htmlContent);
-    } else {
-        res.status(404).send('Dossier "middle" non trouvé');
-    }
-});
-
-// Route pour afficher les fichiers d'observation
-app.get('/app/:appName/config2850/observations', (req, res) => {
-    const appName = req.params.appName;
-    const middlePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'observations');
-
-    // Vérifiez si le répertoire existe et renvoyer son contenu
-    if (fs.existsSync(middlePath) && fs.lstatSync(middlePath).isDirectory()) {
-        const items = fs.readdirSync(middlePath);
-
-        let htmlContent = '<ul>';
-        items.forEach(item => {
-            htmlContent += `<li><a href="/app/${appName}/config2850/observations/${item}">${item}</a></li>`;
-        });
-        htmlContent += '</ul>';
-
-        res.send(htmlContent);
-    } else {
-        res.status(404).send('Dossier "observations" non trouvé');
-    }
-});
-
-// Route pour afficher la structure des dossiers dans l'iframe (racine)
-app.get('/app/:appName/folders', (req, res) => {
-    const appName = req.params.appName;
-    const appPath = path.join(__dirname, '../apifolders', appName);
-
-    if (!fs.existsSync(appPath) || !fs.lstatSync(appPath).isDirectory()) {
-        return res.status(404).send('Dossier non trouvé');
-    }
-
-    const folderStructure = getFolderStructure(appPath);
+    const configPath = path.join(__dirname, '../apifolders', appName, 'config2850');
+    const configDirs = fs.existsSync(configPath) ? fs.readdirSync(configPath).filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory()) : [];
 
     let htmlContent = '<ul>';
 
-    const generateFolderStructure = (folder, currentPath = '') => {
-        if (folder.type === 'dossier') {
-            htmlContent += `<li><strong>${folder.name}</strong><ul>`;
-            folder.contenu.forEach(item => {
-                if (item.type === 'dossier') {
-                    const newPath = path.join(currentPath, folder.name, item.name).replace(/\\/g, '/'); // assure le format URL
-                    htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/folders/${newPath}')">${item.name}</a></li>`;
-                } else if (item.type === 'fichier') {
-                    htmlContent += `<li>${item.name}</li>`;
-                }
-            });
-            htmlContent += '</ul></li>';
-        }
-    };
+    configDirs.forEach(dir => {
+        htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</a></li>`;
+    });
 
-    folderStructure.forEach(item => generateFolderStructure(item));
     htmlContent += '</ul>';
 
     res.send(`
@@ -281,33 +241,40 @@ app.get('/app/:appName/folders', (req, res) => {
     `);
 });
 
-// Middleware pour servir des fichiers dynamiquement depuis tous les dossiers dans 'apifolders'
-fs.readdirSync(path.join(__dirname, '../apifolders')).forEach(folder => {
-    const folderPath = path.join(__dirname, '../apifolders', folder);
+// Route pour afficher le contenu d'un fichier ou d'un dossier spécifique dans config2850
+app.get('/app/:appName/config2850/:dirName', (req, res) => {
+    const { appName, dirName } = req.params;
+    const dirPath = path.join(__dirname, '../apifolders', appName, 'config2850', dirName);
 
-    // Vérifie que c'est bien un dossier
-    if (fs.lstatSync(folderPath).isDirectory()) {
-        app.use(`/apifolders/${folder}`, express.static(folderPath));
+    if (!fs.existsSync(dirPath)) {
+        return res.status(404).send('Dossier non trouvé');
     }
-});
 
-// Route pour récupérer le contenu d'un fichier dans un dossier
-app.get('/app/:appName/folders/*', (req, res) => {
-    const appName = req.params.appName;
-    const filePath = path.join(__dirname, '../apifolders', appName, req.params[0]);
-
-    if (fs.existsSync(filePath)) {
-        const mimeType = mime.lookup(filePath) || 'application/octet-stream';
-        res.setHeader('Content-Type', mimeType);
-        fs.createReadStream(filePath).pipe(res);
-    } else {
-        res.status(404).send('Fichier non trouvé');
+    // Si c'est un fichier, le renvoyer
+    const stats = fs.lstatSync(dirPath);
+    if (stats.isFile()) {
+        const fileType = mime.lookup(dirPath);
+        res.type(fileType);
+        return res.sendFile(dirPath);
     }
+
+    // Si c'est un dossier, afficher son contenu
+    const folderStructure = getFolderStructure(dirPath);
+    let htmlContent = '<ul>';
+
+    folderStructure.forEach(item => {
+        if (item.type === 'dossier') {
+            htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dirName}/${item.name}')">${item.name}</a></li>`;
+        } else {
+            htmlContent += `<li>${item.name}</li>`;
+        }
+    });
+
+    htmlContent += '</ul>';
+
+    res.send(htmlContent);
 });
 
 app.listen(port, () => {
     console.log(`Le serveur tourne sur http://localhost:${port}`);
 });
-
-
-module.exports = app;
