@@ -30,7 +30,7 @@ function getFolderStructure(dirPath) {
 
         if (isDirectory) {
             // Chercher l'image dans le dossier 'config2850/picture'
-            const pictureDir = path.join(itemPath, 'config2850', 'picture');
+            const pictureDir = path.join(itemPath, 'config2850', 'pictures2850');
             let imageUrl = '';
 
             if (fs.existsSync(pictureDir)) {
@@ -39,7 +39,7 @@ function getFolderStructure(dirPath) {
                 const imageFile = filesInPictureDir.find(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
 
                 if (imageFile) {
-                    imageUrl = `/apifolders/${item}/config2850/picture/${imageFile}`;
+                    imageUrl = `/apifolders/${item}/config2850/pictures2850/${imageFile}`;
                 }
             }
 
@@ -54,7 +54,8 @@ function getFolderStructure(dirPath) {
         return structureItem;
     });
 }
-// 
+
+// Route principale pour afficher les applications (accueil)
 app.get('/', (req, res) => {
     const folderStructure = getFolderStructure(path.join(__dirname, '../apifolders'));
 
@@ -121,44 +122,163 @@ app.get('/', (req, res) => {
     res.send(htmlContent);
 });
 
-
-
-// Route pour afficher la structure d'un dossier spécifique
+// Route principale pour l'application avec menu et iframe
 app.get('/app/:appName', (req, res) => {
     const appName = req.params.appName;
     const appPath = path.join(__dirname, '../apifolders', appName);
 
-    // Vérifier si le dossier existe
     if (!fs.existsSync(appPath)) {
         return res.status(404).send('Application non trouvée');
     }
 
-    // Récupérer la structure de l'application choisie
+    // On garde seulement le menu et l'iframe
+    const htmlContent = `
+       <style>
+        .menu {
+            display: flex;
+            background-color: white;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+            padding: 10px;
+        }
+        .menu h1 {
+            margin-right: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        .menu button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .menu button:hover {
+            background-color: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+       </style>
+       <div class="menu">
+           <h1>${appName}</h1>
+           <button onclick="loadPage('/app/${appName}/config2850/middle')">🗝️ Middle</button>
+           <button onclick="loadPage('/app/${appName}/folders/end')">🗝️ BD</button>
+           <button onclick="loadPage('/app/${appName}/config2850/observations')">🖊️ Obs</button>
+           <button onclick="loadPage('/app/${appName}/folders')">Arbre</button>
+
+
+       </div>
+       <iframe id="content-frame" src="/app/${appName}/folders" frameborder="0"></iframe>
+       <script>
+           function loadPage(url) {
+               document.getElementById('content-frame').src = url;
+           }
+       </script>
+    `;
+
+    res.send(htmlContent);
+});
+// Route pour afficher les fichiers de middle
+app.get('/app/:appName/config2850/middle', (req, res) => {
+    const appName = req.params.appName;
+    const middlePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'middle');
+
+    // Vérifiez si le répertoire existe et renvoyer son contenu
+    if (fs.existsSync(middlePath) && fs.lstatSync(middlePath).isDirectory()) {
+        const items = fs.readdirSync(middlePath);
+
+        let htmlContent = '<ul>';
+        items.forEach(item => {
+            htmlContent += `<li><a href="/app/${appName}/config2850/middle/${item}">${item}</a></li>`;
+        });
+        htmlContent += '</ul>';
+
+        res.send(htmlContent);
+    } else {
+        res.status(404).send('Dossier "middle" non trouvé');
+    }
+});
+
+// Route pour afficher les fichiers d'observation
+app.get('/app/:appName/config2850/observations', (req, res) => {
+    const appName = req.params.appName;
+    const middlePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'observations');
+
+    // Vérifiez si le répertoire existe et renvoyer son contenu
+    if (fs.existsSync(middlePath) && fs.lstatSync(middlePath).isDirectory()) {
+        const items = fs.readdirSync(middlePath);
+
+        let htmlContent = '<ul>';
+        items.forEach(item => {
+            htmlContent += `<li><a href="/app/${appName}/config2850/observations/${item}">${item}</a></li>`;
+        });
+        htmlContent += '</ul>';
+
+        res.send(htmlContent);
+    } else {
+        res.status(404).send('Dossier "observations" non trouvé');
+    }
+});
+
+// Route pour afficher la structure des dossiers dans l'iframe (racine)
+app.get('/app/:appName/folders', (req, res) => {
+    const appName = req.params.appName;
+    const appPath = path.join(__dirname, '../apifolders', appName);
+
+    if (!fs.existsSync(appPath) || !fs.lstatSync(appPath).isDirectory()) {
+        return res.status(404).send('Dossier non trouvé');
+    }
+
     const folderStructure = getFolderStructure(appPath);
 
-    let htmlContent = `<h1>Structure de l'application: ${appName}</h1><ul>`;
+    let htmlContent = '<ul>';
 
-    // Fonction récursive pour afficher les fichiers et sous-dossiers
-    const generateFolderStructure = (folder) => {
+    const generateFolderStructure = (folder, currentPath = '') => {
         if (folder.type === 'dossier') {
             htmlContent += `<li><strong>${folder.name}</strong><ul>`;
             folder.contenu.forEach(item => {
                 if (item.type === 'dossier') {
-                    htmlContent += `<li><a href="/app/${appName}/${folder.name}/${item.name}">${item.name}</a></li>`;
-                    generateFolderStructure(item);  // Appel récursif pour sous-dossiers
+                    const newPath = path.join(currentPath, folder.name, item.name).replace(/\\/g, '/'); // assure le format URL
+                    htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/folders/${newPath}')">${item.name}</a></li>`;
                 } else if (item.type === 'fichier') {
-                    htmlContent += `<li><a href="/app/${appName}/${folder.name}/${item.name}">${item.name}</a></li>`;
+                    htmlContent += `<li>${item.name}</li>`;
                 }
             });
             htmlContent += '</ul></li>';
         }
     };
 
-    // Générer la structure pour chaque dossier
     folderStructure.forEach(item => generateFolderStructure(item));
-
     htmlContent += '</ul>';
-    res.send(htmlContent);
+
+    res.send(`
+        <style>
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            li {
+                margin: 5px 0;
+                font-family: Arial, sans-serif;
+            }
+            a {
+                text-decoration: none;
+                color: #007bff;
+                cursor: pointer;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+        ${htmlContent}
+    `);
 });
 
 // Middleware pour servir des fichiers dynamiquement depuis tous les dossiers dans 'apifolders'
@@ -171,28 +291,23 @@ fs.readdirSync(path.join(__dirname, '../apifolders')).forEach(folder => {
     }
 });
 
-// Route pour récupérer le contenu d'un fichier spécifié par son chemin
-app.get('/file-content', (req, res) => {
-    const filePath = req.query.filePath;
-    if (!filePath) {
-        return res.status(400).send('Chemin du fichier non spécifié');
-    }
+// Route pour récupérer le contenu d'un fichier dans un dossier
+app.get('/app/:appName/folders/*', (req, res) => {
+    const appName = req.params.appName;
+    const filePath = path.join(__dirname, '../apifolders', appName, req.params[0]);
 
-    const absoluteFilePath = path.join(__dirname, '../apifolders', filePath);
-    fs.stat(absoluteFilePath, (err, stats) => {
-        if (err || !stats.isFile()) {
-            return res.status(404).send('Fichier introuvable');
-        }
-        const mimeType = mime.lookup(absoluteFilePath) || 'application/octet-stream';
+    if (fs.existsSync(filePath)) {
+        const mimeType = mime.lookup(filePath) || 'application/octet-stream';
         res.setHeader('Content-Type', mimeType);
-        const readStream = fs.createReadStream(absoluteFilePath);
-        readStream.pipe(res);
-    });
+        fs.createReadStream(filePath).pipe(res);
+    } else {
+        res.status(404).send('Fichier non trouvé');
+    }
 });
 
-// Serveur Node.js en écoute
 app.listen(port, () => {
-    console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
+    console.log(`Le serveur tourne sur http://localhost:${port}`);
 });
+
 
 module.exports = app;
