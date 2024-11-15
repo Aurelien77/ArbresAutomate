@@ -88,6 +88,7 @@ app.get('/', (req, res) => {
 
     const htmlContent = `
         <style>
+     
             .card-container {
                 display: flex;
                 flex-wrap: wrap;
@@ -121,7 +122,6 @@ app.get('/', (req, res) => {
             }
         </style>
 
-        <p>Voici la liste des applications disponibles :</p>
         <div class="card-container">
             ${cardsHtml}
         </div>
@@ -151,54 +151,155 @@ app.get('/app/:appName', (req, res) => {
     const configDirs = fs.existsSync(configPath) ? fs.readdirSync(configPath).filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory()) : [];
 
     const menuButtonsHtml = configDirs.map(dir => {
-        return `<button onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</button>`;
+        return `<button onclick="loadPage('/app/${appName}/config2850/${dir}')" data-url="/app/${appName}/config2850/${dir}">📁${dir}</button>
+`;
     }).join(' ');
 
     const htmlContent = `
-       <style>
-        .menu {
-            display: flex;
-            background-color: white;
-            justify-content: center;
-            gap: 15px;
-            align-items: center;
-            padding: 10px;
+      <style>
+      
+       .iframeview {
+    display: flex;
+    gap: 10px; /* Espacement entre les iframes */
+}
+
+.iframeview iframe {
+    flex: 1;
+    height: 600px;
+    border: 1px solid #ddd;
+}
+    h1{
+    color:white;
+    }
+    .toggleMenuButton {
+        position: fixed;
+        top: 5px;
+        right: 20px;
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+        background-color: #4CAF50; /* Couleur verte */
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 100;
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Effet lumineux */
+    }
+
+    .toggleMenuButton:hover {
+        background-color: #45a049;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 1); /* Effet lumineux au survol */
+        transform: scale(1.1); /* Légère agrandissement au survol */
+    }
+
+    /* Menu caché par défaut */
+    .categoryMenu {
+        position: fixed;
+        top: -150px; /* Hors de l'écran en haut */
+        left: 0;
+        width: 100%; /* Le menu prend toute la largeur */
+        height: 150px; /* Hauteur du menu */
+        background-color: #333; /* Couleur sombre pour le fond */
+        transition: top 0.3s ease-in-out; /* Animation pour le déploiement */
+        z-index: 50;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Ombre pour le menu */
+    }
+
+    .categoryMenu a {
+        display: block;
+        padding: 12px;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .categoryMenu a:hover {
+        background-color: #575757; /* Effet hover des liens du menu */
+    }
+
+    /* Activer le menu lorsqu'il est ouvert */
+    .categoryMenu.active {
+        top: 0; /* Déplace le menu vers le haut */
+    }
+
+    /* Style pour le contenu principal */
+    iframe {
+        width: 100%;
+        height: 600px;
+        border: 1px solid #ddd;
+        margin-top: 20px;
+    }
+        #content-frame {
+          margin-top: 35px;
         }
-        .menu h1 {
-            margin-right: 20px;
-            font-size: 1.5rem;
-            color: #333;
-        }
-        .menu button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .menu button:hover {
-            background-color: #0056b3;
-        }
-        iframe {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            margin-top: 20px;
-        }
-       </style>
-       <div class="menu">
-           <h1>${appName}</h1>
+          #titre{
+         margin-top: 110px;
+          }
+</style>
+       <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
+
+     <div id="categoryMenu" class="categoryMenu">
+          
            ${menuButtonsHtml}
+    
             <button onclick="loadPage('/app/${appName}/config2850')">Arbre</button>  
+                    <h1 id="titre" >${appName}</h1>
        </div>
+       <div class="iframeview">
        <iframe id="content-frame" src="/app/${appName}/config2850" frameborder="0"></iframe>
-       <script>
-           function loadPage(url) {
-               document.getElementById('content-frame').src = url;
-           }
-       </script>
+ <iframe id="content-frame-view" src="" frameborder="0"></iframe>
+<div>
+  <script>
+  // Fonction pour charger une page dans l'iframe appropriée
+  function loadPage(url, type = 'dossier') {
+    const iframeView = document.getElementById('content-frame-view');
+    const iframe = document.getElementById('content-frame');
+
+    if (type === 'fichier') {
+        // Vérification du type MIME et chargement approprié
+        fetch(url)
+            .then(response => {
+                const contentType = response.headers.get("Content-Type");
+                if (contentType.includes("image") || contentType.includes("video") || contentType.includes("audio")) {
+                    // Si c'est une image, vidéo ou audio, afficher dans l'iframe
+                    iframeView.src = url; // Charger l'image ou fichier multimédia
+                } else if (contentType.includes("application/pdf")) {
+                    // Si c'est un PDF, on peut l'afficher dans l'iframe
+                    iframeView.src = url;
+                } else {
+                    // Si c'est un autre type de fichier (texte, etc.), on peut l'ouvrir dans une nouvelle page ou iframe
+                    iframeView.src = url; 
+                }
+            })
+            .catch(error => console.error('Erreur lors du chargement du fichier:', error));
+    } else {
+        // Si c'est un dossier, charger la structure du dossier
+        iframe.src = url; // Charger le dossier dans la première iframe
+    }
+  }
+
+  // Fonction pour basculer l'affichage du menu
+  const toggleMenuButton = document.getElementById('toggleMenuButton');
+  const categoryMenu = document.getElementById('categoryMenu');
+
+  toggleMenuButton.addEventListener('click', function () {
+      categoryMenu.classList.toggle('active');
+  });
+
+  // Fermer le menu après clic sur un bouton
+  const menuButtons = document.querySelectorAll('.categoryMenu button');
+  menuButtons.forEach(button => {
+      button.addEventListener('click', () => {
+          categoryMenu.classList.remove('active');
+      });
+  });
+</script>
+
+
     `;
 
     res.send(htmlContent);
@@ -213,8 +314,9 @@ app.get('/app/:appName/config2850', (req, res) => {
     let htmlContent = '<ul>';
 
     configDirs.forEach(dir => {
-        htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</a></li>`;
+        htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dir}', 'dossier')">📁${dir}</a></li>`;
     });
+    
 
     htmlContent += '</ul>';
 
@@ -241,39 +343,59 @@ app.get('/app/:appName/config2850', (req, res) => {
     `);
 });
 
-// Route pour afficher le contenu d'un fichier ou d'un dossier spécifique dans config2850
-app.get('/app/:appName/config2850/:dirName', (req, res) => {
-    const { appName, dirName } = req.params;
-    const dirPath = path.join(__dirname, '../apifolders', appName, 'config2850', dirName);
+app.get('/app/:appName/config2850/:dirName/:fileName?', (req, res) => {
+    const { appName, dirName, fileName } = req.params;
+    const basePath = path.join(__dirname, '../apifolders', appName, 'config2850', dirName);
 
-    if (!fs.existsSync(dirPath)) {
-        return res.status(404).send('Dossier non trouvé');
+    let filePath = basePath;
+    if (fileName) {
+        filePath = path.join(basePath, fileName);
     }
 
-    // Si c'est un fichier, le renvoyer
-    const stats = fs.lstatSync(dirPath);
+    // Vérifier l'existence du fichier ou dossier
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('Fichier ou dossier non trouvé');
+    }
+
+    // Si c'est un fichier, l'envoyer avec le bon type MIME
+    const stats = fs.lstatSync(filePath);
     if (stats.isFile()) {
-        const fileType = mime.lookup(dirPath);
-        res.type(fileType);
-        return res.sendFile(dirPath);
+        const fileType = mime.lookup(filePath);
+        res.type(fileType); // Déterminer et envoyer le type MIME
+        return res.sendFile(filePath);
     }
 
     // Si c'est un dossier, afficher son contenu
-    const folderStructure = getFolderStructure(dirPath);
+    const folderStructure = getFolderStructure(filePath);
     let htmlContent = '<ul>';
 
     folderStructure.forEach(item => {
         if (item.type === 'dossier') {
-            htmlContent += `<li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dirName}/${item.name}')">${item.name}</a></li>`;
+            htmlContent += `
+                <li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dirName}/${item.name}', 'dossier')">📁${item.name}</a></li>
+            `;
         } else {
-            htmlContent += `<li>${item.name}</li>`;
+            htmlContent += `
+                <li><a href="#" onclick="loadPage('/app/${appName}/config2850/${dirName}/${item.name}', 'fichier')">📃${item.name}</a></li>
+            `;
         }
     });
 
     htmlContent += '</ul>';
 
-    res.send(htmlContent);
+    res.send(`
+        <style>
+            ul { list-style-type: none; padding: 0; }
+            li { margin: 5px 0; font-family: Arial, sans-serif; }
+            a { text-decoration: none; color: #007bff; cursor: pointer; }
+            a:hover { text-decoration: underline; }
+        </style>
+        ${htmlContent}
+    `);
 });
+
+
+
 
 app.listen(port, () => {
     console.log(`Le serveur tourne sur http://localhost:${port}`);
