@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
     let cardsHtml = '';
     folderStructure.forEach(item => {
         if (item.type === 'dossier') {
-            const appUrl = `/app/${item.name}`;
+            const appUrl = `/arborescence/${item.name}`;
             const imageFolderPath = path.join(__dirname, '../apifolders', item.name, 'config2850', 'pictures2850');
     
             const images = getImagesFromFolder(imageFolderPath);
@@ -119,8 +119,8 @@ app.get('/', (req, res) => {
     res.send(htmlContent);
 });
 
-// -------------------------------------------------- =>  Principal page / Menu / Ifram1 /Ifram2  => without Tree
-app.get('/app/:appName', (req, res) => {
+// -------------------------------------------------- =>  Principal page / Menu / Ifram1  => without Tree
+app.get('/arborescence/:appName', (req, res) => {
     const appName = req.params.appName;
     const appPath = path.join(__dirname, '../apifolders', appName);
 
@@ -144,6 +144,7 @@ app.get('/app/:appName', (req, res) => {
 
     h1{
     color:white;
+    margin-top:5.7vw;
     }
     .toggleMenuButton {
         position: fixed;
@@ -201,39 +202,30 @@ app.get('/app/:appName', (req, res) => {
     }
 
     /* Style pour le contenu principal */
-    iframe {
-        width: 100%;
-     
-        border: 1px solid #ddd;
-        margin-top: 20px;
-    }
-        #container {
-    display: flex; /* Créer un layout en deux colonnes */
-    height: 100vh; /* Hauteur de l'écran */
+ iframe {
+    width: 100%;
+    height: 100%; 
+    border: none; 
+    overflow: hidden; 
+    display: block; 
 }
+   
 
 #content-frame {
-    width: 100%; 
-    height: 100%;
-    overflow-y: scroll; /* Permet le défilement si nécessaire */
-    padding: 10px;
-    box-sizing: border-box;
+
 
 }
 
-#content-frame-view-container {
-    position: relative;
-    width: 50%; 
-   
-    padding: 10px;
-    box-sizing: border-box;
-}
+ifram img {
 
+ img {
+                border: 2px solid red;
+                
+                }
+    
 #content-frame-view {
-    width: 100%; 
-    height: 100%; 
-    border: none;
-    border-top: 5vw solid #ccc; /* Bordure de 5vw */
+width: 100%;
+     
 }
 
           #titre{
@@ -251,7 +243,7 @@ app.get('/app/:appName', (req, res) => {
           
            ${menuButtonsHtml}
     
-            <button onclick="loadPage('/app/${appName}/config2850')">Arbre</button>  
+         <button onclick="window.location.href='/tree/${appName}'">Arbre</button>
                     <h1 id="titre" >${appName}</h1>
        </div>
        <div class="iframeview">
@@ -260,7 +252,7 @@ app.get('/app/:appName', (req, res) => {
 
 
 
-       <iframe id="content-frame" src="/app/${appName}/config2850" frameborder="0">
+       <iframe id="content-frame" src="/tree/${appName}" frameborder="0">
        
        
        
@@ -281,25 +273,25 @@ app.get('/app/:appName', (req, res) => {
 <div>
   <script>
   
+  // Définition de la fonction loadPageView
+  function loadPageView(url) {
+    const iframeView = document.getElementById('content-frame-view');
+    if (iframeView) {
+        iframeView.src = url; // Charger l'URL dans l'iframe secondaire
+    } else {
+        console.error("L'iframe 'content-frame-view' n'a pas été trouvé.");
+    }
+  }
 
-
-
-    
-function loadPage(url) {
- 
+  // Définition de la fonction loadPage
+  function loadPage(url) {
     const iframe = document.getElementById('content-frame');
+    iframe.src = url; // Charger l'URL dans l'iframe principal
+  }
 
-   
-    iframe.src = url; // Si c'est un dossier, on peut aussi le charger dans l'iframe principal
-}
-
-
-
-
-  // Fonction pour basculer l'affichage du menu
+  // Optionnel : Gestion de l'affichage du menu
   const toggleMenuButton = document.getElementById('toggleMenuButton');
   const categoryMenu = document.getElementById('categoryMenu');
-
   toggleMenuButton.addEventListener('click', function () {
       categoryMenu.classList.toggle('active');
   });
@@ -312,6 +304,7 @@ function loadPage(url) {
       });
   });
 </script>
+
 
 
     `;
@@ -327,112 +320,12 @@ function loadPage(url) {
 // ------------------------- => Logic route and controllers TREE
 
 
-// Dossier View in IFRAM // ------------------------------------------------------------------------ =>
-    app.get('/app/:appName/config2850/:dirName/:fileName?', (req, res) => {
-        const { appName, dirName, fileName } = req.params;
-        const basePath = path.join(__dirname, '../apifolders', appName, 'config2850', dirName);
-        
-        let filePath = basePath;
-        if (fileName) {
-            filePath = path.join(basePath, fileName);
-        }
-        
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).send('Fichier ou dossier non trouvé');
-        }
-        
-        const stats = fs.lstatSync(filePath);
-        if (stats.isFile()) {
-            const fileType = mime.lookup(filePath);
-            res.type(fileType); // Déterminer et envoyer le type MIME
-            return res.sendFile(filePath);
-        }
-        
-        // Fonction pour générer la structure de l'arborescence des dossiers
-        const folderStructure = getFolderStructure(filePath);
-        
-        const renderFolder = (structure, currentPath = `/app/${appName}/config2850/${dirName}`) => {
-            return structure.map(item => {
-                const itemPath = `${currentPath}/${item.name}`; // Crée le chemin complet pour chaque élément
-                if (item.type === 'dossier') {
-                    return `
-                        <li class="folder">
-                            <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                            📁 <a href="#" onclick="loadPageView('${itemPath}')">${item.name}</a>
-                            <ul class="hidden">
-                                ${renderFolder(item.contenu, itemPath)} <!-- Utilisation du chemin complet -->
-                            </ul>
-                        </li>
-                    `;
-                } else {
-                    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
-                    const icon = isImage ? '🖼️' : '📃';
-                    return `
-                        <li>
-                            ${icon} <a href="#" onclick="loadPageView('${itemPath}')">${item.name}</a>
-                        </li>
-                    `;
-                }
-            }).join('');
-        };
-        
-        const htmlContent = `
-            <style>
-                ul { list-style-type: none; padding-left: 20px; }
-                li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
-                .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
-                .toggle:hover { text-decoration: underline; }
-                .hidden { display: none; padding-left: 20px; }
-                a { text-decoration: none; color: #007bff; }
-                a:hover { text-decoration: underline; }
-            </style>
-            <ul>${renderFolder(folderStructure)}</ul>
-            <script>
-                function toggleVisibility(element) {
-                    const sublist = element.nextElementSibling.nextElementSibling;
-                    if (sublist.classList.contains('hidden')) {
-                        sublist.classList.remove('hidden');
-                        element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
-                    } else {
-                        sublist.classList.add('hidden');
-                        element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
-                    }
-                }
-    
-                function loadPageView(url) {
-                    const iframeView = document.getElementById('content-frame-view');
-                    // Vérification si l'iframe existe
-                    if (iframeView) {
-                        iframeView.src = url; // Charger l'URL directement dans l'iframe view
-                    } else {
-                        console.error("L'iframe 'content-frame-view' n'a pas été trouvé.");
-                    }
-                }
 
-
-
-                function toggleVisibility(element) {
-                    const sublist = element.nextElementSibling.nextElementSibling;
-                    if (sublist.classList.contains('hidden')) {
-                        sublist.classList.remove('hidden');
-                        element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
-                    } else {
-                        sublist.classList.add('hidden');
-                        element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
-                    }
-                }
-            </script>
-        `;
-    
-        res.send(htmlContent);
-    });
     
     
-    
-// ARBRE  // ------------------------------------------------------------------------ =>
+// Vers Ifram View // ------------------------------------------------------------------------ =>
 
   
-    
     app.get('/app/:appName/*', (req, res) => {
         const appName = req.params.appName;
         const relativePath = req.params[0];  // Récupère tout ce qui suit "/app/:appName/"
@@ -447,141 +340,272 @@ function loadPage(url) {
         const stats = fs.lstatSync(appPath);
     
         if (stats.isFile()) {
-            // Si c'est un fichier, on envoie le fichier avec le bon type MIME
+            // Si c'est un fichier, on vérifie le type MIME ou l'extension du fichier
             const fileType = mime.lookup(appPath);
-            res.type(fileType); // Déterminer et envoyer le type MIME
-            return res.sendFile(appPath);
+            const fileExtension = path.extname(appPath).toLowerCase();
+    
+            if (['.js', '.css', '.html'].includes(fileExtension)) {
+                // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
+                fs.readFile(appPath, 'utf-8', (err, data) => {
+                    if (err) {
+                        return res.status(500).send('Erreur lors de la lecture du fichier');
+                    }
+    
+                    // Injecter le CSS et les balises <pre>
+                    const htmlContent = `
+                        <style>
+                            pre {
+                                background-color: black;
+                                padding: 20px;
+                                border-radius: 5px;
+                                font-family: monospace;
+                                font-size: 1rem;
+                                overflow-x: auto;
+                                white-space: pre-wrap;
+                                background-color: black;
+                                color: white;
+                                max-height: none; /* Empêche un scroll vertical dans 'pre' */
+                            }
+                        </style>
+                        <pre>${data}</pre>
+                    `;
+                    res.send(htmlContent);
+                });
+            } else {
+                // Pour les autres types de fichiers, on les envoie directement
+                res.type(fileType); // Déterminer et envoyer le type MIME
+                return res.sendFile(appPath);
+            }
+        } else {
+            // Si ce n'est pas un fichier mais un dossier, on continue comme précédemment
+            const folderStructure = getFolderStructure(appPath);
+    
+            const renderFolder = (structure, currentPath = `/app/${appName}${relativePath ? '/' + relativePath : ''}`) => {
+                return structure.map(item => {
+                    if (item.type === 'dossier') {
+                        return `
+                            <li class="folder">
+                                <span class="toggle" onclick="toggleVisibility(this)">➕</span>
+                                📁 <a href="#" onclick="loadPageView('${currentPath}/${item.name}')">${item.name}</a>
+                                <ul class="hidden">
+                                    ${renderFolder(item.contenu, `${currentPath}/${item.name}`)}
+                                </ul>
+                            </li>
+                        `;
+                    } else {
+                        const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
+                        const icon = isImage ? '🖼️' : '📃';
+                        return `
+                            <li>
+                                ${icon} <a href="#" onclick="loadPageView('${currentPath}/${item.name}')">${item.name}</a>
+                            </li>
+                        `;
+                    }
+                }).join('');
+            };
+    
+            const htmlContent = `
+                <style>
+                    ul { list-style-type: none; padding-left: 20px; }
+                    li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
+                    .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
+                    .toggle:hover { text-decoration: underline; }
+                    .hidden { display: none; padding-left: 20px; }
+                    a { text-decoration: none; color: #007bff; }
+                    a:hover { text-decoration: underline; }
+    
+                    /* Structure en deux colonnes */
+                    #container {
+                        display: flex;
+                      margin-top:1VW;
+                    }
+    
+                    #content-frame {
+                        overflow-y: auto;
+                        padding: 10px;
+                        box-sizing: border-box;
+                    }
+    
+                    #content-frame-view {
+                        width: 100%;
+                        padding-left: 2VW;
+                        padding-top: 2VW;
+                    }
+                </style>
+                <div id="container">
+                    <div id="content-frame">
+                        <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
+                    </div>
+                    <div id="content-frame-view-container">
+                        <iframe id="content-frame-view" src="" frameborder="0"></iframe>
+                    </div>
+                </div>
+    
+                <script>
+                    function loadPageView(url) {
+                        const iframeView = document.getElementById('content-frame-view');
+                        if (iframeView) {
+                            iframeView.src = url; // Load the URL into the iframe
+                        } else {
+                            console.error("Iframe 'content-frame-view' not found.");
+                        }
+                    }
+    
+                    function toggleVisibility(element) {
+                        const sublist = element.nextElementSibling.nextElementSibling;
+                        if (sublist.classList.contains('hidden')) {
+                            sublist.classList.remove('hidden');
+                            element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
+                        } else {
+                            sublist.classList.add('hidden');
+                            element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
+                        }
+                    }
+                </script>
+            `;
+    
+            res.send(htmlContent);
         }
-    
-        // Fonction pour obtenir la structure du dossier
-        const getFolderStructure = (dirPath) => {
-            const items = fs.readdirSync(dirPath);
-            return items.map(item => {
-                const itemPath = path.join(dirPath, item);
-                const stats = fs.lstatSync(itemPath);
-    
-                if (stats.isDirectory()) {
-                    // Si c'est un répertoire, on appelle récursivement cette fonction pour obtenir sa structure
-                    return {
-                        name: item,
-                        type: 'dossier',
-                        contenu: getFolderStructure(itemPath), // Appel récursif pour explorer les sous-dossiers
-                    };
-                } else if (stats.isFile()) {
-                    // Si c'est un fichier, on le retourne simplement
-                    return {
-                        name: item,
-                        type: 'fichier',
-                    };
-                } else {
-                    // Si ce n'est ni un fichier, ni un répertoire, on peut ajouter un contrôle ou un message d'erreur ici
-                    return null;
-                }
-            }).filter(item => item !== null); // Filtrer les éléments null (au cas où il y aurait d'autres types)
-        };
-    
-        // Récupérer la structure du dossier
-        const folderStructure = getFolderStructure(appPath);
-    
-        // Fonction pour afficher la structure du dossier en HTML
-        const renderFolder = (structure, currentPath = `/app/${appName}${relativePath ? '/' + relativePath : ''}`) => {
-            return structure.map(item => {
-                if (item.type === 'dossier') {
-                    return `
-                        <li class="folder">
-                            <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                            📁 <a href="#" onclick="loadPageView('${currentPath}/${item.name}')">${item.name}</a>
-                            <ul class="hidden">
-                                ${renderFolder(item.contenu, `${currentPath}/${item.name}`)}
-                            </ul>
-                        </li>
-                    `;
-                } else {
-                    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
-                    const icon = isImage ? '🖼️' : '📃';
-                    return `
-                        <li>
-                            ${icon} <a href="#" onclick="loadPageView('${currentPath}/${item.name}')">${item.name}</a>
-                        </li>
-                    `;
-                }
-            }).join('');
-        };
-    
-        const htmlContent = `
-            <style>
-                ul { list-style-type: none; padding-left: 20px; }
-                li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
-                .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
-                .toggle:hover { text-decoration: underline; }
-                .hidden { display: none; padding-left: 20px; }
-                a { text-decoration: none; color: #007bff; }
-                a:hover { text-decoration: underline; }
-    
-                /* Structure en deux colonnes */
-                #container {
-                    display: flex;
-                    height: 100vh;
-                }
-    
-                #content-frame {
-                    width: 50%;
-                    overflow-y: scroll;
-                    padding: 10px;
-                    box-sizing: border-box;
-                }
-    
-                #content-frame-view-container {
-                    position: relative;
-                    width: 50%;
-                    height: 100vh;
-                    padding: 10px;
-                    box-sizing: border-box;
-                }
-    
-                #content-frame-view {
-                    width: 100%;
-                    height: 100%;
-                    border: none;
-                    border-top: 5vw solid #ccc;
-                }
-            </style>
-            <div id="container">
-                <div id="content-frame">
-                    <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
-                </div>
-                <div id="content-frame-view-container">
-                    <iframe id="content-frame-view" src="" frameborder="0"></iframe>
-                </div>
-            </div>
-    
-            <script>
-                function loadPageView(url) {
-                    const iframeView = document.getElementById('content-frame-view');
-                    // Vérification si l'iframe existe
-                    if (iframeView) {
-                        iframeView.src = url; // Charger l'URL directement dans l'iframe view
-                    } else {
-                        console.error("L'iframe 'content-frame-view' n'a pas été trouvé.");
-                    }
-                }
-    
-                function toggleVisibility(element) {
-                    const sublist = element.nextElementSibling.nextElementSibling;
-                    if (sublist.classList.contains('hidden')) {
-                        sublist.classList.remove('hidden');
-                        element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
-                    } else {
-                        sublist.classList.add('hidden');
-                        element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
-                    }
-                }
-            </script>
-        `;
-        
-        res.send(htmlContent);
     });
     
+
+
+// ARBRE  // ------------------------------------------------------------------------ =>
+
+
+
+    // Route pour afficher uniquement l'arborescence d'une application
+    app.get('/tree/:appName/', (req, res) => {
+  const appName = req.params.appName;
+    const relativePath = req.params[0] || req.params[1] || '';
+        const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
+
+    
+        console.log('Chemin demandé :', appPath); // Log pour debug
+    
+        if (!fs.existsSync(appPath)) {
+            return res.status(404).send('Application ou fichier non trouvé');
+        }
+    
+        const stats = fs.lstatSync(appPath);
+    
+        if (stats.isFile()) {
+            // Gestion des fichiers spécifiques
+            const fileType = mime.lookup(appPath);
+            const fileExtension = path.extname(appPath).toLowerCase();
+    
+            if (['.js', '.css', '.html'].includes(fileExtension)) {
+                // Rendre les fichiers de code avec un style spécifique
+                fs.readFile(appPath, 'utf-8', (err, data) => {
+                    if (err) {
+                        return res.status(500).send('Erreur lors de la lecture du fichier');
+                    }
+    
+                    const htmlContent = `
+                        <style>
+                            pre {
+                                background-color: black;
+                                color: white;
+                                padding: 20px;
+                                border-radius: 5px;
+                                font-family: monospace;
+                                font-size: 1rem;
+                                overflow-x: auto;
+                                white-space: pre-wrap;
+                            }
+                        </style>
+                        <pre>${data}</pre>
+                    `;
+                    res.send(htmlContent);
+                });
+            } else {
+                // Renvoyer les autres types de fichiers directement
+                res.type(fileType);
+                return res.sendFile(appPath);
+            }
+        } else {
+            // Si ce n'est pas un fichier mais un dossier, générer l'arborescence
+            const folderStructure = getFolderStructure(appPath);
+    
+            const renderFolder = (structure, currentPath = `/tree/${appName}/${relativePath}`) => {
+                const sanitizedPath = currentPath.replace(/\/+/g, '/'); // Supprime les slashes multiples
+                return structure.map(item => {
+                    const newPath = `${sanitizedPath}/${item.name}`.replace(/\/+/g, '/');
+                    if (item.type === 'dossier') {
+                        return `
+                            <li class="folder">
+                                <span class="toggle" onclick="toggleVisibility(this)">➕</span>
+                                📁 <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a>
+                                <ul class="hidden">
+                                    ${renderFolder(item.contenu, newPath)}
+                                </ul>
+                            </li>
+                        `;
+                    } else {
+                        const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
+                        const icon = isImage ? '🖼️' : '📃';
+                        return `
+                            <li>
+                                ${icon} <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a>
+                            </li>
+                        `;
+                    }
+                }).join('');
+            };
+            
+    
+            const htmlContent = `
+                <style>
+                    ul { list-style-type: none; padding-left: 20px; }
+                    li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
+                    .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
+                    .toggle:hover { text-decoration: underline; }
+                    .hidden { display: none; padding-left: 20px; }
+                    a { text-decoration: none; color: #007bff; }
+                    a:hover { text-decoration: underline; }
+                    #container { display: flex; margin-top: 1VW; }
+                    #content-frame { overflow-y: auto; padding: 10px; box-sizing: border-box; }
+                    #content-frame-view { width: 100%; padding-left: 2VW; padding-top: 2VW; }
+                </style>
+                <div id="container">
+                    <div id="content-frame">
+                        <ul>${renderFolder(folderStructure, `/tree/${appName}/${relativePath}`)}</ul>
+                    </div>
+                    <div id="content-frame-view-container">
+                        <iframe id="content-frame-view" src="" frameborder="0"></iframe>
+                    </div>
+                </div>
+    
+                <script>
+                    function loadPageView(url) {
+                        const iframeView = document.getElementById('content-frame-view');
+                        if (iframeView) {
+                            iframeView.src = url; // Charge l'URL dans l'iframe
+                        } else {
+                            console.error("Iframe 'content-frame-view' non trouvé.");
+                        }
+                    }
+    
+                    function toggleVisibility(element) {
+                        const sublist = element.nextElementSibling.nextElementSibling;
+                        if (sublist.classList.contains('hidden')) {
+                            sublist.classList.remove('hidden');
+                            element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
+                        } else {
+                            sublist.classList.add('hidden');
+                            element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
+                        }
+                    }
+                        console.log('App Name:', appName);
+console.log('Relative Path:', relativePath);
+console.log('Constructed Path:', appPath);
+                </script>
+            `;
+    
+            res.send(htmlContent);
+        }
+    });
+
     app.listen(3000, () => {
         console.log('Serveur en écoute sur le port 3000');
     });
