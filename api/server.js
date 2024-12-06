@@ -29,19 +29,7 @@ function getFolderStructure(dirPath) {
     return items.map(item => {
         const itemPath = path.join(dirPath, item);
         const isDirectory = fs.lstatSync(itemPath).isDirectory();
-        console.log(
-            dirPath,
-            "=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=> "
-          );
-
-          console.log(
-            items,
-            "--------------------------------------------------- "
-          );
-          console.log(
-            isDirectory,
-            "isDirectory "
-          );
+     
         return {
             type: isDirectory ? 'dossier' : 'fichier',
             name: item,
@@ -133,7 +121,9 @@ app.get('/', (req, res) => {
     res.send(htmlContent);
 });
 
-// -------------------------------------------------- =>  Principal page / Menu / Ifram1 + page home tree 
+// -------------------------------------------------- => § Home de l'application
+
+    // Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850
 app.get('/arborescence/:appName', (req, res) => {
     const appName = req.params.appName;
     const appPath = path.join(__dirname, '../apifolders', appName);
@@ -142,7 +132,7 @@ app.get('/arborescence/:appName', (req, res) => {
         return res.status(404).send('Application non trouvée');
     }
 
-    // Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850
+
     const configPath = path.join(appPath, 'config2850');
     const configDirs = fs.existsSync(configPath) ? fs.readdirSync(configPath).filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory()) : [];
 
@@ -338,7 +328,7 @@ width: 100%;
 
     
     
-// Ifram Vers Ifram View // ------------------------------------------------------------------------ =>
+// Ifram Vers Ifram View //
 
   
     app.get('/app/:appName/*', (req, res) => {
@@ -486,9 +476,9 @@ width: 100%;
         }
     });
     
+    // FIN Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850  ------------------------------------------------------------------------ 
 
-
-// ARBRE  // ------------------------------------------------------------------------ =>
+// ARBRE  // ------------------------------------------------------------------------ 
 
 
 
@@ -498,7 +488,7 @@ width: 100%;
             const appName = req.params.appName;
             const relativePath = req.params[0] || req.params[1] || '';
             const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
-    console.log("relatif path t =>---------", relativePath)
+   
             // Vérification si le chemin existe
             if (!fs.existsSync(appPath)) {
                 return res.status(404).send('Application ou fichier non trouvé');
@@ -589,7 +579,7 @@ width: 100%;
     </style>
     <div id="container">
         <div id="content-frame">
-         <ul>${renderFolder(folderStructure, `localhost:3000/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
+         <ul>${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
         <div id="content-frame-view-container">
             <iframe id="content-frame-view" src="" frameborder="0"></iframe>
