@@ -13,7 +13,7 @@ function getImagesFromFolder(folderPath) {
         const files = fs.readdirSync(folderPath);
         return files.filter(file => {
             // Vérifier si le fichier est une image en fonction de son extension
-            return /\.(jpg|jpeg|png|gif|bmp)$/i.test(file);
+            return /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file);
         });
     } catch (err) {
         console.error(`Erreur lors de la lecture du dossier ${folderPath}:`, err);
@@ -236,8 +236,9 @@ width: 100%;
            ${menuButtonsHtml}
     
          <button onclick="window.location.href='${appName}'">Arbre</button>
+    <button onclick="reveal()" id="fullscreen">Fullscreen</button>
 
-
+  <button onclick="window.location.href='/'">🏠</button>
                     <h1 id="titre" >${appName}</h1>
        </div>
        <div class="iframeview">
@@ -251,6 +252,11 @@ width: 100%;
 <div>
   <script>
   
+    // Fonction pour basculer en plein écran
+        function reveal() {
+            const fileContent = document.getElementById('fileContent');
+            fileContent.classList.toggle('fullscreen');
+        }
   // Définition de la fonction loadPageView
   function loadPageView(url) {
     const iframeView = document.getElementById('content-frame-view');
@@ -288,7 +294,7 @@ width: 100%;
     res.send(htmlContent);
 });
 
-// Ifram Vers Ifram View //
+// recoit une arborescence + envoi fichiers vers ifram view  //
 
 app.get('/app/:appName/*', (req, res) => {
     try {
@@ -304,14 +310,17 @@ app.get('/app/:appName/*', (req, res) => {
           
         }
 
-        const stats = fs.lstatSync(appPath);
+        const stats = fs.lstatSync(appPath); // lstatSync est une méthode de LS pour retrouner des information sur un fichier
+
+//=> Si c'est un fichier => return  <pre>${data}</pre>   sinon  <li> ${icon} <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a></li>
+
 
         if (stats.isFile()) {
             // Si c'est un fichier, on vérifie le type MIME ou l'extension du fichier
             const fileType = mime.lookup(appPath);
-            const fileExtension = path.extname(appPath).toLowerCase();
+            const fileExtension = path.extname(appPath).toLowerCase();   // extname  extrait l'extenssion ( methode de path )
 
-            if (['.js', '.css', '.html'].includes(fileExtension)) {
+            if (['.js', '.css', '.html','.url'].includes(fileExtension)) {
                 // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) {
@@ -322,17 +331,17 @@ app.get('/app/:appName/*', (req, res) => {
                     const htmlContent = `
                         <style>
                             pre {
-                                background-color: black;
+                                  background-color: black;
                                 padding: 20px;
                                 border-radius: 5px;
                                 font-family: monospace;
                                 font-size: 1rem;
                                 overflow-x: auto;
                                 white-space: pre-wrap;
-                                background-color: black;
                                 color: white;
-                                max-height: none; /* Empêche un scroll vertical dans 'pre' */
+                                margin: 0;
                             }
+                                
                         </style>
                         <pre>${data}</pre>
                     `;
@@ -355,14 +364,17 @@ app.get('/app/:appName/*', (req, res) => {
                         return `
                             <li class="folder">
                                 <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                                📁 <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a>
+
+                                📁 <a href="#" </a>
+
+
                                 <ul class="hidden">
                                     ${renderFolder(item.contenu, newPath)}
                                 </ul>
                             </li>
                         `;
                     } else {
-                        const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
+                        const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
                         const icon = isImage ? '🖼️' : '📃';
                         return `
                             <li>
@@ -376,6 +388,8 @@ app.get('/app/:appName/*', (req, res) => {
 
             const htmlContent = `
                 <style>
+
+           
                     ul { list-style-type: none; padding-left: 20px; }
                     li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
                     .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
@@ -388,18 +402,21 @@ app.get('/app/:appName/*', (req, res) => {
                     #container {
                         display: flex;
                       margin-top:1VW;
+                     
                     }
     
                     #content-frame {
                         overflow-y: auto;
                         padding: 10px;
                         box-sizing: border-box;
+                     
                     }
     
                     #content-frame-view {
                         width: 100%;
                         padding-left: 2VW;
                         padding-top: 2VW;
+                        
                     }
                 </style>
                 <div id="container">
@@ -444,11 +461,12 @@ app.get('/app/:appName/*', (req, res) => {
     }
 });
 
-// FIN Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850  ------------------------------------------------------------------------ 
 
 // ARBRE  // ------------------------------------------------------------------------ 
 
-// Route pour afficher uniquement l'arborescence d'une application
+/* Générer une arborescence de l'application avant de générer l'affichage des élément dans la route /app/:appName */
+
+// ---------------------------------------------------------------------------------- 
 app.get('/:appName', (req, res) => {
     try {
         const appName = req.params.appName;
@@ -516,7 +534,9 @@ app.get('/:appName', (req, res) => {
                                     <span class="toggle" onclick="toggleVisibility(this)">➕</span>
 
 
-                                    📁 <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a>
+
+
+                                    📁 <a href="#" >${item.name}</a>
 
 
                                 
@@ -526,7 +546,7 @@ app.get('/:appName', (req, res) => {
                                 </li>
                             `;
                     } else {
-                        const isImage = /\.(jpg|jpeg|png|gif)$/i.test(item.name);
+                        const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
                         const icon = isImage ? '🖼️' : '📃';
                         return `
                                 <li>
