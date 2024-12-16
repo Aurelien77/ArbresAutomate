@@ -25,7 +25,10 @@ function getImagesFromFolder(folderPath) {
 // Fonction pour récupérer la structure des dossiers
 function getFolderStructure(dirPath) {
     const items = fs.readdirSync(dirPath);
-    return items.map(item => {
+
+    return items
+    .filter(item => item !== 'pictures2850') 
+    .map(item => {
         const itemPath = path.join(dirPath, item);
         const isDirectory = fs.lstatSync(itemPath).isDirectory();
 
@@ -37,6 +40,25 @@ function getFolderStructure(dirPath) {
         };
     });
 }
+
+
+//Fonction pour récupérer une arborescence de fichier en excluant le dossier config2850
+function getFolderStructurewithout(dirPath) {
+    const items = fs.readdirSync(dirPath);
+    return items
+        .filter(item => item !== 'config2850') // Exclure le dossier "config2850"
+        .map(item => {
+            const itemPath = path.join(dirPath, item);
+            const isDirectory = fs.lstatSync(itemPath).isDirectory();
+
+            return {
+                type: isDirectory ? 'dossier' : 'fichier',
+                name: item,
+                contenu: isDirectory ? getFolderStructurewithout(itemPath) : [] // Appel récursif pour les sous-dossiers
+            };
+        });
+}
+
 
 
 // -------------------------------------------------- => creation card + link to Principal page  => /arborescence/${item.name}
@@ -127,9 +149,17 @@ app.get('/arborescence/:appName', (req, res) => {
         return res.status(404).send('Application non trouvée');
     }
 
+    // Génère l'arborescnce + filtre le dossier De configuration image
 
     const configPath = path.join(appPath, 'config2850');
-    const configDirs = fs.existsSync(configPath) ? fs.readdirSync(configPath).filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory()) : [];
+    const configDirs = fs.existsSync(configPath) 
+    ? fs.readdirSync(configPath)
+        .filter(item => {
+            const itemPath = path.join(configPath, item);
+            return fs.lstatSync(itemPath).isDirectory() && item.toLowerCase() !== 'pictures2850';
+        })
+    : [];
+
 
     const menuButtonsHtml = configDirs.map(dir => {
         return `<button onclick="loadPage('/app/${appName}/config2850/${dir}')" data-url="/app/${appName}/config2850/${dir}">${dir}</button>
@@ -273,7 +303,7 @@ width: 100%;
     iframe.src = url; // Charger l'URL dans l'iframe principal
   }
 
-  // Optionnel : Gestion de l'affichage du menu
+  // ==================> Optionnel : Gestion de l'affichage du menu
   const toggleMenuButton = document.getElementById('toggleMenuButton');
   const categoryMenu = document.getElementById('categoryMenu');
   toggleMenuButton.addEventListener('click', function () {
@@ -302,7 +332,7 @@ app.get('/app/:appName/*', (req, res) => {
         const relativePath = req.params[0];  // Récupère tout ce qui suit "/app/:appName/"
         const appPath = path.join(__dirname, '../apifolders', appName, relativePath); // Construction du chemin complet
 
-        console.log('Je suis dans le composant app/:appName/* => ', appPath); // Log du chemin pour déboguer
+   
 
         if (!fs.existsSync(appPath)) {
     
@@ -320,7 +350,7 @@ app.get('/app/:appName/*', (req, res) => {
             const fileType = mime.lookup(appPath);
             const fileExtension = path.extname(appPath).toLowerCase();   // extname  extrait l'extenssion ( methode de path )
 
-            if (['.js', '.css', '.html','.url'].includes(fileExtension)) {
+            if (['.js', '.css', '.html','.url','.jfif'].includes(fileExtension)) {
                 // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) {
@@ -467,6 +497,8 @@ app.get('/app/:appName/*', (req, res) => {
 /* Générer une arborescence de l'application avant de générer l'affichage des élément dans la route /app/:appName */
 
 // ---------------------------------------------------------------------------------- 
+
+
 app.get('/:appName', (req, res) => {
     try {
         const appName = req.params.appName;
@@ -516,7 +548,7 @@ app.get('/:appName', (req, res) => {
             }
         } else {
             // Si ce n'est pas un fichier mais un dossier, générer l'arborescence
-            const folderStructure = getFolderStructure(appPath);
+            const folderStructure = getFolderStructurewithout(appPath);
 
 // renderFolder affiche l'arborescence des dossier à gauche ----------------------------------------->
 
@@ -617,9 +649,7 @@ app.get('/:appName', (req, res) => {
             }
         }
 
-        console.log('App Name:', appName);
-        console.log('Relative Path ab :', ${relativePath});
-        console.log('Constructed Path:', "${appPath}");
+   
     </script>
 `;
 
