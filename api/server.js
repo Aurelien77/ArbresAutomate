@@ -168,7 +168,15 @@ app.get('/arborescence/:appName', (req, res) => {
 
     const htmlContent = `
       <style>
-      
+         /* Style pour le contenu d'arborescence => iframe de gauche */
+ iframe {
+    width: 100%;
+    height: 100%; 
+    border: none; 
+    overflow: hidden; 
+    display: block; 
+}
+   
     h1{
     color:white;
     margin-top:5.7vw;
@@ -228,35 +236,28 @@ app.get('/arborescence/:appName', (req, res) => {
         top: 0; /* Déplace le menu vers le haut */
     }
 
-    /* Style pour le contenu principal */
- iframe {
-    width: 100%;
-    height: 100%; 
-    border: none; 
-    overflow: hidden; 
-    display: block; 
-}
-   
+ 
 
-#content-frame {
-
-}
 
 ifram img {
 
- img {
+
+ width:100%;
                 border: 2px solid red;
                 
-                }
-    
-#content-frame-view {
-width: 100%;
-     
 }
+                
+   .iframeview{
+  
+   } 
 
-          #titre{
-         margin-top: 110px;
-          }
+   #content-frame{
+   
+   
+   }
+
+
+
 </style>
 
        <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
@@ -350,7 +351,7 @@ app.get('/app/:appName/*', (req, res) => {
             const fileType = mime.lookup(appPath);
             const fileExtension = path.extname(appPath).toLowerCase();   // extname  extrait l'extenssion ( methode de path )
 
-            if (['.js', '.css', '.html','.url','.jfif'].includes(fileExtension)) {
+            if (['.js', '.css', '.html','.url','.jfif','.txt'].includes(fileExtension)) {
                 // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) {
@@ -360,6 +361,7 @@ app.get('/app/:appName/*', (req, res) => {
                     // Injecter le CSS et les balises <pre>
                     const htmlContent = `
                         <style>
+                       
                             pre {
                                   background-color: black;
                                 padding: 20px;
@@ -370,10 +372,13 @@ app.get('/app/:appName/*', (req, res) => {
                                 white-space: pre-wrap;
                                 color: white;
                                 margin: 0;
+                      
                             }
                                 
+                                
+                                
                         </style>
-                        <pre>${data}</pre>
+                   <pre>${data}</pre> 
                     `;
                     res.send(htmlContent);
                 });
@@ -418,7 +423,7 @@ app.get('/app/:appName/*', (req, res) => {
 
             const htmlContent = `
                 <style>
-
+         
            
                     ul { list-style-type: none; padding-left: 20px; }
                     li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
@@ -428,24 +433,27 @@ app.get('/app/:appName/*', (req, res) => {
                     a { text-decoration: none; color: #007bff; }
                     a:hover { text-decoration: underline; }
     
-                    /* Structure en deux colonnes */
+                    /* flex column */
                     #container {
                         display: flex;
                       margin-top:1VW;
                      
                     }
     
-                    #content-frame {
-                        overflow-y: auto;
-                        padding: 10px;
-                        box-sizing: border-box;
-                     
-                    }
-    
+              
+     /* Ajustement style Ifram View-------------------------------------------------------------------------------------------------------- */
                     #content-frame-view {
                         width: 100%;
-                        padding-left: 2VW;
+                        height:100%;
+                        padding-left: 0VW;
                         padding-top: 2VW;
+                         display:flex;
+                        
+align-items: flex-start;
+align-content: flex-start
+  justify-content: center;
+        background-color:#958;
+   
                         
                     }
                 </style>
@@ -453,9 +461,9 @@ app.get('/app/:appName/*', (req, res) => {
                     <div id="content-frame">
                         <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
                     </div>
-                    <div id="content-frame-view-container">
+              
                         <iframe id="content-frame-view" src="" frameborder="0"></iframe>
-                    </div>
+                    
                 </div>
     
                 <script>
@@ -605,8 +613,12 @@ app.get('/:appName', (req, res) => {
 
             const htmlContent = `
     <style>
-        ul { list-style-type: none; padding-left: 20px; }
-        li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
+
+ // Style pour iframe view Arbre ----------------------------------------->
+ 
+        ul { list-style-type: none; padding-left: 20px; text-decoration: none;}
+        li { margin: 5px 0; font-family: Arial, sans-serif; position: relative;list-style-type: none;  }
+    
         .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
         .toggle:hover { text-decoration: underline; }
         .hidden { display: none; padding-left: 20px; }
@@ -614,15 +626,16 @@ app.get('/:appName', (req, res) => {
         a:hover { text-decoration: underline; }
         #container { display: flex; margin-top: 1VW; }
         #content-frame { overflow-y: auto; padding: 10px; box-sizing: border-box; }
-        #content-frame-view { width: 100%; padding-left: 2VW; padding-top: 2VW; }
+        #content-frame-view { width: 100%; height:100%; padding-left: 2VW; padding-top: 2VW; }
+      
     </style>
     <div id="container">
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
-        <div id="content-frame-view-container">
+   
             <iframe id="content-frame-view" src="" frameborder="0"></iframe>
-        </div>
+      
     </div>
 
     <script>
