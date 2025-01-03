@@ -174,8 +174,9 @@ app.get('/arborescence/:appName', (req, res) => {
     height: 100%; 
     border: none; 
     overflow: hidden; 
-    display: block; 
-}
+   
+}  
+ 
    
     h1{
     color:white;
@@ -239,13 +240,6 @@ app.get('/arborescence/:appName', (req, res) => {
  
 
 
-ifram img {
-
-
- width:100%;
-                border: 2px solid red;
-                
-}
                 
    .iframeview{
   
@@ -256,7 +250,10 @@ ifram img {
    
    }
 
-
+body{
+width:100%;
+height:100%;
+}
 
 </style>
 
@@ -423,7 +420,7 @@ app.get('/app/:appName/*', (req, res) => {
 
             const htmlContent = `
                 <style>
-         
+
            
                     ul { list-style-type: none; padding-left: 20px; }
                     li { margin: 5px 0; font-family: Arial, sans-serif; position: relative; }
@@ -434,30 +431,55 @@ app.get('/app/:appName/*', (req, res) => {
                     a:hover { text-decoration: underline; }
     
                     /* flex column */
-                    #container {
-                        display: flex;
-                      margin-top:1VW;
-                     
-                    }
+
+
+                  .container {
+    display: flex;
+
+   
+
+    width: 100%; 
+    min-height: 100%; 
+    box-sizing: border-box; /* Inclut les bordures et le padding dans les dimensions */
+    margin: 0;
+    padding-top: 8px;
+    overflow: auto; /* Permet de scroller si le contenu dépasse l'écran */
+}
+
+    .container img {
+    max-width: 20vw;
+    max-height: 20vw; 
+    object-fit: contain; 
+    border 3px solid red;
+}
+
+
+  
     
               
      /* Ajustement style Ifram View-------------------------------------------------------------------------------------------------------- */
                     #content-frame-view {
                         width: 100%;
-                        height:100%;
+              
                         padding-left: 0VW;
                         padding-top: 2VW;
-                         display:flex;
+                    object-fit: contain;
                         
 align-items: flex-start;
 align-content: flex-start
   justify-content: center;
-        background-color:#958;
+     
    
                         
                     }
+.imageiframe {
+width : 30vw;
+}
+                   #content-frame{
+                   
+                   margin-top: 2%;}
                 </style>
-                <div id="container">
+                <div class="container" >
                     <div id="content-frame">
                         <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
                     </div>
@@ -466,12 +488,31 @@ align-content: flex-start
                     
                 </div>
     
-                <script>
+                <script>    const iframe = document.getElementById('content-frame-view');
+
+  // Une fois que le contenu de l'iframe est chargé
+  iframe.onload = function() {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    // Appliquer un style aux images dans l'iframe
+    const images = iframeDoc.getElementsByTagName('img');
+    for (let img of images) {
+      img.style.maxWidth = '60vw';
+      img.style.height = '100%';
+      img.style.borderRadius = '10px';  // Exemple de bordure arrondie
+    }
+  };
                     function loadPageView(url) {
                         const iframeView = document.getElementById('content-frame-view');
+                           const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url);
                         if (iframeView) {
                             iframeView.src = url; // Load the URL into the iframe
-                        } else {
+                        }
+                              if (isImage) {
+                            iframeView.src = url;
+                            iframeView.class = imageiframe;  // Load the URL into the iframe
+                        }
+                        else {
                             console.error("Iframe 'content-frame-view' not found.");
                         }
                     }
@@ -615,7 +656,15 @@ app.get('/:appName', (req, res) => {
     <style>
 
  // Style pour iframe view Arbre ----------------------------------------->
- 
+ body {
+                        margin: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                      
+                       
+                    }
+                 
         ul { list-style-type: none; padding-left: 20px; text-decoration: none;}
         li { margin: 5px 0; font-family: Arial, sans-serif; position: relative;list-style-type: none;  }
     
@@ -624,26 +673,52 @@ app.get('/:appName', (req, res) => {
         .hidden { display: none; padding-left: 20px; }
         a { text-decoration: none; color: #007bff; }
         a:hover { text-decoration: underline; }
-        #container { display: flex; margin-top: 1VW; }
-        #content-frame { overflow-y: auto; padding: 10px; box-sizing: border-box; }
-        #content-frame-view { width: 100%; height:100%; padding-left: 2VW; padding-top: 2VW; }
+        #container { display: flex; margin-top: 1vw;  }
+
+
+#content-frame {
+
+}
+
+
+        #content-frame { overflow-y: auto; padding-top: 20px; box-sizing: border-box;   }
+        #content-frame-view { width: 100%; height:45vw; padding-left: 2VW; padding-top: 2VW;
+      
+        
+        }
       
     </style>
     <div id="container">
+
+
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
-   
-            <iframe id="content-frame-view" src="" frameborder="0"></iframe>
+
+            <iframe id="content-frame-view" src="" frameborder="0" style="img :""></iframe>
       
     </div>
 
     <script>
         const appName = "${appName}";
         const relativePath = "${relativePath}";
-       
+       const iframe = document.getElementById('content-frame-view');
+
+  // Une fois que le contenu de l'iframe est chargé
+  iframe.onload = function() {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    // Appliquer un style aux images dans l'iframe
+    const images = iframeDoc.getElementsByTagName('img');
+    for (let img of images) {
+      img.style.maxWidth = '80vw';
+      img.style.height = '100%';
+      img.style.borderRadius = '10px';  // Exemple de bordure arrondie
+    }
+  };
         function loadPageView(url) {
             const iframeView = document.getElementById('content-frame-view');
+            
             if (iframeView) {
                 iframeView.src = url; // Charge l'URL dans l'iframe
             } else {
