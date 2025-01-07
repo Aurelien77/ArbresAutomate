@@ -264,7 +264,7 @@ height:100%;
            ${menuButtonsHtml}
     
          <button onclick="window.location.href='${appName}'">Arbre</button>
-    <button onclick="reveal()" id="fullscreen">Fullscreen</button>
+
 
   <button onclick="window.location.href='/'">🏠</button>
                     <h1 id="titre" >${appName}</h1>
@@ -497,9 +497,13 @@ width : 30vw;
     // Appliquer un style aux images dans l'iframe
     const images = iframeDoc.getElementsByTagName('img');
     for (let img of images) {
-      img.style.maxWidth = '60vw';
+     img.style.position = 'absolute';
+      img.style.top = '50%';
+      img.style.left = '50%';
+      img.style.transform = 'translate(-50%, -50%)'; 
+      img.style.maxWidth = '75vw';
       img.style.height = '100%';
-      img.style.borderRadius = '10px';  // Exemple de bordure arrondie
+      img.style.borderRadius = '10px' 
     }
   };
                     function loadPageView(url) {
@@ -654,7 +658,30 @@ app.get('/:appName', (req, res) => {
 
             const htmlContent = `
     <style>
+  #fullscreenbutton {
+    position: absolute;
+    top: 2.5vw;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 51;
 
+  }
+
+  .buttonactivated {
+
+   position: absolute;
+      top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+ 
+  }
+ 
+  #content-frame-view {
+    width: 100%;
+    height: 45vw;
+
+
+  }
  // Style pour iframe view Arbre ----------------------------------------->
  body {
                         margin: 0;
@@ -676,20 +703,20 @@ app.get('/:appName', (req, res) => {
         #container { display: flex; margin-top: 1vw;  }
 
 
-#content-frame {
-
-}
 
 
         #content-frame { overflow-y: auto; padding-top: 20px; box-sizing: border-box;   }
-        #content-frame-view { width: 100%; height:45vw; padding-left: 2VW; padding-top: 2VW;
-      
-        
-        }
+     
+
+ 
+ 
+                
+
+                     
       
     </style>
     <div id="container">
-
+<button id="fullscreenbutton">⛶ </button> 
 
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
@@ -711,9 +738,14 @@ app.get('/:appName', (req, res) => {
     // Appliquer un style aux images dans l'iframe
     const images = iframeDoc.getElementsByTagName('img');
     for (let img of images) {
-      img.style.maxWidth = '80vw';
+    img.style.position = 'absolute';
+
+       img.style.top = '50%';
+      img.style.left = '50%';
+      img.style.transform = 'translate(-50%, -50%)'; 
+      img.style.maxWidth = '75vw';
       img.style.height = '100%';
-      img.style.borderRadius = '10px';  // Exemple de bordure arrondie
+      img.style.borderRadius = '10px' 
     }
   };
         function loadPageView(url) {
@@ -737,7 +769,33 @@ app.get('/:appName', (req, res) => {
             }
         }
 
-   
+    const fullscreenButton = document.getElementById('fullscreenbutton');
+  const iframeView = document.getElementById('content-frame-view');
+
+  // Lorsque le bouton est cliqué
+  fullscreenButton.addEventListener('click', () => {
+    iframeView.classList.toggle('buttonactivated');
+  });
+
+  function loadPageView(url) {
+    const iframeView = document.getElementById('content-frame-view');
+    if (iframeView) {
+      iframeView.src = url;
+    } else {
+      console.error("Iframe 'content-frame-view' non trouvé.");
+    }
+  }
+
+  function toggleVisibility(element) {
+    const sublist = element.nextElementSibling.nextElementSibling;
+    if (sublist.classList.contains('hidden')) {
+      sublist.classList.remove('hidden');
+      element.textContent = '➖';
+    } else {
+      sublist.classList.add('hidden');
+      element.textContent = '➕';
+    }
+  }
     </script>
 `;
 
