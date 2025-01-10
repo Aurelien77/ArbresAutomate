@@ -117,13 +117,55 @@ app.get('/', (req, res) => {
                 background-size: cover;
                 background-position: center;
             }
-            .card h2 {
-                font-size: 1.5rem;
-                color: white;
-            }
-            .card p {
+      .card h2 {
+    background-color: white;
+    border-radius: 20%;
+    font-size: 1.5rem;
+    color: black;
+    text-shadow: 
+        1px 1px 0 white,
+        -1px 1px 0 white,
+        1px -1px 0 white,
+        -1px -1px 0 white,
+        1px 0 0 white,
+        -1px 0 0 white,
+        0 1px 0 white,
+        0 -1px 0 white;
+    text-decoration: none;
+    display: inline-block; 
+    padding: 0.5rem; 
+     border: 0.2px solid black;
+}
+
+.card a {
+    display: inline-flex; 
+    justify-content: center;
+    flex-direction: column;
+    text-decoration: none;transition: transform 0.3s ease;
+height:100%;
+  max-width:100%;
+}
+
+
+
+            .card p {    
+              border: 0.2px solid black;
+             padding: 0.3em; 
+            background-color:white;
+          border-radius: 20%;
+          width: 100%;
                 font-size: 1rem;
-                color: #fff;
+                  color: black;
+        text-shadow: 
+        1px 1px 0 white,
+        -1px 1px 0white,
+        1px -1px 0 white,
+        -1px -1px 0 white,
+        1px 0 0 white,
+        -1px 0 0 white,
+        0 1px 0 white,
+        0 -1px 0 white;
+     text-decoration: none;
             }
             .card:hover {
                 transform: scale(1.05);
@@ -254,6 +296,37 @@ body{
 width:100%;
 height:100%;
 }
+#arbre {
+    font-size: 1rem;
+    color: white;
+    text-decoration: none;
+    text-shadow: 
+        1px 1px 1px rgba(0, 0, 0, 0.5), /* Ombre noire subtile */
+        0.5px 0.5px 0 black,
+        -1px 1px 0 black,
+        1px -1px 0 black,
+        -1px -0.5px 0 black,
+        1px 0 0 white,
+        -1px 0 0 white,
+        0 1px 0 black,
+        0 -1px 0 white;
+
+}
+
+#arbre:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+      text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.5), /* Ombre noire subtile */
+        1px 1px 0 red,
+        -1px 1px 0 red,
+        1px -1px 0 red,
+        -1px -1px 0 red,
+        1px 0 0 red,
+        -1px 0 0 red,
+        0 1px 0 red,
+        0 -1px 0 red;
+}
 
 </style>
 
@@ -263,7 +336,7 @@ height:100%;
           
            ${menuButtonsHtml}
     
-         <button onclick="window.location.href='${appName}'">Arbre</button>
+         <button id="arbre" onclick="window.location.href='${appName}'">-Tree-</button>
 
 
   <button onclick="window.location.href='/'">🏠</button>
@@ -349,7 +422,9 @@ app.get('/app/:appName/*', (req, res) => {
             const fileExtension = path.extname(appPath).toLowerCase();   // extname  extrait l'extenssion ( methode de path )
 
             if (['.js', '.css', '.html','.url','.jfif','.txt'].includes(fileExtension)) {
+
                 // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
+                
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) {
                         return res.status(500).send('Erreur lors de la lecture du fichier');
