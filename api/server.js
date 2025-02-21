@@ -322,64 +322,67 @@ height:100%;
 app.get('/app/:appName/*', (req, res) => {
     try {
         const appName = req.params.appName;
-        const relativePath = req.params[0];  // Récupère tout ce qui suit "/app/:appName/"
-        const appPath = path.join(__dirname, '../apifolders', appName, relativePath); // Construction du chemin complet
+        const relativePath = req.params[0];  
+        const appPath = path.join(__dirname, '../apifolders', appName, relativePath); 
+
         if (!fs.existsSync(appPath)) {
             return res.status(404).send('Le dossier spécifié n\'existe pas');
         }
-        const stats = fs.lstatSync(appPath); // lstatSync est une méthode de LS pour retrouner des information sur un fichier
-//=> Si c'est un fichier => return  <pre>${data}</pre>   sinon  <li> ${icon} <a href="#" onclick="loadPageView('${newPath}')">${item.name}</a></li>
+
+        const stats = fs.lstatSync(appPath); 
+
         if (stats.isFile()) {
-            // Si c'est un fichier, on vérifie le type MIME ou l'extension du fichier
             const fileType = mime.lookup(appPath);
-            const fileExtension = path.extname(appPath).toLowerCase();   // extname  extrait l'extenssion ( methode de path )
-            if (['.js', '.css', '.html','.url','.jfif','.txt'].includes(fileExtension)) {
-                // Si c'est un fichier de code (par exemple .js, .css, .html), on l'affiche avec <pre> et du CSS
+            const fileExtension = path.extname(appPath).toLowerCase();  
+
+            if (['.js', '.css', '.html', '.url', '.jfif', '.txt'].includes(fileExtension)) {
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) {
                         return res.status(500).send('Erreur lors de la lecture du fichier');
                     }
-                    // Injecter le CSS et les balises <pre>
+
+                    // Échapper le contenu pour éviter l'exécution du HTML/JS
+                    const escapedData = data
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
                     const htmlContent = `
                         <style>
-                        body {
-                        margin: 0;
-                        
-                        }
+                            body {
+                                margin: 0;
+                                background-color: black;
+                                color: white;
+                                font-family: monospace;
+                            }
                             pre {
-                                  background-color: black;
                                 padding: 20px;
                                 border-radius: 5px;
-                                font-family: monospace;
-                                font-size: 1rem;
                                 overflow-x: auto;
                                 white-space: pre-wrap;
-                                color: white;
-                                margin: 0;
-                      
-                            }      
+                            }
                         </style>
-                   <pre>${data}</pre> 
+                        <pre><code>${escapedData}</code></pre> 
                     `;
                     res.send(htmlContent);
                 });
             } else {
-                // Pour les autres types de fichiers, on les envoie directement
-                res.type(fileType); // Déterminer et envoyer le type MIME
+                res.type(fileType); 
                 return res.sendFile(appPath);
             }
         } else {
-            // Si ce n'est pas un fichier mais un dossier, on continue comme précédemment
             const folderStructure = getFolderStructure(appPath);
             const renderFolder = (structure, currentPath = `/${appName}/${relativePath}`) => {
-                const sanitizedPath = currentPath.replace(/\/+/g, '/'); // Supprime les slashes multiples
+                const sanitizedPath = currentPath.replace(/\/+/g, '/'); 
                 return structure.map(item => {
                     const newPath = `${currentPath}/${item.name}`;
                     if (item.type === 'dossier') {
                         return `
                             <li class="folder">
                                 <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                                📁 <a href="#" </a>
+                                📁 <a href="#"></a>
                                 <ul class="hidden">
                                     ${renderFolder(item.contenu, newPath)}
                                 </ul>
@@ -396,6 +399,7 @@ app.get('/app/:appName/*', (req, res) => {
                     }
                 }).join('');
             };
+
             const htmlContent = `
                 <style>
                     ul { list-style-type: none; padding-left: 20px; }
@@ -405,82 +409,82 @@ app.get('/app/:appName/*', (req, res) => {
                     .hidden { display: none; padding-left: 20px; }
                     a { text-decoration: none; color: #007bff; }
                     a:hover { text-decoration: underline; }
-                  .container {
-    display: flex;
-    width: 100%; 
-    min-height: 100%; 
-    box-sizing: border-box; /* Inclut les bordures et le padding dans les dimensions */
-    margin: 0;
-    padding-top: 8px;
-    overflow: auto; /* Permet de scroller si le contenu dépasse l'écran */
-}
-    .container img {
-    max-width: 20vw;
-    max-height: 20vw; 
-    object-fit: contain; 
-    border 3px solid red;
-}       
-     /* Ajustement style Ifram View-------------------------------------------------------------------------------------------------------- */
+                    .container {
+                        display: flex;
+                        width: 100%; 
+                        min-height: 100%; 
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding-top: 8px;
+                        overflow: auto;
+                    }
+                    .container img {
+                        max-width: 20vw;
+                        max-height: 20vw; 
+                        object-fit: contain; 
+                        border: 3px solid red;
+                    }       
                     #content-frame-view {
                         width: 100%;
                         padding-left: 0VW;
                         padding-top: 2VW;
-                    object-fit: contain; 
-align-items: flex-start;
-align-content: flex-start
-  justify-content: center;    
+                        object-fit: contain; 
+                        align-items: flex-start;
+                        align-content: flex-start;
+                        justify-content: center;    
                     }
-.imageiframe {
-width : 30vw;
-}
-                   #content-frame{
-                   margin-top: 2%;}
+                    .imageiframe {
+                        width: 30vw;
+                    }
+                    #content-frame {
+                        margin-top: 2%;
+                    }
                 </style>
-                <div class="container" >
+                <div class="container">
                     <div id="content-frame">
                         <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
                     </div>
-                        <iframe id="content-frame-view" src="" frameborder="0"></iframe>
-                       
+                    <iframe id="content-frame-view" src="" frameborder="0"></iframe>
                 </div>
-                <script>    const iframe = document.getElementById('content-frame-view');
-  // Une fois que le contenu de l'iframe est chargé
-  iframe.onload = function() {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    // Appliquer un style aux images dans l'iframe
-    const images = iframeDoc.getElementsByTagName('img');
-    for (let img of images) {
-     img.style.position = 'absolute';
-      img.style.top = '50%';
-      img.style.left = '50%';
-      img.style.transform = 'translate(-50%, -50%)'; 
-      img.style.maxWidth = '75vw';
-      img.style.height = '100%';
-      img.style.borderRadius = '10px' 
-    }
-  };
+                <script>
+                    const iframe = document.getElementById('content-frame-view');
+
+                    iframe.onload = function() {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const images = iframeDoc.getElementsByTagName('img');
+                        for (let img of images) {
+                            img.style.position = 'absolute';
+                            img.style.top = '50%';
+                            img.style.left = '50%';
+                            img.style.transform = 'translate(-50%, -50%)'; 
+                            img.style.maxWidth = '75vw';
+                            img.style.height = '100%';
+                            img.style.borderRadius = '10px'; 
+                        }
+                    };
+
                     function loadPageView(url) {
                         const iframeView = document.getElementById('content-frame-view');
-                           const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url);
+                        const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url);
+                        
                         if (iframeView) {
-                            iframeView.src = url; // Load the URL into the iframe
-                        }
-                              if (isImage) {
                             iframeView.src = url;
-                            iframeView.class = imageiframe;  // Load the URL into the iframe
-                        }
-                        else {
+                            if (isImage) {
+                                iframeView.classList.add("imageiframe");
+                            }
+                        } else {
                             console.error("Iframe 'content-frame-view' not found.");
                         }
                     }
+
                     function toggleVisibility(element) {
                         const sublist = element.nextElementSibling.nextElementSibling;
                         if (sublist.classList.contains('hidden')) {
                             sublist.classList.remove('hidden');
-                            element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
+                            element.textContent = '➖';
                         } else {
                             sublist.classList.add('hidden');
-                            element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
+                            element.textContent = '➕';
                         }
                     }
                 </script>
@@ -493,6 +497,7 @@ width : 30vw;
         res.status(500).send('Une erreur est survenue lors du traitement de la demande');
     }
 });
+
 // ARBRE  // ------------------------------------------------------------------------ 
 
 /* Générer une arborescence de l'application avant de générer l'affichage des élément dans la route /app/:appName */
@@ -532,7 +537,7 @@ app.get('/:appName', (req, res) => {
                                     white-space: pre-wrap;
                                 }
                             </style>
-                            <pre>${data}</pre>
+                            <pre><code>${data}</code></pre>
                         `;
                     res.send(htmlContent);
                 });
@@ -553,9 +558,9 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         let presetButton = '';
         if (fs.existsSync(configFilePath)) {
             presetButton = `
-                <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
-                    📌 Commentaires
-                </button>
+             <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
+    📌 Commentaires
+</button>
             `;
         }
         if (item.type === 'dossier') {
@@ -583,6 +588,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
  const htmlContent = `
     <style>
   #fullscreenbutton {
+  z-index:9999;
     position: absolute;
     top: 2.5vw;
     left: 50%;
@@ -628,13 +634,24 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 }
 
 #split-container iframe {
-width: 50vw;         
+width: 100vw;         
     height: 100vh     
     border: none;     
     gap: none;
     z-index: 10;
 }
 
+#content-frame-view-comment {
+    width: 50vw;
+    height: 100vh;
+    border: none;
+    display: block;
+}
+    #content-frame-view-comment.hidden {
+        display: none;
+    }
+
+    
     </style>
     <div id="container">
 <button id="fullscreenbutton">⛶ </button> 
@@ -646,7 +663,7 @@ width: 50vw;
 
       <div id="split-container">
     <iframe id="content-frame-view" src="" frameborder="0"></iframe> 
-    <iframe id="content-frame-view-comment" src="" frameborder="0"></iframe>
+   <iframe id="content-frame-view-comment" src="" frameborder="0" class="hidden"></iframe>
 </div>
 
 
@@ -683,15 +700,30 @@ width: 50vw;
                 console.error("Iframe 'content-frame-view' non trouvé.");
             }
         }
- function loadPageViewComment(url) {
-            const iframeView = document.getElementById('content-frame-view-comment');
-            
-            if (iframeView) {
-                iframeView.src = url; // Charge l'URL dans l'iframe
-            } else {
-                console.error("Iframe 'content-frame-view' non trouvé.");
-            }
-        }
+function loadPageViewComment(url) {
+    const iframeComment = document.getElementById('content-frame-view-comment');
+
+    if (!iframeComment) {
+        console.error("⚠️ Iframe 'content-frame-view-comment' introuvable !");
+        return;
+    }
+
+    // Vérifier si l'iframe affiche déjà cette URL et est visible
+    if (iframeComment.src.includes(url) && !iframeComment.classList.contains('hidden')) {
+        console.log("🔻 Masquage de l'iframe");
+        iframeComment.classList.add('hidden');  // Cache l'iframe
+        iframeComment.src = "about:blank"; // Vide l'iframe pour éviter de recharger inutilement
+    } else {
+        console.log("🔺 Affichage de l'iframe avec :", url);
+        iframeComment.src = url;
+        iframeComment.classList.remove('hidden');  // Affiche l'iframe
+    }
+}
+
+
+
+
+
         function toggleVisibility(element) {
             const sublist = element.nextElementSibling.nextElementSibling;
             if (sublist.classList.contains('hidden')) {
