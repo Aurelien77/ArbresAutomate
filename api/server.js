@@ -153,7 +153,7 @@ height:100%;
     `;
     res.send(htmlContent);
 });
-// -------------------------------------------------- => § Home de l'application
+// -------------------------------------------------- => § Titres  
 // Générer dynamiquement les boutons de menu basés sur les sous-dossiers dans config2850  +   Génère le chemin pour les cards accueil
 app.get('/arborescence/:appName', (req, res) => {
     const appName = req.params.appName;
@@ -268,6 +268,12 @@ height:100%;
         0 1px 0 red,
         0 -1px 0 red;
 }
+        #fullscreenbutton{
+        position:absolute;
+        left:50%;
+        top: 160px;
+        
+        }
 </style>
        <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
      <div id="categoryMenu" class="categoryMenu">
@@ -275,17 +281,60 @@ height:100%;
          <button id="arbre" onclick="window.location.href='${appName}'">-Tree-</button>
   <button onclick="window.location.href='/'">🏠</button>
                     <h1 id="titre" >${appName}</h1>
+
+                    <button id="fullscreenbutton">Full ⛶ Screen</button>
+
        </div>
        <div class="iframeview">
        <iframe id="content-frame" src="/${appName}" frameborder="0">
        </iframe>
 <div>
   <script>
-    // Fonction pour basculer en plein écran
-        function reveal() {
-            const fileContent = document.getElementById('fileContent');
-            fileContent.classList.toggle('fullscreen');
-        }
+ const fullscreenButton = document.getElementById('fullscreenbutton');
+const iframeView = document.getElementById('content-frame'); // L'iframe principale
+
+// Fonction pour mettre à jour le texte du bouton selon l'état du plein écran
+function updateFullscreenButtonText() {
+  if (document.fullscreenElement) {
+    fullscreenButton.innerHTML = "Exit ⛶ Screen";
+  } else {
+    fullscreenButton.innerHTML = "Full ⛶ Screen";
+  }
+}
+
+fullscreenButton.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    // Si aucun élément n'est en plein écran, on l'active
+    if (iframeView.requestFullscreen) {
+      iframeView.requestFullscreen();
+    } else if (iframeView.webkitRequestFullscreen) { /* Safari */
+      iframeView.webkitRequestFullscreen();
+    } else if (iframeView.msRequestFullscreen) { /* IE11 */
+      iframeView.msRequestFullscreen();
+    }
+  } else {
+    // Si on est déjà en plein écran, on le quitte
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+      document.msExitFullscreen();
+    }
+  }
+});
+
+// Gérer le changement d'état du plein écran pour mettre à jour le texte du bouton
+document.addEventListener("fullscreenchange", () => {
+  updateFullscreenButtonText();
+  console.log("Changement d'état du plein écran");
+  if (!document.fullscreenElement) {
+    console.log("Sortie du mode plein écran");
+  }
+});
+
+// Initialiser le texte du bouton au chargement
+updateFullscreenButtonText();
   // Définition de la fonction loadPageView
   function loadPageView(url) {
     const iframeView = document.getElementById('content-frame-view');
@@ -444,6 +493,7 @@ app.get('/app/:appName/*', (req, res) => {
                     <div id="content-frame">
                         <ul>${renderFolder(folderStructure, `/app/${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
                     </div>
+                    
                     <iframe id="content-frame-view" src="" frameborder="0"></iframe>
                 </div>
                 <script>
@@ -587,11 +637,11 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 };
  const htmlContent = `
     <style>
-  #fullscreenbutton {
+  #fullscreenbuttoniframe {
   z-index:9999;
     position: absolute;
-    top: 2.5vw;
-    left: 50%;
+    top:57px;
+    right: 15px;
     transform: translate(-50%, -50%);
     z-index: 51;
   }
@@ -654,15 +704,15 @@ width: 100vw;
     
     </style>
     <div id="container">
-<button id="fullscreenbutton">⛶ </button> 
+
 
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
 
-
+<button id="fullscreenbuttoniframe">⛶</button>
       <div id="split-container">
-    <iframe id="content-frame-view" src="" frameborder="0"></iframe> 
+    <iframe id="content-frame-view" src="" frameborder="0"> </iframe> 
    <iframe id="content-frame-view-comment" src="" frameborder="0" class="hidden"></iframe>
 </div>
 
@@ -717,9 +767,34 @@ function loadPageViewComment(url) {
         console.log("🔺 Affichage de l'iframe avec :", url);
         iframeComment.src = url;
         iframeComment.classList.remove('hidden');  // Affiche l'iframe
+
+        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
+        iframeComment.onload = function () {
+            const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
+            if (iframeDoc) {
+                const closeButton = iframeDoc.createElement('button');
+                closeButton.textContent = '❌ Fermer';
+                closeButton.style.position = 'fixed';
+                closeButton.style.top = '18px';
+                closeButton.style.right = '60px';
+                closeButton.style.padding = '2px';
+                closeButton.style.background = 'red';
+                closeButton.style.color = 'white';
+                closeButton.style.border = 'none';
+                closeButton.style.cursor = 'pointer';
+                closeButton.style.zIndex = '9999';
+
+                closeButton.onclick = () => {
+                    iframeComment.classList.add('hidden');
+                    iframeComment.src = "about:blank";
+                };
+
+                // Ajouter le bouton au début du body de l'iframe
+                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
+            }
+        };
     }
 }
-
 
 
 
@@ -735,7 +810,7 @@ function loadPageViewComment(url) {
             }
         }
 
-    const fullscreenButton = document.getElementById('fullscreenbutton');
+    const fullscreenButton = document.getElementById('fullscreenbuttoniframe');
   const iframeView = document.getElementById('content-frame-view');
 
   // Lorsque le bouton est cliqué
@@ -743,14 +818,52 @@ function loadPageViewComment(url) {
     iframeView.classList.toggle('buttonactivated');
   });
 
-  function loadPageView(url) {
+ function loadPageView(url) {
     const iframeView = document.getElementById('content-frame-view');
-    if (iframeView) {
-      iframeView.src = url;
-    } else {
-      console.error("Iframe 'content-frame-view' non trouvé.");
+
+    if (!iframeView) {
+        console.error("⚠️ Iframe 'content-frame-view' introuvable !");
+        return;
     }
-  }
+
+    // Vérifier si l'iframe affiche déjà cette URL et est visible
+    if (iframeView.src.includes(url) && !iframeView.classList.contains('hidden')) {
+        console.log("🔻 Masquage de l'iframe principale");
+        iframeView.classList.add('hidden');  // Cache l'iframe
+        iframeView.src = "about:blank"; // Vide l'iframe
+    } else {
+        console.log("🔺 Affichage de l'iframe principale avec :", url);
+        iframeView.src = url;
+        iframeView.classList.remove('hidden');  // Affiche l'iframe
+
+        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
+        iframeView.onload = function () {
+            const iframeDoc = iframeView.contentDocument || iframeView.contentWindow.document;
+            if (iframeDoc) {
+                const closeButton = iframeDoc.createElement('button');
+                closeButton.textContent = '❌ Fermer';
+                closeButton.style.position = 'fixed';
+                closeButton.style.top = '20px';
+                closeButton.style.right = '50px';
+                closeButton.style.padding = '1px';
+                closeButton.style.background = 'red';
+                closeButton.style.color = 'white';
+                closeButton.style.border = 'none';
+                closeButton.style.cursor = 'pointer';
+                closeButton.style.zIndex = '9999';
+
+                closeButton.onclick = () => {
+                    iframeView.classList.add('hidden');
+                    iframeView.src = "about:blank";
+                };
+
+                // Ajouter le bouton au début du body de l'iframe
+                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
+            }
+        };
+    }
+}
+
 
   function toggleVisibility(element) {
     const sublist = element.nextElementSibling.nextElementSibling;
