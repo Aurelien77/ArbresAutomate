@@ -183,95 +183,92 @@ app.get('/arborescence/:appName', (req, res) => {
     overflow: hidden; 
 }  
     h1{
-    color:white;
-    margin-top:5.7vw;
+margin-left: 200px;
+color: red;
+margin-top: -5px;
     }
-    .toggleMenuButton {
-        position: fixed;
-        top: 5px;
-        right: 20px;
-        width: 30px;
-        height: 30px;
-        font-size: 20px;
-        background-color: #4CAF50; /* Couleur verte */
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 100;
-        transition: transform 0.3s ease-in-out;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Effet lumineux */
-    }
-    .toggleMenuButton:hover {
-        background-color: #45a049;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 1); /* Effet lumineux au survol */
-        transform: scale(1.1); /* Légère agrandissement au survol */
-    }
-    /* Menu caché par défaut */
-    .categoryMenu {
-        position: fixed;
-        top: -150px; /* Hors de l'écran en haut */
-        left: 0;
-        width: 100%; /* Le menu prend toute la largeur */
-        height: 150px; /* Hauteur du menu */
-        background-color: #333; /* Couleur sombre pour le fond */
-        transition: top 0.3s ease-in-out; /* Animation pour le déploiement */
-        z-index: 50;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Ombre pour le menu */
-    }
-    .categoryMenu a {
-        display: block;
-        padding: 12px;
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
-    .categoryMenu a:hover {
-        background-color: #575757; /* Effet hover des liens du menu */
-    }
-    /* Activer le menu lorsqu'il est ouvert */
-    .categoryMenu.active {
-        top: 0; /* Déplace le menu vers le haut */
-    }    
+ .categoryMenu {
+    position: fixed;
+    top: 0;
+    left: -100%; /* Caché par défaut */
+    border-radius: 0% 0% 10% 10%;
+    height: 40px; 
+    background-color: #333;
+    transition: left 1s ease-in-out;
+    z-index: 50;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+
+/* Quand le menu est actif, il se décale */
+.categoryMenu.active {
+z-index:20;
+    left: 0;
+    width:90vw;
+    display:flex;
+    flex-direction: row;
+        border-radius: 10% 0% 30% 0%;
+}
+
+/* Bouton pour ouvrir/fermer */
+.toggleMenuButton {
+    position: fixed;
+    top: 5px;
+    left: 10px;
+    width: 35px;
+    height: 35px;
+    font-size: 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    transition: transform 0s ease-in-out;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+}
+
+.toggleMenuButton:hover {
+    background-color: #45a049;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 1);
+    transform: scale(1.1);
+}
+
+/* Boutons dans le menu */
+.categoryMenu button {
+    width: 100%;
+    margin: 5px 0;
+    color: white;
+    background: #444;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  
+}
+
+.categoryMenu button:hover {
+    background: #575757;
+}   
 body{
 width:100%;
 height:100%;
 }
-#arbre {
-    font-size: 1rem;
-    color: white;
-    text-decoration: none;
-    text-shadow: 
-        1px 1px 1px rgba(0, 0, 0, 0.5), /* Ombre noire subtile */
-        0.5px 0.5px 0 black,
-        -1px 1px 0 black,
-        1px -1px 0 black,
-        -1px -0.5px 0 black,
-        1px 0 0 white,
-        -1px 0 0 white,
-        0 1px 0 black,
-        0 -1px 0 white;
-}
-#arbre:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
-      text-shadow: 
-        2px 2px 4px rgba(0, 0, 0, 0.5), /* Ombre noire subtile */
-        1px 1px 0 red,
-        -1px 1px 0 red,
-        1px -1px 0 red,
-        -1px -1px 0 red,
-        1px 0 0 red,
-        -1px 0 0 red,
-        0 1px 0 red,
-        0 -1px 0 red;
-}
+
         #fullscreenbutton{
         position:absolute;
-        left:50%;
-        top: 160px;
+        right:15px;
+        top: 5px;
+        width: 100px;
+        border-radius: 40%;
+        }
+
+        .iframeview {
+  
+margin-top: -33px;
+        margin-left:-20px;
         
         }
 </style>
@@ -280,11 +277,13 @@ height:100%;
            ${menuButtonsHtml}
          <button id="arbre" onclick="window.location.href='${appName}'">-Tree-</button>
   <button onclick="window.location.href='/'">🏠</button>
-                    <h1 id="titre" >${appName}</h1>
+                   
 
-                    <button id="fullscreenbutton">Full ⛶ Screen</button>
+                
 
-       </div>
+       </div>              
+        <h1 id="titre" >${appName}</h1>
+       <button id="fullscreenbutton">Full ⛶ Screen</button>
        <div class="iframeview">
        <iframe id="content-frame" src="/${appName}" frameborder="0">
        </iframe>
@@ -461,10 +460,10 @@ app.get('/app/:appName/*', (req, res) => {
                     .container {
                         display: flex;
                         width: 100%; 
-                        min-height: 100%; 
+                      
                         box-sizing: border-box;
                         margin: 0;
-                        padding-top: 8px;
+            
                         overflow: auto;
                     }
                     .container img {
@@ -485,9 +484,7 @@ app.get('/app/:appName/*', (req, res) => {
                     .imageiframe {
                         width: 30vw;
                     }
-                    #content-frame {
-                        margin-top: 2%;
-                    }
+                 
                 </style>
                 <div class="container">
                     <div id="content-frame">
@@ -640,7 +637,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
   #fullscreenbuttoniframe {
   z-index:9999;
     position: absolute;
-    top:57px;
+    top:15px;
     right: 15px;
     transform: translate(-50%, -50%);
     z-index: 51;
@@ -672,15 +669,42 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         .hidden { display: none; padding-left: 20px; }
         a { text-decoration: none; color: #007bff; }
         a:hover { text-decoration: underline; }
-        #container { display: flex; margin-top: 1vw;  }
-        #content-frame { overflow-y: auto; padding-top: 20px; box-sizing: border-box; display: flex; flex-direction: row;  }
+        #container { 
+        
+    
+        display: flex 
 
+        
+        
+        }
+
+
+        #content-frame {
+
+         overflow-y: auto; 
+height : 100%;
+           display: flex; 
+           flex-direction: row;
+            background-color: #cccccc;
+             border-radius: 0% 5% 0% 0%;
+             box-shadow: 1px 1px 1px #129867;
+             text-shadow: 1px 1px 1px #129867;
+             padding: 7px;
+         
+             }
+#content-frame a:visited {
+    color: black; 
+    text-decoration: none; 
+
+}
 #split-container {
+
     display: flex;        
     width: 100vw;        
     height: 100vh;  
    overflow-x: hidden;   
    overflow-y: auto;  
+   margin-left: 10px;
 }
 
 #split-container iframe {
@@ -775,8 +799,8 @@ function loadPageViewComment(url) {
                 const closeButton = iframeDoc.createElement('button');
                 closeButton.textContent = '❌ Fermer';
                 closeButton.style.position = 'fixed';
-                closeButton.style.top = '18px';
-                closeButton.style.right = '60px';
+                closeButton.style.top = '20px';
+                closeButton.style.right = '10px';
                 closeButton.style.padding = '2px';
                 closeButton.style.background = 'red';
                 closeButton.style.color = 'white';
@@ -844,7 +868,7 @@ function loadPageViewComment(url) {
                 closeButton.textContent = '❌ Fermer';
                 closeButton.style.position = 'fixed';
                 closeButton.style.top = '20px';
-                closeButton.style.right = '50px';
+                closeButton.style.right = '10px';
                 closeButton.style.padding = '1px';
                 closeButton.style.background = 'red';
                 closeButton.style.color = 'white';
