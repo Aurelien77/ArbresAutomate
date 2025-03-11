@@ -680,7 +680,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 
 
         #content-frame {
-
+z-index: 100;
          overflow-y: auto; 
 height : 100%;
            display: flex; 
@@ -690,7 +690,7 @@ height : 100%;
              box-shadow: 1px 1px 1px #129867;
              text-shadow: 1px 1px 1px #129867;
              padding: 7px;
-         
+         margin-top: 5px;
              }
 #content-frame a:visited {
     color: black; 
@@ -725,10 +725,25 @@ width: 100vw;
         display: none;
     }
 
-    
+    #toggle-frame {
+    position: absolute;
+    z-index : 5000;
+    top: 15px;
+    left: 3px;
+    padding: 5px 10px;
+    background-color:rgb(30, 255, 0);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#toggle-frame:hover {
+    background-color:rgb(12, 206, 122);
+}
     </style>
     <div id="container">
-
+<button id="toggle-frame">⇤</button>
 
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
@@ -745,6 +760,23 @@ width: 100vw;
     </div>
 
     <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const frame = document.getElementById("content-frame");
+    const button = document.getElementById("toggle-frame");
+    let isHidden = false;
+
+    button.addEventListener("click", function () {
+        if (!isHidden) {
+            frame.style.marginLeft = "-100%"; // Déplace la frame à gauche
+            button.textContent = "⇥"; // Change le texte du bouton
+        } else {
+            frame.style.marginLeft = "0vw"; // Remet la frame à sa place
+            button.textContent = "⇤";
+        }
+        isHidden = !isHidden;
+    });
+});
+
         const appName = "${appName}";
         const relativePath = "${relativePath}";
        const iframe = document.getElementById('content-frame-view');
