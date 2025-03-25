@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/server.js", "use": "@vercel/node" },
+    { "src": "public/**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/public/applichoice.html" },
+    { "src": "/codeschoice", "dest": "/public/pagesotwarepresentation.html" },
+    { "src": "/menu", "dest": "/public/skeleton/menu.html" },
+    { "src": "/codeaccueil", "dest": "/public/skeleton/codeaccueil.html" },
+    { "src": "/logicroadcode", "dest": "/public/logicroadcode.html" },
+    { "src": "/middle", "dest": "/public/skeleton/middle.html" },
+    { "src": "/observation", "dest": "/public/skeleton/observation.html" },
+    
+
+    { "src": "/file-content", "dest": "/api/server.js" },
+    { "src": "/folder-structure", "dest": "/api/server.js" },
+    
+ 
+    { "src": "/icon", "dest": "/public/media/code_book.ico" },
+    { "src": "/logo", "dest": "/public/media/tree.jpg" },
+    
+
+    { "src": "/apifolders/(.*)", "dest": "/api/server.js" }
+  ]
+}
