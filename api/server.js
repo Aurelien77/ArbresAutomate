@@ -158,214 +158,98 @@ height:100%;
 app.get('/arborescence/:appName', (req, res) => {
     const appName = req.params.appName;
     const appPath = path.join(__dirname, '../apifolders', appName);
+    
     if (!fs.existsSync(appPath)) {
         return res.status(404).send('Application non trouvée');
     }
-    // Génère l'arborescnce + filtre le dossier De configuration image
+    
     const configPath = path.join(appPath, 'config2850');
     const configDirs = fs.existsSync(configPath) 
-    ? fs.readdirSync(configPath)
-        .filter(item => {
-            const itemPath = path.join(configPath, item);
-            return fs.lstatSync(itemPath).isDirectory() && item.toLowerCase() !== 'picture2850';
-        })
-    : [];
-    const menuButtonsHtml = configDirs.map(dir => {
-        return `<button onclick="loadPage('/app/${appName}/config2850/${dir}')" data-url="/app/${appName}/config2850/${dir}">${dir}</button>`;
-    }).join(' ');
-    const htmlContent = `
-      <style>
-         /* Style pour le contenu d'arborescence => iframe de gauche */
- iframe {
-    width: 100%;
-    height: 100%; 
-    border: none; 
-    overflow: hidden; 
-}  
-    h1{
-margin-left: 200px;
-color: red;
-margin-top: -5px;
-    }
- .categoryMenu {
-    position: fixed;
-    top: 0;
-    left: -100%; /* Caché par défaut */
-    border-radius: 0% 0% 10% 10%;
-    height: 40px; 
-    background-color: #333;
-    transition: left 1s ease-in-out;
-    z-index: 50;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+        ? fs.readdirSync(configPath)
+            .filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory() && item.toLowerCase() !== 'picture2850')
+        : [];
+
+    const menuButtonsHtml = configDirs.map(dir => `
+        <button onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</button>
+    `).join(' ');
     
-}
-
-/* Quand le menu est actif, il se décale */
-.categoryMenu.active {
-z-index:20;
-    left: 0;
-    width:90vw;
-    display:flex;
-    flex-direction: row;
-        border-radius: 10% 0% 30% 0%;
-}
-
-/* Bouton pour ouvrir/fermer */
-.toggleMenuButton {
-    position: fixed;
-    top: 5px;
-    left: 10px;
-    width: 35px;
-    height: 35px;
-    font-size: 25px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 100;
-    transition: transform 0s ease-in-out;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
-}
-
-.toggleMenuButton:hover {
-    background-color: #45a049;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 1);
-    transform: scale(1.1);
-}
-
-/* Boutons dans le menu */
-.categoryMenu button {
-    width: 100%;
-    margin: 5px 0;
-    color: white;
-    background: #444;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-  
-}
-
-.categoryMenu button:hover {
-    background: #575757;
-}   
-body{
-width:100%;
-height:100%;
-}
-
-        #fullscreenbutton{
-        position:absolute;
-        right:15px;
-        top: 5px;
-        width: 100px;
-        border-radius: 40%;
+    res.send(`
+    <style>
+        .categoryMenu {
+            position: fixed;
+            top: 10px;
+            left: -100%;
+            width: 90vw;
+            height: 50px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background: #f0f0f0;
+            transition: left 0.5s ease-in-out;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            border-radius: 0 20px 20px 0;
         }
-
-        .iframeview {
-  
-margin-top: -33px;
-        margin-left:-20px;
-        
+        .categoryMenu.active {
+            left: 0;
+            opacity: 1;
+            transition: left 0.5s ease-in-out, opacity 0.3s ease-in-out;
         }
-</style>
-       <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
-     <div id="categoryMenu" class="categoryMenu">
-           ${menuButtonsHtml}
-         <button id="arbre" onclick="window.location.href='${appName}'">-Tree-</button>
-  <button onclick="window.location.href='/'">🏠</button>
-                   
+        .toggleMenuButton {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            background-color: lightblue;
+            border-radius: 50%;
+            z-index: 1000;
+            transition: left 0.5s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .toggleMenuButton:hover {
+            transform: scale(1.1);
+        }
+        .toggleMenuButton.active {
+            left: 88vw; /* Décalage progressif pour suivre le menu */
+        }
+        .categoryMenu button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        .categoryMenu button:hover {
+            background: #575757;
+        }
+    </style>
 
-                
+    <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
+    <div id="categoryMenu" class="categoryMenu">
+        ${menuButtonsHtml}
+        <button onclick="loadPage('/${appName}')">-Tree-</button>
+        <button onclick="window.location.href='/'">🏠</button>
+    </div>
+    <iframe id="contentFrame" src="/${appName}" style="width:100%; height:100vh; border:none;"></iframe>
 
-       </div>              
-        <h1 id="titre" >${appName}</h1>
-       <button id="fullscreenbutton">Full ⛶ Screen</button>
-       <div class="iframeview">
-       <iframe id="content-frame" src="/${appName}" frameborder="0">
-       </iframe>
-<div>
-  <script>
- const fullscreenButton = document.getElementById('fullscreenbutton');
-const iframeView = document.getElementById('content-frame'); // L'iframe principale
-
-// Fonction pour mettre à jour le texte du bouton selon l'état du plein écran
-function updateFullscreenButtonText() {
-  if (document.fullscreenElement) {
-    fullscreenButton.innerHTML = "Exit ⛶ Screen";
-  } else {
-    fullscreenButton.innerHTML = "Full ⛶ Screen";
-  }
-}
-
-fullscreenButton.addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    // Si aucun élément n'est en plein écran, on l'active
-    if (iframeView.requestFullscreen) {
-      iframeView.requestFullscreen();
-    } else if (iframeView.webkitRequestFullscreen) { /* Safari */
-      iframeView.webkitRequestFullscreen();
-    } else if (iframeView.msRequestFullscreen) { /* IE11 */
-      iframeView.msRequestFullscreen();
-    }
-  } else {
-    // Si on est déjà en plein écran, on le quitte
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) { /* Safari */
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { /* IE11 */
-      document.msExitFullscreen();
-    }
-  }
+    <script>
+        document.getElementById('toggleMenuButton').addEventListener('click', function () {
+            const menu = document.getElementById('categoryMenu');
+            const button = document.getElementById('toggleMenuButton');
+            menu.classList.toggle('active');
+            button.classList.toggle('active');
+        });
+        function loadPage(url) {
+            document.getElementById('contentFrame').src = url;
+        }
+    </script>
+    `);
 });
 
-// Gérer le changement d'état du plein écran pour mettre à jour le texte du bouton
-document.addEventListener("fullscreenchange", () => {
-  updateFullscreenButtonText();
-  console.log("Changement d'état du plein écran");
-  if (!document.fullscreenElement) {
-    console.log("Sortie du mode plein écran");
-  }
-});
-
-// Initialiser le texte du bouton au chargement
-updateFullscreenButtonText();
-  // Définition de la fonction loadPageView
-  function loadPageView(url) {
-    const iframeView = document.getElementById('content-frame-view');
-    if (iframeView) {
-        iframeView.src = url; // Charger l'URL dans l'iframe secondaire
-    } else {
-        console.error("L'iframe 'content-frame-view' n'a pas été trouvé.");
-    }
-  }
-  // Définition de la fonction loadPage
-  function loadPage(url) {
-    const iframe = document.getElementById('content-frame');
-    iframe.src = url; // Charger l'URL dans l'iframe principal
-  }
-  // ==================> Optionnel : Gestion de l'affichage du menu
-  const toggleMenuButton = document.getElementById('toggleMenuButton');
-  const categoryMenu = document.getElementById('categoryMenu');
-  toggleMenuButton.addEventListener('click', function () {
-      categoryMenu.classList.toggle('active');
-  });
-  // Fermer le menu après clic sur un bouton
-  const menuButtons = document.querySelectorAll('.categoryMenu button');
-  menuButtons.forEach(button => {
-      button.addEventListener('click', () => {
-          categoryMenu.classList.remove('active');
-      });
-  });
-</script>
- `;
-
-    res.send(htmlContent);
-});
 // recoit une arborescence + envoi fichiers vers ifram view  //
 app.get('/app/:appName/*', (req, res) => {
     try {
@@ -582,6 +466,7 @@ app.get('/:appName', (req, res) => {
                                     font-size: 1rem;
                                     overflow-x: auto;
                                     white-space: pre-wrap;
+                                      box-shadow: 3px 3px 2px 1px rgba(0, 0, 255, .2);
                                 }
                             </style>
                             <pre><code>${data}</code></pre>
@@ -653,7 +538,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
  
   #content-frame-view {
     width: 100%;
-    height: 45vw;
+    height: auto;
   }
  // Style pour iframe view Arbre ----------------------------------------->
  body {
@@ -669,6 +554,8 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         .hidden { display: none; padding-left: 20px; }
         a { text-decoration: none; color: #007bff; }
         a:hover { text-decoration: underline; }
+
+
         #container { 
         
     
@@ -690,7 +577,7 @@ height : 100%;
              box-shadow: 1px 1px 1px #129867;
              text-shadow: 1px 1px 1px #129867;
              padding: 7px;
-         margin-top: 5px;
+         margin-top: 55px;
              }
 #content-frame a:visited {
     color: black; 
@@ -698,6 +585,8 @@ height : 100%;
 
 }
 #split-container {
+
+margin-top: 55px;
 
     display: flex;        
     width: 100vw;        
@@ -726,16 +615,18 @@ width: 100vw;
     }
 
     #toggle-frame {
+    z-index: 9999;
     position: absolute;
-    z-index : 5000;
-    top: 15px;
-    left: 3px;
+
+    top:65px;
+    left: 10px;
     padding: 5px 10px;
-    background-color:rgb(30, 255, 0);
+
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 5px;
+    box-shadow: black 1px 1px 1px;
 }
 
 #toggle-frame:hover {
