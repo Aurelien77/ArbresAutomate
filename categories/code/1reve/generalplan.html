@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic File Explorer</title>
+</head>
+<body>
+
+<div id="fileExplorer"></div>
+
+<script>
+// Fonction pour charger la structure des dossiers et fichiers depuis une API
+function loadFolderStructure() {
+    // Supposons que vous ayez une API qui fournit la structure des dossiers et fichiers
+    // Vous devrez remplacer cette URL par l'URL de votre API réelle
+    var apiUrl = 'https://votre-api.com/structure';
+
+    // Effectuer une requête AJAX vers l'API
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', apiUrl, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                var folderStructure = JSON.parse(xhr.responseText);
+                displayFolderStructure(folderStructure);
+            } else {
+                console.error('Erreur lors de la récupération de la structure des dossiers et fichiers.');
+            }
+        }
+    };
+    xhr.send();
+}
+
+// Fonction pour afficher la structure des dossiers et fichiers
+function displayFolderStructure(folderStructure) {
+    var fileExplorer = document.getElementById("fileExplorer");
+    loadFilesAndFolders(folderStructure, fileExplorer);
+}
+
+function loadFilesAndFolders(data, parentElement) {
+    var table = document.createElement('table');
+    parentElement.appendChild(table);
+
+    data.forEach(function(item) {
+        var row = table.insertRow();
+        var cell = row.insertCell();
+        
+        var text = '';
+        if (item.type === 'dossier') {
+            text = 'Dossier: ' + item.name;
+        } else if (item.type === 'fichier') {
+            text = 'Fichier: ' + item.name;
+        }
+        
+        cell.textContent = text;
+
+        if (item.contenu && item.contenu.length > 0) {
+            loadFilesAndFolders(item.contenu, cell); // Récursion pour les sous-dossiers
+        }
+    });
+}
+
+// Charger la structure des dossiers et fichiers au chargement de la page
+window.onload = function() {
+    loadFolderStructure();
+};
+</script>
+
+</body>
+</html>

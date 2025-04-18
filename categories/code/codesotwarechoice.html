@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Arbre de choix</title>
+
+    <link rel="stylesheet" href="code.css">
+    
+
+    
+</head>
+<body>
+
+<div class="containeriframe">
+    <div class="menu">
+        
+        <ul>
+<li><a href="../../index.html" target="_parent">Accueil</a></li>
+
+
+
+        </ul>
+   
+        <ul>
+            <li><a href="#" onclick="loadPage('./1reve/codeaccueil.html');loadMenu('./1reve/menu.html')">1reve</a></li>
+            <li><a href="#" onclick="loadPage('./1dream2pianos/codeaccueil.html');loadMenu('./1dream2pianos/menu.html')">1dream2pianos</a></li>
+            <li><a href="#" onclick="loadPage('./austral/codeaccueil.html');loadMenu('./austral/menu.html')">Austral</a></li>
+        </ul>
+    </div>
+    <div class="content">
+      
+
+        <iframe id="FrameMenu" frameborder="0" src="../code/1reve/menu.html"> 
+
+
+        </iframe>
+    
+        <iframe id="contentFrame" frameborder="0" src="./1reve/codeaccueil.html">      </iframe>
+    </div>
+   
+      
+    </div>
+</div>
+
+<script>
+    function loadPage(url) {
+        // Charger la page dans l'iframe
+        document.getElementById('contentFrame').src = url;
+    }
+
+    function loadMenu(url) {
+        // Charger la page dans l'iframe
+        document.getElementById('FrameMenu').src = url;
+    }
+    function  refresh() {
+      
+        parent.location.reload();
+    }
+   
+
+ 
+</script>
+
+</body>
+</html>

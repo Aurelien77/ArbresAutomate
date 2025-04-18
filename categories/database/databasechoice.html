@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Menu Codes</title>
+
+    <link rel="stylesheet" href="database.css">
+    
+
+    
+</head>
+<body>
+
+<div class="containeriframe">
+    <div class="menu">
+        
+        <ul>
+<li><a href="../../index.html" target="_parent">Accueil</a></li>
+
+
+
+        </ul>
+   
+        <ul>
+            <li><a href="#" onclick="loadPage('./sql.html')">SQL</a></li>
+            <li><a href="#" onclick="loadPage('./firebase.html')">Firebase</a></li>
+            <li><a href="#" onclick="loadPage('./sequelize.html')">Sequelize</a></li>
+        </ul>
+    </div>
+    <div class="content">
+      
+
+
+        <iframe id="contentFrame" frameborder="0" src="../database/sql.html"> 
+
+        </iframe>
+    
+     
+    </div>
+   
+      
+    </div>
+</div>
+
+<script>
+    function loadPage(url) {
+        // Charger la page dans l'iframe
+        document.getElementById('contentFrame').src = url;
+    }
+
+
+
+ 
+</script>
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+#contentFrame {
+    height: 100%;
+    
+        width: 100%;
+    }
+
+/* //Presentation des dossiers frontend, backend etc.. */
+.container{
+    display: flex;
+        flex-direction: row;
+    align-items: center;
+        font-size: 1.5rem;
+    gap: 2vw;
+    }
+.menu-entete {
+    display: flex;
+align-items: center;#contentFrame {
+    height: 100%;
+    
+        width: 100%;
+    }
+
+/* //Presentation des dossiers frontend, backend etc.. */
+.container{
+    display: flex;
+        flex-direction: row;
+    align-items: center;
+        font-size: 1.5rem;
+    gap: 2vw;
+    }
+.menu-entete {
+    display: flex;
+align-items: center;
+justify-content: center;
+}
+    .content {
+display: flex;
+flex-direction: column;
+align-items: center;
+        height: 100%;
+          width: 100%;
+          background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);
+        border: 2px solid red;
+            
+        }
+        .flex {
+
+            display: flex;
+        flex-direction: row;
+        }
+        .image {
+        margin-top: 3px;
+            width: 6vw;
+                border-radius: 10%;
+                border: 1px solid gold;
+                box-shadow: black 3px 3px 3px;
+              
+            }
+
+            .image:hover {
+
+               transform: scale(1.02);
+            }
+            .textimage {
+color: azure;
+                text-align: center;
+                font-size: 1.2rem;
+                margin-right: 5vw;
+            }
+.flexfolder {
+
+    display: flex;
+    flex-direction:row;
+
+}
+.lien:hover {
+    transform: scale(1.1);
+border: #d4d4d4 2px solid;
+padding: 5px;
+}
+/* // Partie texte d'accueil */
+h1 {
+    background-color: black;
+    color: white;
+
+}
+pre {
+    white-space: pre-wrap; /* Permettre le passage à la ligne automatique */
+    overflow-x: auto; /* Ajouter une barre de défilement horizontale si nécessaire */
+    padding: 10px; /* Ajouter un peu d'espace intérieur */
+    border-radius: 5px; /* Ajouter des coins arrondis */
+    background-color: #1e1e1e; /* Couleur de fond */
+    color: #d4d4d4; /* Couleur du texte */
+    font-family: 'Courier New', Courier, monospace; /* Police de caractères */
+    font-size: 14px; /* Taille de la police */
+    line-height: 1.5; /* Hauteur de ligne */
+}
+
+
+/* // Partie frame  */
+.containeriframe {
+
+    height: 55vw;
+        display: flex;
+        flex-direction: row;
+        background-color: antiquewhite;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        
+    }
+
+
+    a:active{
+    
+    text-decoration: none;
+    color: white;
+    }
+    a:visited{
+        text-decoration: none;
+        color: white;
+        }
+    
+        li {
+    
+            margin: 1vh;
+        }
+        
+
+#FrameMenu {
+
+
+    width: 100%;
+}
+
+.menu {
+    background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);
+
+}
+.flipped {
+    transform: rotateY(180deg);
+}
+
+
+ 
+a {
+ text-decoration: none;
+    margin: 1vw;
+
+    color: white;
+}
+
+.add {
+    position: absolute;
+    bottom: 5px;
+    border-radius: 0 0 5% 5%;
+    left:0;
+display: flex;
+    width: 80%;
+padding: 0.2vw;
+    border: 2px solid red;
+    background-color: rgb(209, 15, 15) ;
+    color: white;
+}
+
+
+.frontend{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 5vw;
+height: 5vw;
+font-size: 1rem;
+    background: url(../../../media/folder.png);
+    background-size: cover;
+    padding: 1vw;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.frontend:hover  {
+    font-weight: bold;
+transform: scale(1.1);
+transition: transform 0.3s ease;
+}
+
+.package{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 7vw;
+height: 7vw;
+    background: url(../../../media/dossier.png);
+    background-size: cover;
+    padding: 1vw;
+color: white;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.package:hover  {
+    font-weight: bold;
+transform: scale(1.1);
+transition: transform 0.3s ease;
+
+}
+.observationtext {
+
+    color: white;
+}
+.observation:hover {
+
+    font-weight: bold;
+    transform: scale(1.1);
+transition: transform 0.3s ease;
+
+}
+.backend{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 5vw;
+height: 5vw;
+font-size: 1rem;
+        background: url(../../../media/backend.png);
+        background-size: cover;
+        padding: 1vw;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .backend:hover {
+font-weight: bold;
+        transform: scale(1.1);
+transition: transform 0.3s ease;
+    }
+
+    .container_accueil {
+
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+@keyframes fly-in {
+    0% {
+        transform: translate(-100%, -100%) rotate(45deg); /* Starting position */
+        opacity: 0; /* Starting opacity */
+    }
+    100% {
+        transform: translate(0, 0) rotate(0); /* Ending position */
+        opacity: 1; /* Ending opacity */
+    }
+}
+justify-content: center;
+}
+    .content {
+display: flex;
+flex-direction: column;
+align-items: center;
+        height: 100%;
+          width: 100%;
+          background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);
+        border: 2px solid red;
+            
+        }
+        .flex {
+
+            display: flex;
+        flex-direction: row;
+        }
+        .image {
+        margin-top: 3px;
+            width: 6vw;
+                border-radius: 10%;
+                border: 1px solid gold;
+                box-shadow: black 3px 3px 3px;
+              
+            }
+
+            .image:hover {
+
+               transform: scale(1.02);
+            }
+            .textimage {
+color: azure;
+                text-align: center;
+                font-size: 1.2rem;
+                margin-right: 5vw;
+            }
+.flexfolder {
+
+    display: flex;
+    flex-direction:row;
+
+}
+.lien:hover {
+    transform: scale(1.1);
+border: #d4d4d4 2px solid;
+padding: 5px;
+}
+/* // Partie texte d'accueil */
+h1 {
+    background-color: black;
+    color: white;
+
+}
+pre {
+    white-space: pre-wrap; /* Permettre le passage à la ligne automatique */
+    overflow-x: auto; /* Ajouter une barre de défilement horizontale si nécessaire */
+    padding: 10px; /* Ajouter un peu d'espace intérieur */
+    border-radius: 5px; /* Ajouter des coins arrondis */
+    background-color: #1e1e1e; /* Couleur de fond */
+    color: #d4d4d4; /* Couleur du texte */
+    font-family: 'Courier New', Courier, monospace; /* Police de caractères */
+    font-size: 14px; /* Taille de la police */
+    line-height: 1.5; /* Hauteur de ligne */
+}
+
+
+/* // Partie frame  */
+.containeriframe {
+
+    height: 55vw;
+        display: flex;
+        flex-direction: row;
+        background-color: antiquewhite;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        
+    }
+
+
+    a:active{
+    
+    text-decoration: none;
+    color: white;
+    }
+    a:visited{
+        text-decoration: none;
+        color: white;
+        }
+    
+        li {
+    
+            margin: 1vh;
+        }
+        
+
+#FrameMenu {
+
+
+    width: 100%;
+}
+
+.menu {
+    background: url(https://www.elegantthemes.com/blog/wp-content/uploads/2013/09/bg-1-full.jpg);
+
+}
+.flipped {
+    transform: rotateY(180deg);
+}
+
+
+ 
+a {
+ text-decoration: none;
+    margin: 1vw;
+
+    color: white;
+}
+
+.add {
+    position: absolute;
+    bottom: 5px;
+    border-radius: 0 0 5% 5%;
+    left:0;
+display: flex;
+    width: 80%;
+padding: 0.2vw;
+    border: 2px solid red;
+    background-color: rgb(209, 15, 15) ;
+    color: white;
+}
+
+
+.frontend{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 5vw;
+height: 5vw;
+font-size: 1rem;
+    background: url(../../../media/folder.png);
+    background-size: cover;
+    padding: 1vw;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.frontend:hover  {
+    font-weight: bold;
+transform: scale(1.1);
+transition: transform 0.3s ease;
+}
+
+.package{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 7vw;
+height: 7vw;
+    background: url(../../../media/dossier.png);
+    background-size: cover;
+    padding: 1vw;
+color: white;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.package:hover  {
+    font-weight: bold;
+transform: scale(1.1);
+transition: transform 0.3s ease;
+
+}
+.observationtext {
+
+    color: white;
+}
+.observation:hover {
+
+    font-weight: bold;
+    transform: scale(1.1);
+transition: transform 0.3s ease;
+
+}
+.backend{
+    display: flex;
+    align-items: end;
+justify-content: center;
+width: 5vw;
+height: 5vw;
+font-size: 1rem;
+        background: url(../../../media/backend.png);
+        background-size: cover;
+        padding: 1vw;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .backend:hover {
+font-weight: bold;
+        transform: scale(1.1);
+transition: transform 0.3s ease;
+    }
+
+    .container_accueil {
+
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+@keyframes fly-in {
+    0% {
+        transform: translate(-100%, -100%) rotate(45deg); /* Starting position */
+        opacity: 0; /* Starting opacity */
+    }
+    100% {
+        transform: translate(0, 0) rotate(0); /* Ending position */
+        opacity: 1; /* Ending opacity */
+    }
+}
