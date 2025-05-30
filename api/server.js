@@ -189,7 +189,11 @@ app.get('/arborescence/:appName', (req, res) => {
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             opacity: 0;
             border-radius: 0 20px 20px 0;
+      
         }
+             .categoryMenu button { 
+                border-radius: 50%;
+             }
         .categoryMenu.active {
             left: 0;
             opacity: 1;
@@ -198,7 +202,7 @@ app.get('/arborescence/:appName', (req, res) => {
         }
         .toggleMenuButton {
             position: fixed;
-            top: 10px;
+            top: 15px;
             left: 10px;
             width: 40px;
             height: 40px;
@@ -238,15 +242,23 @@ app.get('/arborescence/:appName', (req, res) => {
     <iframe id="contentFrame" src="/${appName}" style="width:100%; height:100vh; border:none;"></iframe>
 
     <script>
-        document.getElementById('toggleMenuButton').addEventListener('click', function () {
-            const menu = document.getElementById('categoryMenu');
-            const button = document.getElementById('toggleMenuButton');
-            menu.classList.toggle('active');
-            button.classList.toggle('active');
-        });
-        function loadPage(url) {
-            document.getElementById('contentFrame').src = url;
-        }
+     document.getElementById('toggleMenuButton').addEventListener('click', function () {
+    const menu = document.getElementById('categoryMenu');
+    const button = document.getElementById('toggleMenuButton');
+
+    menu.classList.toggle('active');
+    button.classList.toggle('active');
+
+    if (menu.classList.contains('active')) {
+        // Calculer la largeur visible du menu (en px)
+        const menuWidth = menu.getBoundingClientRect().width;
+        // Décaler le bouton à droite du menu + 10px de marge
+        button.style.left = (menuWidth + 10) + 'px';
+    } else {
+        // Menu caché, bouton à sa position initiale
+        button.style.left = '10px';
+    }
+});
     </script>
     `);
 });
@@ -442,6 +454,22 @@ app.get('/:appName', (req, res) => {
         const relativePath = req.params[0] || req.params[1] || '';
         const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
 
+//Recuperer image 
+
+ const imageFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'picture2850');
+            const images = getImagesFromFolder(imageFolderPath);
+            let imageUrl = '';
+            if (images.length > 0) {
+                // Utiliser la première image trouvée dans le dossier comme image de fond
+                imageUrl = `/app/${appName}/config2850/picture2850/${images[0]}`;
+            } else {
+                // Fallback image si aucune image n'est trouvée
+                imageUrl = '/path/to/default-image.jpg'; // Remplacez par une image par défaut
+            }
+
+
+
+
         // Vérification si le chemin existe
         if (!fs.existsSync(appPath)) {
             return res.status(404).send('Application ou fichier non trouvé');
@@ -527,7 +555,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
     top:15px;
     right: 15px;
     transform: translate(-50%, -50%);
-    z-index: 51;
+   
   }
 
   .buttonactivated {
@@ -644,15 +672,42 @@ width: 100%;
 #toggle-frame:hover {
     background-color:rgb(12, 206, 122);
 }
+    #app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+   color: black;
+
+    text-align: center;
+    line-height: 50px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 10000;
+
+}
+
     </style>
-    <div id="container">
+
+
+
+
+
+
+
+    <div id="container"><div id="app-header">${appName}</div>
+    <img src="${imageUrl}" style="display: block; position: absolute; top: 0; right: 0; max-width: 100px; height: auto;" alt="Image" />
 <button id="toggle-frame">⇤</button>
 
         <div id="content-frame">
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
 
-<button id="fullscreenbuttoniframe">⛶</button>
+
+
+
+
       <div id="split-container">
     <iframe id="content-frame-view" src="" frameborder="0"> </iframe> 
    <iframe id="content-frame-view-comment" src="" frameborder="0" class="hidden"></iframe>
