@@ -194,6 +194,7 @@ app.get('/arborescence/:appName', (req, res) => {
             left: 0;
             opacity: 1;
             transition: left 0.5s ease-in-out, opacity 0.3s ease-in-out;
+            width : auto;
         }
         .toggleMenuButton {
             position: fixed;
@@ -290,6 +291,7 @@ app.get('/app/:appName/*', (req, res) => {
                                 font-family: monospace;
                             }
                             pre {
+                            margin-top: 15px;
                                 padding: 20px;
                                 border-radius: 5px;
                                 overflow-x: auto;
@@ -559,53 +561,63 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         #container { 
         
     
-        display: flex 
+        display: flex;
+  height: 100%;
+  width: 100%;
 
-        
+      
         
         }
 
 
         #content-frame {
-z-index: 100;
-         overflow-y: auto; 
-height : 100%;
-           display: flex; 
-           flex-direction: row;
-            background-color: #cccccc;
-             border-radius: 0% 5% 5% 0%;
-             box-shadow: 1px 1px 1px #129867;
-             text-shadow: 1px 1px 1px #129867;
-             padding: 7px;
-         margin-top: 55px;
+ width: 250px;
+ height:fit-content;
+    transition: margin-left 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+    display: block; /* ou flex avec flex-direction: column si nécessaire */
+    background-color: #cccccc;
+    border-radius: 0% 5% 5% 0%;
+    box-shadow: 1px 1px 1px #129867;
+    text-shadow: 1px 1px 1px #129867;
+    padding: 7px;
+    margin-top: 55px;
              }
 #content-frame a:visited {
     color: black; 
     text-decoration: none; 
 
 }
-#split-container {
 
+#split-container {
+  flex-grow: 1;
+  transition: width 0.3s ease;
 margin-top: 55px;
 
     display: flex;        
-    width: 100vw;        
+      
     height: 100vh;  
    overflow-x: hidden;   
    overflow-y: auto;  
    margin-left: 10px;
 }
 
+#split-container.expanded {
+    width: 100%;
+    margin-left: 0px;
+}
+
 #split-container iframe {
-width: 100vw;         
-    height: 100vh     
+width: 100%;         
+    height: 100%;     
     border: none;     
     gap: none;
     z-index: 10;
 }
 
 #content-frame-view-comment {
-    width: 50vw;
+    width: 100%;
     height: 100vh;
     border: none;
     display: block;
@@ -658,10 +670,12 @@ width: 100vw;
 
     button.addEventListener("click", function () {
         if (!isHidden) {
-            frame.style.marginLeft = "-100%"; // Déplace la frame à gauche
+           frame.style.display = "none";
+document.getElementById("split-container").classList.add("expanded");
             button.textContent = "⇥"; // Change le texte du bouton
         } else {
-            frame.style.marginLeft = "0vw"; // Remet la frame à sa place
+            frame.style.display = "flex";
+document.getElementById("split-container").classList.remove("expanded");
             button.textContent = "⇤";
         }
         isHidden = !isHidden;
