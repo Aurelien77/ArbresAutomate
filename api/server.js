@@ -175,6 +175,8 @@ app.get('/arborescence/:appName', (req, res) => {
     
     res.send(`
     <style>
+
+    
         .categoryMenu {
             position: fixed;
             top: 10px;
@@ -218,6 +220,16 @@ app.get('/arborescence/:appName', (req, res) => {
         }
         .toggleMenuButton.active {
             left: 88vw; /* Décalage progressif pour suivre le menu */
+                 background: linear-gradient(145deg, #e0e0e0, #a0a0a0, #f5f5f5, #777);
+                border-radius: 10%;
+                   box-shadow:
+        inset 1px 1px 3px rgba(255, 255, 255, 0.8),  
+        inset -2px -2px 5px rgba(0, 0, 0, 0.2),      
+        2px 2px 5px rgba(0, 0, 0, 0.3);              
+    color: #333;
+    border: 1px solid #999;
+    background-size: 200% 200%;
+    animation: metalShift 3s ease-in-out infinite;
         }
         .categoryMenu button {
             background: #444;
@@ -231,6 +243,13 @@ app.get('/arborescence/:appName', (req, res) => {
         .categoryMenu button:hover {
             background: #575757;
         }
+            
+        #contentFrame {
+         background: #575757;
+    
+  
+    
+    }
     </style>
 
     <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
@@ -242,6 +261,13 @@ app.get('/arborescence/:appName', (req, res) => {
     <iframe id="contentFrame" src="/${appName}" style="width:100%; height:100vh; border:none;"></iframe>
 
     <script>
+
+
+         function loadPage(url) {
+            document.getElementById('contentFrame').src = url;
+        }
+                    
+    
      document.getElementById('toggleMenuButton').addEventListener('click', function () {
     const menu = document.getElementById('categoryMenu');
     const button = document.getElementById('toggleMenuButton');
@@ -303,6 +329,7 @@ app.get('/app/:appName/*', (req, res) => {
                                 font-family: monospace;
                             }
                             pre {
+                        
                             margin-top: 15px;
                                 padding: 20px;
                                 border-radius: 5px;
@@ -328,7 +355,7 @@ app.get('/app/:appName/*', (req, res) => {
                         return `
                             <li class="folder">
                                 <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                                📁 <a href="#"></a>
+                           📁 <a href="#"></a> 
                                 <ul class="hidden">
                                     ${renderFolder(item.contenu, newPath)}
                                 </ul>
@@ -487,17 +514,26 @@ app.get('/:appName', (req, res) => {
                     }
                     const htmlContent = `
                             <style>
+
+
+
+
+                        
                                 pre {
                                     background-color: black;
                                     color: white;
                                     padding: 20px;
-                                    border-radius: 5px;
+                                    border-radius: 5%;
                                     font-family: monospace;
                                     font-size: 1rem;
                                     overflow-x: auto;
                                     white-space: pre-wrap;
-                                      box-shadow: 3px 3px 2px 1px rgba(0, 0, 255, .2);
+                                      box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
+                                       border-radius : 5%;
+                            border: 1px solid gold;
                                 }
+
+                          
                             </style>
                             <pre><code>${data}</code></pre>
                         `;
@@ -527,9 +563,12 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         }
         if (item.type === 'dossier') {
             return `
-                <li class="folder">
-                    <span class="toggle" onclick="toggleVisibility(this)">➕</span>
-                    📁 <a href="#">${item.name}</a>
+                <li class="folderclasslist">
+
+                    <div class="toggle" onclick="toggleVisibility(this)">➕</div>
+                        <div class=""> 📁 <a href="#" >${item.name}</a>  </div>
+
+
                     <ul class="hidden">
                         ${renderFolder(item.contenu, newPath)}
                     </ul>
@@ -549,6 +588,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 };
  const htmlContent = `
     <style>
+  
   #fullscreenbuttoniframe {
   z-index:9999;
     position: absolute;
@@ -599,19 +639,26 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 
 
         #content-frame {
- width: 250px;
+
  height:fit-content;
     transition: margin-left 0.3s ease;
     z-index: 100;
     overflow-y: auto;
-    display: block; /* ou flex avec flex-direction: column si nécessaire */
-    background-color: #cccccc;
+    display: flex; 
+    flex-direction : column;
+    background-color:rgb(230, 222, 222);
     border-radius: 0% 5% 5% 0%;
     box-shadow: 1px 1px 1px #129867;
     text-shadow: 1px 1px 1px #129867;
     padding: 7px;
-    margin-top: 55px;
+    margin-top: 100px;
              }
+
+                 
+
+
+
+
 #content-frame a:visited {
     color: black; 
     text-decoration: none; 
@@ -697,10 +744,11 @@ width: 100%;
 
 
     <div id="container"><div id="app-header">${appName}</div>
-    <img src="${imageUrl}" style="display: block; position: absolute; top: 0; right: 0; max-width: 100px; height: auto;" alt="Image" />
+   <img src="${imageUrl}" style="display: block; position: absolute; top: 5px; right: 50px; border-radius: 10%; max-width: 50px; height: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);" alt="Image" />
+
 <button id="toggle-frame">⇤</button>
 
-        <div id="content-frame">
+        <div id="content-frame" style="box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);>
          <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
         </div>
 
@@ -885,7 +933,7 @@ function loadPageViewComment(url) {
     const sublist = element.nextElementSibling.nextElementSibling;
     if (sublist.classList.contains('hidden')) {
       sublist.classList.remove('hidden');
-      element.textContent = '➖';
+      element.textContent = '➖➖➖➖➖➖➡️';
     } else {
       sublist.classList.add('hidden');
       element.textContent = '➕';
