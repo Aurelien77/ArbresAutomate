@@ -1,81 +1,190 @@
-.iframeview {
-    display: flex;
-    gap: 10px; /* Espacement entre les iframes */
+
+  html {
+
+overflow-x: hidden;
+  overflow-y: hidden;
+background-color: black;
+
+}
+       
+       li {
+  margin: 5px 0;
+  font-family: Arial, sans-serif;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+pre {
+background-color : black;
+      color: black;
+}
+.toggle {
+width : 100%;
+cursor : pointer;
+display: flex;
+    background-color: rgba(255, 255, 255, 0.1); */
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-.iframeview iframe {
-    flex: 1;
-    height: 600px;
-    border: 1px solid #ddd;
+#content-frame.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  transition: width 0.3s ease, padding 0.3s ease;
 }
-    h1{
-    color:white;
-    }
-    .toggleMenuButton {
-        position: fixed;
-        top: 5px;
-        right: 20px;
-        width: 30px;
-        height: 30px;
-        font-size: 20px;
-        background-color: #4CAF50; /* Couleur verte */
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 100;
-        transition: transform 0.3s ease-in-out;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Effet lumineux */
-    }
 
-    .toggleMenuButton:hover {
-        background-color: #45a049;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 1); /* Effet lumineux au survol */
-        transform: scale(1.1); /* Légère agrandissement au survol */
-    }
+ 
 
-    /* Menu caché par défaut */
-    .categoryMenu {
-        position: fixed;
-        top: -150px; /* Hors de l'écran en haut */
-        left: 0;
-        width: 100%; /* Le menu prend toute la largeur */
-        height: 150px; /* Hauteur du menu */
-        background-color: #333; /* Couleur sombre pour le fond */
-        transition: top 0.3s ease-in-out; /* Animation pour le déploiement */
-        z-index: 50;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Ombre pour le menu */
-    }
+      a { text-decoration: none; }
+        
+        a:hover { text-decoration: underline; }
+       
 
-    .categoryMenu a {
-        display: block;
-        padding: 12px;
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
 
-    .categoryMenu a:hover {
-        background-color: #575757; /* Effet hover des liens du menu */
-    }
+        .hidden { display: none; padding-left: 20px; }
 
-    /* Activer le menu lorsqu'il est ouvert */
-    .categoryMenu.active {
-        top: 0; /* Déplace le menu vers le haut */
-    }
+  
 
-    /* Style pour le contenu principal */
-    iframe {
-        width: 100%;
-        height: 600px;
-        border: 1px solid #ddd;
-        margin-top: 20px;
-    }
-        #content-frame {
-          margin-top: 35px;
+
+        #container { 
+        
+    
+        display: flex;
+  height: 100%;
+  width: 100%;
+
+   
+        
         }
-          #titre{
-         margin-top: 110px;
-          }
+
+
+        #content-frame {
+              color: black;
+position : absolute;
+top: 50px;
+left : 10px;
+ height:fit-content;
+    transition: margin-left 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+    display: flex; 
+    flex-direction : column;
+    background-color: rgba(255, 255, 255, 0.1); */
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  color: white;;
+    border-radius: 0% 5% 5% 0%;
+    box-shadow: 1px 1px 1px #129867;
+    text-shadow: 1px 1px 1px #129867;
+    padding: 7px;
+    margin-top: 100px;
+   
+             }
+
+
+
+
+
+#content-frame a:visited {
+    color: black; 
+    text-decoration: none; 
+
+}
+
+#split-container {
+  flex-grow: 1;
+  transition: width 0.6s ease;
+margin-top: 55px;
+
+    display: flex;        
+      
+    height: 100vh;  
+   overflow-x: hidden;   
+   overflow-y: auto;  
+   margin-left: 10px;
+}
+
+
+
+#split-container iframe {
+width: 100%;         
+    height: 100%;     
+    border: none;     
+    gap: none;
+    z-index: 10;
+    
+}
+
+#content-frame-view-comment {
+    width: 100%;
+    height: 100vh;
+    border: none;
+    display: block;
+          color: black;
+}
+    #content-frame-view-comment.hidden {
+        display: none;
+    }
+
+    
+    #toggle-frame {
+    z-index: 9999;
+    position: absolute;
+
+    top:65px;
+    left: 10px;
+    padding: 5px 10px;
+
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: black 1px 1px 1px;
+}
+
+
+    #app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+   color: black;
+
+    text-align: center;
+    line-height: 50px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 10000;
+
+}
+.folder-item {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  list-style-type: none;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.folder-name {
+  font-weight: bold;
+}
+
+
+   

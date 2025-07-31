@@ -220,12 +220,22 @@ app.get('/arborescence/:appName', (req, res) => {
             border-radius: 50%;
             z-index: 1000;
             transition: left 0.5s ease-in-out, transform 0.2s ease-in-out;
+          
         }
+
+  
+            
+            
+            }
         .toggleMenuButton:hover {
             transform: scale(1.1);
         }
         .toggleMenuButton.active {
-            left: 88vw; /* Décalage progressif pour suivre le menu */
+            left: 88vw;
+            
+            /* Décalage progressif pour suivre le menu */
+
+
                  background: linear-gradient(145deg, #e0e0e0, #a0a0a0, #f5f5f5, #777);
                 border-radius: 10%;
                    box-shadow:
@@ -308,556 +318,59 @@ app.get('/arborescence/:appName', (req, res) => {
 
 app.get('/app/:appName/*', (req, res) => {
     try {
-        const appName = req.params.appName;
-        const relativePath = req.params[0] || req.params[1] || '';
+        const { appName } = req.params;
+        const relativePath = req.params[0] || '';
         const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
 
-//Recuperer image 
+        // 📌 Récupération image (background)
+        const imageFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'picture2850');
+        const images = getImagesFromFolder(imageFolderPath);
+        const imageUrl = images.length > 0
+            ? `/app/${appName}/config2850/picture2850/${images[0]}`
+            : '/path/to/default-image.jpg';
 
- const imageFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'picture2850');
-            const images = getImagesFromFolder(imageFolderPath);
-            let imageUrl = '';
-            if (images.length > 0) {
-                // Utiliser la première image trouvée dans le dossier comme image de fond
-                imageUrl = `/app/${appName}/config2850/picture2850/${images[0]}`;
-            } else {
-                // Fallback image si aucune image n'est trouvée
-                imageUrl = '/path/to/default-image.jpg'; // Remplacez par une image par défaut
-            }
-
-
-
-
-        // Vérification si le chemin existe
+        // 📌 Vérification du chemin
         if (!fs.existsSync(appPath)) {
             return res.status(404).send('Application ou fichier non trouvé');
         }
+
         const stats = fs.lstatSync(appPath);
 
-
-
+        // === 🟢 Si c'est un fichier ===  --------------------------------------------------------- Style pour l'affichage du code
         if (stats.isFile()) {
-            // Gestion des fichiers spécifiques
             const fileType = mime.lookup(appPath);
             const fileExtension = path.extname(appPath).toLowerCase();
-            if (['.js', '.css', '.html'].includes(fileExtension)) {
-                // Rendre les fichiers de code avec un style spécifique
+
+            if (['.js', '.css', '.html', '.txt'].includes(fileExtension)) {
+                // Rendu stylisé
                 fs.readFile(appPath, 'utf-8', (err, data) => {
-                    if (err) {
-                        return res.status(500).send('Erreur lors de la lecture du fichier');
-                    }
-
-               const style = `
-    background-color: black;
-    color: white;
-    padding: 20px;
-    border-radius: 5%;
-    font-family: monospace;
-    font-size: 1rem;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
-    border: 1px solid gold;
-    border-radius : 10%;
-`;
-
-                    const htmlContent = `
-                           
-                         <pre style="${style}"><code >${data}</code></pre>
-                        `;
-                    res.send(htmlContent);
-                });
-            } else {
-                // Renvoyer les autres types de fichiers directement
-                res.type(fileType);
-                return res.sendFile(appPath);
-            }
-        } else {
-            // Si ce n'est pas un fichier mais un dossier, générer l'arborescence
-            const folderStructure = getFolderStructurewithout(appPath);
-// renderFolder affiche l'arborescence des dossier à gauche ----------------------------------------->
-const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
-    return structure.map(item => {
-        const newPath = `${currentPath}/${item.name}`;
-        const configFilePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'Tech2850', item.name);
-
-        let presetButton = '';
-        if (fs.existsSync(configFilePath)) {
-            presetButton = `
-             <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
-    📌 Commentaires
-</button>
-            `;
-        }
-        if (item.type === 'dossier') {
-            return `
-                <li class="">
-
-                    <div class="toggle" onclick="toggleVisibility(this)">➕</div>
-                        <div class=""> 📁 <a href="#" >${item.name}</a>  </div>
-
-
-                    <ul class="hidden">
-                        ${renderFolder(item.contenu, newPath)}
-                    </ul>
-                </li>
-            `;
-        } else {
-            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
-            const icon = isImage ? '🖼️' : '📃';
-            return `
-                <li>
-                    ${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a>
-                    ${presetButton}
-                </li>
-            `;
-        }
-    }).join('');
-};
- const htmlContent = `
-    <style>
-  
-  #fullscreenbuttoniframe {
-  z-index:9999;
-    position: absolute;
-    top:15px;
-    right: 15px;
-    transform: translate(-50%, -50%);
-   
-  }
-
-  .buttonactivated {
-
-   position: absolute;
-      top: 42%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
- 
-  #content-frame-view {
-    width: 100%;
-    height: auto;
-  }
- // Style pour iframe view Arbre ----------------------------------------->
- body {
-                        margin: 0;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
-        ul { list-style-type: none; padding-left: 20px; text-decoration: none;}
-        li { margin: 5px 0; font-family: Arial, sans-serif; position: relative;list-style-type: none;  }
-        .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
-        .toggle:hover { text-decoration: underline; }
-        .hidden { display: none; padding-left: 20px; }
-        a { text-decoration: none; color: #007bff; }
-        a:hover { text-decoration: underline; }
-
-
-        #container { 
-        
-    
-        display: flex;
-  height: 100%;
-  width: 100%;
-
-      
-        
-        }
-
-
-        #content-frame {
-
- height:fit-content;
-    transition: margin-left 0.3s ease;
-    z-index: 100;
-    overflow-y: auto;
-    display: flex; 
-    flex-direction : column;
-    background-color:width;
-    border-radius: 0% 5% 5% 0%;
-    box-shadow: 1px 1px 1px #129867;
-    text-shadow: 1px 1px 1px #129867;
-    padding: 7px;
-    margin-top: 100px;
-   
-             }
-
-                 
-
-
-
-
-#content-frame a:visited {
-    color: black; 
-    text-decoration: none; 
-
-}
-
-#split-container {
-  flex-grow: 1;
-  transition: width 0.3s ease;
-margin-top: 55px;
-
-    display: flex;        
-      
-    height: 100vh;  
-   overflow-x: hidden;   
-   overflow-y: auto;  
-   margin-left: 10px;
-}
-
-#split-container.expanded {
-    width: 100%;
-    margin-left: 0px;
-}
-
-#split-container iframe {
-width: 100%;         
-    height: 100%;     
-    border: none;     
-    gap: none;
-    z-index: 10;
-    
-}
-
-#content-frame-view-comment {
-    width: 100%;
-    height: 100vh;
-    border: none;
-    display: block;
-}
-    #content-frame-view-comment.hidden {
-        display: none;
-    }
-
-    #toggle-frame {
-    z-index: 9999;
-    position: absolute;
-
-    top:65px;
-    left: 10px;
-    padding: 5px 10px;
-
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    box-shadow: black 1px 1px 1px;
-}
-
-#toggle-frame:hover {
-    background-color:rgb(12, 206, 122);
-}
-    #app-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-   color: black;
-
-    text-align: center;
-    line-height: 50px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    z-index: 10000;
-
-}
-
-    </style>
-
-
-
-
-
-
-
-    <div id="container"><div id="app-header">${appName}</div>
-   <img src="${imageUrl}" style="display: block; position: absolute; top: 5px; right: 50px; border-radius: 10%; max-width: 50px; height: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);" alt="Image" />
-
-<button id="toggle-frame">⇤</button>
-
-        <div id="content-frame" style="box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);>
-         <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
-        </div>
-
-
-
-
-
-      <div id="split-container">
-    <iframe id="content-frame-view" src="" frameborder="0"> </iframe> 
-   <iframe id="content-frame-view-comment" src="" frameborder="0" class="hidden"></iframe>
-</div>
-
-
-
-    </div>
-
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const frame = document.getElementById("content-frame");
-    const button = document.getElementById("toggle-frame");
-    let isHidden = false;
-
-    button.addEventListener("click", function () {
-        if (!isHidden) {
-           frame.style.display = "none";
-document.getElementById("split-container").classList.add("expanded");
-            button.textContent = "⇥"; // Change le texte du bouton
-        } else {
-            frame.style.display = "flex";
-document.getElementById("split-container").classList.remove("expanded");
-            button.textContent = "⇤";
-        }
-        isHidden = !isHidden;
-    });
-});
-
-        const appName = "${appName}";
-        const relativePath = "${relativePath}";
-       const iframe = document.getElementById('content-frame-view');
-
-  // Une fois que le contenu de l'iframe est chargé
-  iframe.onload = function() {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-    // Appliquer un style aux images dans l'iframe
-    const images = iframeDoc.getElementsByTagName('img');
-    for (let img of images) {
-    img.style.position = 'absolute';
-       img.style.top = '50%';
-      img.style.left = '50%';
-      img.style.transform = 'translate(-50%, -50%)'; 
-      img.style.maxWidth = '75vw';
-      img.style.height = '100%';
-      img.style.borderRadius = '10px' 
-    }
-  };
-        function loadPageView(url) {
-            const iframeView = document.getElementById('content-frame-view');
-            
-            if (iframeView) {
-                iframeView.src = url; // Charge l'URL dans l'iframe
-            } else {
-                console.error("Iframe 'content-frame-view' non trouvé.");
-            }
-        }
-function loadPageViewComment(url) {
-    const iframeComment = document.getElementById('content-frame-view-comment');
-
-    if (!iframeComment) {
-        console.error("⚠️ Iframe 'content-frame-view-comment' introuvable !");
-        return;
-    }
-
-    // Vérifier si l'iframe affiche déjà cette URL et est visible
-    if (iframeComment.src.includes(url) && !iframeComment.classList.contains('hidden')) {
-        console.log("🔻 Masquage de l'iframe");
-        iframeComment.classList.add('hidden');  // Cache l'iframe
-        iframeComment.src = "about:blank"; // Vide l'iframe pour éviter de recharger inutilement
-    } else {
-        console.log("🔺 Affichage de l'iframe avec :", url);
-        iframeComment.src = url;
-        iframeComment.classList.remove('hidden');  // Affiche l'iframe
-
-        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
-        iframeComment.onload = function () {
-            const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
-            if (iframeDoc) {
-                const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
-                closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '2px';
-                closeButton.style.background = 'red';
-                closeButton.style.color = 'white';
-                closeButton.style.border = 'none';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.zIndex = '9999';
-
-                closeButton.onclick = () => {
-                    iframeComment.classList.add('hidden');
-                    iframeComment.src = "about:blank";
-                };
-
-                // Ajouter le bouton au début du body de l'iframe
-                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
-            }
-        };
-    }
-}
-
-
-
-
-        function toggleVisibility(element) {
-            const sublist = element.nextElementSibling.nextElementSibling;
-            if (sublist.classList.contains('hidden')) {
-                sublist.classList.remove('hidden');
-                element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
-            } else {
-                sublist.classList.add('hidden');
-                element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
-            }
-        }
-
-    const fullscreenButton = document.getElementById('fullscreenbuttoniframe');
-  const iframeView = document.getElementById('content-frame-view');
-
-  // Lorsque le bouton est cliqué
-  fullscreenButton.addEventListener('click', () => {
-    iframeView.classList.toggle('buttonactivated');
-  });
-
- function loadPageView(url) {
-    const iframeView = document.getElementById('content-frame-view');
-
-    if (!iframeView) {
-        console.error("⚠️ Iframe 'content-frame-view' introuvable !");
-        return;
-    }
-
-    // Vérifier si l'iframe affiche déjà cette URL et est visible
-    if (iframeView.src.includes(url) && !iframeView.classList.contains('hidden')) {
-        console.log("🔻 Masquage de l'iframe principale");
-        iframeView.classList.add('hidden');  // Cache l'iframe
-        iframeView.src = "about:blank"; // Vide l'iframe
-    } else {
-        console.log("🔺 Affichage de l'iframe principale avec :", url);
-        iframeView.src = url;
-        iframeView.classList.remove('hidden');  // Affiche l'iframe
-
-        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
-        iframeView.onload = function () {
-            const iframeDoc = iframeView.contentDocument || iframeView.contentWindow.document;
-            if (iframeDoc) {
-                const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
-                closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '1px';
-                closeButton.style.background = 'red';
-                closeButton.style.color = 'white';
-                closeButton.style.border = 'none';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.zIndex = '9999';
-
-                closeButton.onclick = () => {
-                    iframeView.classList.add('hidden');
-                    iframeView.src = "about:blank";
-                };
-
-                // Ajouter le bouton au début du body de l'iframe
-                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
-            }
-        };
-    }
-}
-
-
-  function toggleVisibility(element) {
-    const sublist = element.nextElementSibling.nextElementSibling;
-    if (sublist.classList.contains('hidden')) {
-      sublist.classList.remove('hidden');
-      element.textContent = '➖➖➖➖➖➖⬇️';
-    } else {
-      sublist.classList.add('hidden');
-      element.textContent = '➕';
-    }
-  }
-    </script>
-`;
-
-            res.send(htmlContent);
-
-
-
-        }
-    } catch (error) {
-        console.error("Erreur dans la gestion du chemin de l'application :", error);
-        res.status(500).send('Une erreur est survenue lors du traitement de la demande');
-    }
-});
-
-// ARBRE  // ------------------------------------------------------------------------ 
-
-/* Générer une arborescence de l'application avant de générer l'affichage des élément dans la route /app/:appName */
-
-/* Recoit TREE */
-
-
-// ---------------------------------------------------------------------------------- 
-/* app.get('/:appName', (req, res) => {
-    try {
-        const appName = req.params.appName;
-        const relativePath = req.params[0] || req.params[1] || '';
-        const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
-
-//Recuperer image 
-
- const imageFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'picture2850');
-            const images = getImagesFromFolder(imageFolderPath);
-            let imageUrl = '';
-            if (images.length > 0) {
-                // Utiliser la première image trouvée dans le dossier comme image de fond
-                imageUrl = `/app/${appName}/config2850/picture2850/${images[0]}`;
-            } else {
-                // Fallback image si aucune image n'est trouvée
-                imageUrl = '/path/to/default-image.jpg'; // Remplacez par une image par défaut
-            }
-
-
-
-
-        // Vérification si le chemin existe
-        if (!fs.existsSync(appPath)) {
-            return res.status(404).send('Application ou fichier non trouvé');
-        }
-        const stats = fs.lstatSync(appPath);
-        if (stats.isFile()) {
-            // Gestion des fichiers spécifiques
-            const fileType = mime.lookup(appPath);
-            const fileExtension = path.extname(appPath).toLowerCase();
-            if (['.js', '.css', '.html'].includes(fileExtension)) {
-                // Rendre les fichiers de code avec un style spécifique
-                fs.readFile(appPath, 'utf-8', (err, data) => {
-                    if (err) {
-                        return res.status(500).send('Erreur lors de la lecture du fichier');
-                    }
+                    if (err) return res.status(500).send('Erreur lors de la lecture du fichier');
 
                     const style = `
-    background-color: black;
-    color: white;
-    padding: 20px;
-    border-radius: 5%;
-    font-family: monospace;
-    font-size: 1rem;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
-    border: 1px solid gold;
-`;
-
-                    const htmlContent = `
-                      
-                            
-                            <pre style="${style}"><code>${data}</code></pre>
-                        `;
-                    res.send(htmlContent);
+                        background-color: black;
+                        color: white;
+                        padding: 20px;
+                        border-radius: 2%;
+                        font-family: monospace;
+                        font-size: 1rem;
+                        overflow-x: auto;
+                        white-space: pre-wrap;
+                        box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
+                        border: 1px solid gold;
+                    `;
+                    res.send(`<pre style="${style}"><code>${data}</code></pre>`);
                 });
             } else {
-                // Renvoyer les autres types de fichiers directement
                 res.type(fileType);
                 return res.sendFile(appPath);
             }
-        } else {
-            // Si ce n'est pas un fichier mais un dossier, générer l'arborescence
-            const folderStructure = getFolderStructurewithout(appPath);
-// renderFolder affiche l'arborescence des dossier à gauche ----------------------------------------->
+            return;
+        }
+
+        // === 🟢 Si c'est un dossier ===
+        const folderStructure = getFolderStructurewithout(appPath);
+
+        // 🔧 Fonction récursive pour générer l'arborescence
 const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
     return structure.map(item => {
         const newPath = `${currentPath}/${item.name}`;
@@ -866,80 +379,132 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         let presetButton = '';
         if (fs.existsSync(configFilePath)) {
             presetButton = `
-             <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
-    📌 Commentaires
-</button>
+                <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
+                    📌 Commentaires
+                </button>
             `;
         }
+
         if (item.type === 'dossier') {
             return `
-                <li class="">
-
-                    <div class="toggle" onclick="toggleVisibility(this)">➕</div>
-                        <div class=""> 📁 <a href="#" >${item.name}</a>  </div>
-
-
-                    <ul class="hidden">
+                <div class="tree-item">
+                    <span class="toggle" onclick="toggleVisibility(this)">➕</span>
+                    <span class="folder">📁 ${item.name}</span>
+                    <div class="hidden tree-children">
                         ${renderFolder(item.contenu, newPath)}
-                    </ul>
-                </li>
+                    </div>
+                </div>
             `;
         } else {
             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
             return `
-                <li>
-                    ${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a>
+                <div class="tree-item">
+                    <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
                     ${presetButton}
-                </li>
+                </div>
             `;
         }
     }).join('');
 };
- const htmlContent = `
-    <style>
-  
-  #fullscreenbuttoniframe {
-  z-index:9999;
+
+
+        // === HTML complet ===
+        const htmlContent = `
+      
+            <style>
+
+.folder, .file {
+    flex: 1;
+}
+
+.tree-children {
+
+}
+
+.hidden { 
+    display: none; 
+}
+            
+#content-frame { 
     position: absolute;
-    top:15px;
-    right: 15px;
-    transform: translate(-50%, -50%);
-   
-  }
+    top: 0;
+    left: 10px;
+    margin-top: 100px;
+    transition: margin-left 0.3s ease;
+    z-index: 100;
 
-  .buttonactivated {
+    display: flex; 
+    flex-direction: column;
+    padding: 12px;
+    color: #222;
 
-   position: absolute;
-      top: 42%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+    /* 🎨 Intérieur clair avec texture brossée */
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.5) 1px,
+        rgba(220, 220, 220, 0.6) 2px
+    );
+    background-color: #e3e3e3;
+
+    /* Bord métallique plus sombre */
+    border: 2px solid #2a2a2a;
+    border-radius: 0% 5% 5% 0%;
+
+    /* Ombre extérieure */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+
+    /* Effet relief intérieur */
+    box-shadow: 
+        inset 0 2px 5px rgba(255, 255, 255, 0.8), /* lumière en haut */
+        inset 0 -2px 8px rgba(0, 0, 0, 0.2),      /* ombre en bas */
+        0 4px 12px rgba(0, 0, 0, 0.6);            /* extérieur */
+
+    /* Effet de flou léger (style métal brossé) */
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+
+    /* Texte */
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+#content-frame ul { 
+margin : 0px;
+}
+
+
+
+  html {
+
+overflow-x: hidden;
+  overflow-y: hidden;
+
+
+}
+
+body {
+overflow-x: hidden;
+  overflow-y: hidden;
+
+}
+     
+
+
+
+
+
  
-  #content-frame-view {
-    width: 100%;
-    height: auto;
 
-  }
-
-
-
- // Style pour iframe view Arbre ----------------------------------------->
- body {
-                        margin: 0;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        
-                    }
-        ul { list-style-type: none; padding-left: 20px; text-decoration: none;}
-        li { margin: 5px 0; font-family: Arial, sans-serif; position: relative;list-style-type: none;  }
-        .toggle { cursor: pointer; margin-right: 5px; color: #007bff; }
-        .toggle:hover { text-decoration: underline; }
-        .hidden { display: none; padding-left: 20px; }
-        a { text-decoration: none; color: #007bff; }
+      a { text-decoration: none; }
+        
         a:hover { text-decoration: underline; }
+       
+
+
+        .hidden { display: none; padding-left: 20px; }
+
+  
 
 
         #container { 
@@ -949,43 +514,18 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
   height: 100%;
   width: 100%;
 
-      
+   
         
         }
 
 
-        #content-frame {
-
- height:fit-content;
-    transition: margin-left 0.3s ease;
-    z-index: 100;
-    overflow-y: auto;
-    display: flex; 
-    flex-direction : column;
-    background-color:white;
-    border-radius: 0% 5% 5% 0%;
-    box-shadow: 1px 1px 1px #129867;
-    text-shadow: 1px 1px 1px #129867;
-    padding: 7px;
-    margin-top: 100px;
-     margin-left: -0.5vw;
-     
-             }
-
-                 
 
 
 
-
-#content-frame a:visited {
-    color: black; 
-    text-decoration: none; 
-
-}
 
 #split-container {
   flex-grow: 1;
-  transition: width 1s ease;
+  transition: width 0.6s ease;
 margin-top: 55px;
 
     display: flex;        
@@ -996,10 +536,7 @@ margin-top: 55px;
    margin-left: 10px;
 }
 
-#split-container.expanded {
-    width: 100%;
-    margin-left: 0px;
-}
+
 
 #split-container iframe {
 width: 100%;         
@@ -1007,18 +544,12 @@ width: 100%;
     border: none;     
     gap: none;
     z-index: 10;
+    
 }
 
-#content-frame-view-comment {
-    width: 100%;
-    height: 100vh;
-    border: none;
-    display: block;
-}
-    #content-frame-view-comment.hidden {
-        display: none;
-    }
 
+
+    
     #toggle-frame {
     z-index: 9999;
     position: absolute;
@@ -1034,9 +565,7 @@ width: 100%;
     box-shadow: black 1px 1px 1px;
 }
 
-#toggle-frame:hover {
-    background-color:rgb(12, 206, 122);
-}
+
     #app-header {
     position: fixed;
     top: 0;
@@ -1053,135 +582,47 @@ width: 100%;
 
 }
 
-    </style>
 
 
+   
+
+            </style>
+
+            <div id="container">
 
 
+                <div id="app-header">${appName}</div>
+
+                <img src="${imageUrl}" style="position: absolute; top: 5px; right: 50px; max-width: 50px; border-radius: 10%;"/>
 
 
+                <button id="toggle-frame">⇤</button>
 
-    <div id="container"><div id="app-header">${appName}</div>
-   <img src="${imageUrl}" style="display: block; position: absolute; top: 5px; right: 50px; border-radius: 10%; max-width: 50px; height: auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);" alt="Image" />
+                <div id="content-frame">
+                   ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}
+                </div>
 
-<button id="toggle-frame">⇤</button>
+                <div id="split-container">
+                    <iframe id="content-frame-view"></iframe>
+                    <iframe id="content-frame-view-comment" class="hidden"></iframe>
+                </div>
+            </div>
 
-        <div id="content-frame" style="box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);>
-         <ul> ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}</ul>
-        </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    const frame = document.getElementById("content-frame");
+                    const button = document.getElementById("toggle-frame");
+                    let isHidden = false;
 
+                    button.addEventListener("click", () => {
+                        frame.style.display = isHidden ? "flex" : "none";
+                        document.getElementById("split-container").classList.toggle("expanded", !isHidden);
+                        button.textContent = isHidden ? "⇤" : "⇥";
+                        isHidden = !isHidden;
+                    });
+                });
 
-
-
-
-      <div id="split-container">
-    <iframe id="content-frame-view" src="" frameborder="0"> </iframe> 
-   <iframe id="content-frame-view-comment" src="" frameborder="0" class="hidden"></iframe>
-</div>
-
-
-
-    </div>
-
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const frame = document.getElementById("content-frame");
-    const button = document.getElementById("toggle-frame");
-    let isHidden = false;
-
-    button.addEventListener("click", function () {
-        if (!isHidden) {
-           frame.style.display = "none";
-document.getElementById("split-container").classList.add("expanded");
-            button.textContent = "⇥"; // Change le texte du bouton
-        } else {
-            frame.style.display = "flex";
-document.getElementById("split-container").classList.remove("expanded");
-            button.textContent = "⇤";
-        }
-        isHidden = !isHidden;
-    });
-});
-
-        const appName = "${appName}";
-        const relativePath = "${relativePath}";
-       const iframe = document.getElementById('content-frame-view');
-
-  // Une fois que le contenu de l'iframe est chargé
-  iframe.onload = function() {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-    // Appliquer un style aux images dans l'iframe
-    const images = iframeDoc.getElementsByTagName('img');
-    for (let img of images) {
-    img.style.position = 'absolute';
-       img.style.top = '50%';
-      img.style.left = '50%';
-      img.style.transform = 'translate(-50%, -50%)'; 
-      img.style.maxWidth = '75vw';
-      img.style.height = '100%';
-      img.style.borderRadius = '10px' 
-    }
-  };
-        function loadPageView(url) {
-            const iframeView = document.getElementById('content-frame-view');
-            
-            if (iframeView) {
-                iframeView.src = url; // Charge l'URL dans l'iframe
-            } else {
-                console.error("Iframe 'content-frame-view' non trouvé.");
-            }
-        }
-function loadPageViewComment(url) {
-    const iframeComment = document.getElementById('content-frame-view-comment');
-
-    if (!iframeComment) {
-        console.error("⚠️ Iframe 'content-frame-view-comment' introuvable !");
-        return;
-    }
-
-    // Vérifier si l'iframe affiche déjà cette URL et est visible
-    if (iframeComment.src.includes(url) && !iframeComment.classList.contains('hidden')) {
-        console.log("🔻 Masquage de l'iframe");
-        iframeComment.classList.add('hidden');  // Cache l'iframe
-        iframeComment.src = "about:blank"; // Vide l'iframe pour éviter de recharger inutilement
-    } else {
-        console.log("🔺 Affichage de l'iframe avec :", url);
-        iframeComment.src = url;
-        iframeComment.classList.remove('hidden');  // Affiche l'iframe
-
-        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
-        iframeComment.onload = function () {
-            const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
-            if (iframeDoc) {
-                const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
-                closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '2px';
-                closeButton.style.background = 'red';
-                closeButton.style.color = 'white';
-                closeButton.style.border = 'none';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.zIndex = '9999';
-
-                closeButton.onclick = () => {
-                    iframeComment.classList.add('hidden');
-                    iframeComment.src = "about:blank";
-                };
-
-                // Ajouter le bouton au début du body de l'iframe
-                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
-            }
-        };
-    }
-}
-
-
-
-
-        function toggleVisibility(element) {
+               function toggleVisibility(element) {
             const sublist = element.nextElementSibling.nextElementSibling;
             if (sublist.classList.contains('hidden')) {
                 sublist.classList.remove('hidden');
@@ -1192,15 +633,7 @@ function loadPageViewComment(url) {
             }
         }
 
-    const fullscreenButton = document.getElementById('fullscreenbuttoniframe');
-  const iframeView = document.getElementById('content-frame-view');
-
-  // Lorsque le bouton est cliqué
-  fullscreenButton.addEventListener('click', () => {
-    iframeView.classList.toggle('buttonactivated');
-  });
-
- function loadPageView(url) {
+            function loadPageView(url) {
     const iframeView = document.getElementById('content-frame-view');
 
     if (!iframeView) {
@@ -1245,31 +678,63 @@ function loadPageViewComment(url) {
         };
     }
 }
+                function loadPageViewComment(url) {
+    const iframeComment = document.getElementById('content-frame-view-comment');
 
-
-  function toggleVisibility(element) {
-    const sublist = element.nextElementSibling.nextElementSibling;
-    if (sublist.classList.contains('hidden')) {
-      sublist.classList.remove('hidden');
-      element.textContent = '➖➖➖➖➖➖⬇️';
-    } else {
-      sublist.classList.add('hidden');
-      element.textContent = '➕';
+    if (!iframeComment) {
+        console.error("⚠️ Iframe 'content-frame-view-comment' introuvable !");
+        return;
     }
-  }
-    </script>
-`;
 
-            res.send(htmlContent);
+    // Vérifier si l'iframe affiche déjà cette URL et est visible
+    if (iframeComment.src.includes(url) && !iframeComment.classList.contains('hidden')) {
+        console.log("🔻 Masquage de l'iframe");
+        iframeComment.classList.add('hidden');  // Cache l'iframe
+        iframeComment.src = "about:blank"; // Vide l'iframe pour éviter de recharger inutilement
+    } else {
+        console.log("🔺 Affichage de l'iframe avec :", url);
+        iframeComment.src = url;
+        iframeComment.classList.remove('hidden');  // Affiche l'iframe
 
+        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
+        iframeComment.onload = function () {
+            const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
+            if (iframeDoc) {
+                const closeButton = iframeDoc.createElement('button');
+                closeButton.textContent = '❌ Fermer';
+                closeButton.style.position = 'fixed';
+                closeButton.style.top = '20px';
+                closeButton.style.right = '10px';
+                closeButton.style.padding = '2px';
+                closeButton.style.background = 'red';
+                closeButton.style.color = 'white';
+                closeButton.style.border = 'none';
+                closeButton.style.cursor = 'pointer';
+                closeButton.style.zIndex = '9999';
 
+                closeButton.onclick = () => {
+                    iframeComment.classList.add('hidden');
+                    iframeComment.src = "about:blank";
+                };
 
-        }
+                // Ajouter le bouton au début du body de l'iframe
+                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
+            }
+        };
+    }
+}
+            </script>
+        `;
+
+        res.send(htmlContent);
+    
     } catch (error) {
-        console.error("Erreur dans la gestion du chemin de l'application :", error);
+        console.error("Erreur :", error);
         res.status(500).send('Une erreur est survenue lors du traitement de la demande');
     }
-}); */
+});
+
+
 
 app.listen(3000, () => {
     console.log('Serveur en écoute sur le port 3000');
