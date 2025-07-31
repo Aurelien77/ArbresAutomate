@@ -1,56 +1,19 @@
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
+const path = require('path'); 
 const mime = require('mime-types');
 const app = express();
 const port = process.env.PORT || 3000;
-// -------------------------------------------------- => Recupere image background card and dossier map structure
-function getImagesFromFolder(folderPath) {
-    try {
-        const files = fs.readdirSync(folderPath);
-        return files.filter(file => {
-            // Vérifier si le fichier est une image en fonction de son extension
-            return /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file);
-        });
-    } catch (err) {
-        console.error(`Erreur lors de la lecture du dossier ${folderPath}:`, err);
-        return [];  // Retourner un tableau vide en cas d'erreur
-    }
-}
-// Fonction pour récupérer la structure des dossiers mais pas le dossier picture2850
-function getFolderStructure(dirPath) {
-    const items = fs.readdirSync(dirPath);
-    return items
-    .filter(item => item !== 'picture2850') 
-    .map(item => {
-        const itemPath = path.join(dirPath, item);
-        const isDirectory = fs.lstatSync(itemPath).isDirectory();
-        return {
-            type: isDirectory ? 'dossier' : 'fichier',
-            name: item,
-            contenu: isDirectory ? getFolderStructure(itemPath) : []
-        };
-    });
-}
-//Fonction pour récupérer une arborescence de fichier en excluant le dossier config2850
-function getFolderStructurewithout(dirPath) {
-    const items = fs.readdirSync(dirPath);
-    return items
-        .filter(item => item !== 'config2850')// Exclure le dossier "config2850"
-        .map(item => {
-            const itemPath = path.join(dirPath, item);
-            const isDirectory = fs.lstatSync(itemPath).isDirectory();
-            return {
-                type: isDirectory ? 'dossier' : 'fichier',
-                name: item,
-                contenu: isDirectory ? getFolderStructurewithout(itemPath) : [] // Appel récursif pour les sous-dossiers
-            };
-        });
-}
 
+app.use('/css', express.static(path.join(__dirname, '../public/css/')));
+
+const { 
+    getImagesFromFolder, 
+    getFolderStructure, 
+    getFolderStructurewithout 
+} = require('./utilitaires/fileUtils');
 /* 
 -----------------------------------------------------GET---------------------------------------------------------------------------------- */
-
 
 
 // -------------------------------------------------- => creation card + link to Principal page  => /arborescence/${item.name}
@@ -399,7 +362,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
             return `
-                <div class="tree-item">
+                <div class="tree-item-comment">
                     <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
                     ${presetButton}
                 </div>
@@ -412,181 +375,10 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
         // === HTML complet ===
         const htmlContent = `
       
-            <style>
-
-.folder, .file {
-    flex: 1;
-}
-
-.tree-children {
-
-}
-
-.hidden { 
-    display: none; 
-}
-            
-#content-frame { 
-    position: absolute;
-    top: 0;
-    left: 10px;
-    margin-top: 100px;
-    transition: margin-left 0.3s ease;
-    z-index: 100;
-
-    display: flex; 
-    flex-direction: column;
-    padding: 12px;
-    color: #222;
-
-    /* 🎨 Intérieur clair avec texture brossée */
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0.5),
-        rgba(255, 255, 255, 0.5) 1px,
-        rgba(220, 220, 220, 0.6) 2px
-    );
-    background-color: #e3e3e3;
-
-    /* Bord métallique plus sombre */
-    border: 2px solid #2a2a2a;
-    border-radius: 0% 5% 5% 0%;
-
-    /* Ombre extérieure */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-
-    /* Effet relief intérieur */
-    box-shadow: 
-        inset 0 2px 5px rgba(255, 255, 255, 0.8), /* lumière en haut */
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2),      /* ombre en bas */
-        0 4px 12px rgba(0, 0, 0, 0.6);            /* extérieur */
-
-    /* Effet de flou léger (style métal brossé) */
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-
-    /* Texte */
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-}
-
-#content-frame ul { 
-margin : 0px;
-}
-
-
-
-  html {
-
-overflow-x: hidden;
-  overflow-y: hidden;
-
-
-}
-
-body {
-overflow-x: hidden;
-  overflow-y: hidden;
-
-}
-     
-
-
-
-
-
- 
-
-      a { text-decoration: none; }
-        
-        a:hover { text-decoration: underline; }
-       
-
-
-        .hidden { display: none; padding-left: 20px; }
-
-  
-
-
-        #container { 
-        
-    
-        display: flex;
-  height: 100%;
-  width: 100%;
-
-   
-        
-        }
-
-
-
-
-
-
-#split-container {
-  flex-grow: 1;
-  transition: width 0.6s ease;
-margin-top: 55px;
-
-    display: flex;        
-      
-    height: 100vh;  
-   overflow-x: hidden;   
-   overflow-y: auto;  
-   margin-left: 10px;
-}
-
-
-
-#split-container iframe {
-width: 100%;         
-    height: 100%;     
-    border: none;     
-    gap: none;
-    z-index: 10;
-    
-}
-
-
-
-    
-    #toggle-frame {
-    z-index: 9999;
-    position: absolute;
-
-    top:65px;
-    left: 10px;
-    padding: 5px 10px;
-
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    box-shadow: black 1px 1px 1px;
-}
-
-
-    #app-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-   color: black;
-
-    text-align: center;
-    line-height: 50px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    z-index: 10000;
-
-}
-
-
-
-   
-
-            </style>
+      <head>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
 
             <div id="container">
 
@@ -607,7 +399,7 @@ width: 100%;
                     <iframe id="content-frame-view-comment" class="hidden"></iframe>
                 </div>
             </div>
-
+</body>
             <script>
                 document.addEventListener("DOMContentLoaded", () => {
                     const frame = document.getElementById("content-frame");
