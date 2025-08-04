@@ -6,12 +6,16 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use('/css', express.static(path.join(__dirname, '../public/css/')));
+app.use('/js', express.static(path.join(__dirname, '../public/js')));
+
+
 
 const { 
     getImagesFromFolder, 
     getFolderStructure, 
-    getFolderStructurewithout 
-} = require('./utilitaires/fileUtils');
+    getFolderStructurewithout,
+   
+} = require('../public/js/fileUtils');
 /* 
 -----------------------------------------------------GET---------------------------------------------------------------------------------- */
 
@@ -38,7 +42,7 @@ app.get('/', (req, res) => {
                 <div class="card" style="background-image: url('${imageUrl}');">
                     <a href="${appUrl}">
                         <h2>${item.name}</h2>
-                        <p>Voir la structure de l'application</p>
+                     
                     </a>
                 </div>
             `;
@@ -138,146 +142,102 @@ app.get('/arborescence/:appName', (req, res) => {
             .filter(item => fs.lstatSync(path.join(configPath, item)).isDirectory() && item.toLowerCase() !== 'picture2850'  && item !== 'Tech2850')
         : [];
 
+    // Génère les boutons avec onclick qui cache le bouton ET charge la page
     const menuButtonsHtml = configDirs.map(dir => `
-        <button onclick="loadPage('/app/${appName}/config2850/${dir}')">${dir}</button>
+        <button onclick="handleButtonClick(this); loadPage('/app/${appName}/config2850/${dir}')">${dir}</button>
     `).join(' ');
     
     res.send(`
-    <style>
+         <head>
+    <link rel="stylesheet" href="/css/style.css">
 
-    
-        .categoryMenu {
-            position: fixed;
-            top: 10px;
-            left: -100%;
-            width: 90vw;
-            height: 50px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            background: #f0f0f0;
-            transition: left 0.5s ease-in-out;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            border-radius: 0 20px 20px 0;
-      
-        }
-             .categoryMenu button { 
-                border-radius: 50%;
-             }
-        .categoryMenu.active {
-            left: 0;
-            opacity: 1;
-            transition: left 0.5s ease-in-out, opacity 0.3s ease-in-out;
-            width : auto;
-        }
-        .toggleMenuButton {
-            position: fixed;
-            top: 15px;
-            left: 10px;
-            width: 40px;
-            height: 40px;
-            font-size: 24px;
-            cursor: pointer;
-            background-color: lightblue;
-            border-radius: 50%;
-            z-index: 1000;
-            transition: left 0.5s ease-in-out, transform 0.2s ease-in-out;
-          
-        }
-
-  
-            
-            
-            }
-        .toggleMenuButton:hover {
-            transform: scale(1.1);
-        }
-        .toggleMenuButton.active {
-            left: 88vw;
-            
-            /* Décalage progressif pour suivre le menu */
-
-
-                 background: linear-gradient(145deg, #e0e0e0, #a0a0a0, #f5f5f5, #777);
-                border-radius: 10%;
-                   box-shadow:
-        inset 1px 1px 3px rgba(255, 255, 255, 0.8),  
-        inset -2px -2px 5px rgba(0, 0, 0, 0.2),      
-        2px 2px 5px rgba(0, 0, 0, 0.3);              
-    color: #333;
-    border: 1px solid #999;
-    background-size: 200% 200%;
-    animation: metalShift 3s ease-in-out infinite;
-        }
-        .categoryMenu button {
-            background: #444;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background 0.3s;
-        }
-        .categoryMenu button:hover {
-            background: #575757;
-        }
-            
-        #contentFrame {
-        
-    
-  
-    
-    }
-    </style>
+     
+</head>
+<body>
 
     <button id="toggleMenuButton" class="toggleMenuButton">☰</button>
     <div id="categoryMenu" class="categoryMenu">
         ${menuButtonsHtml}
-        <button onclick="loadPage('/app/${appName}/')">-Tree-</button>
-        <button onclick="window.location.href='/'">🏠</button>
+      <button onclick="handleButtonClick(this); loadPage('/app/${appName}/')" style="display:none;">-${appName}-</button>
+
+        <div onclick="window.location.href='/'" id="accueil">
+      
+          
+   <div>🏠</div>  <div>  Formations    </div>
+        </div>
+        
+        
     </div>
 
-
-    
-    <iframe id="contentFrame" src="/app/${appName}/" style="width:100%; height:100vh; border:none;"></iframe>
-
+    <iframe id="contentFrame" src="/app/${appName}/"></iframe>
+</body>
     <script>
+       let hiddenButton = null;
+function updateToggleButtonPosition() {
+    const menu = document.getElementById('categoryMenu');
+    const toggleButton = document.getElementById('toggleMenuButton');
+    if (menu.classList.contains('active')) {
+        const menuWidth = menu.getBoundingClientRect().width;
+        toggleButton.style.left = (menuWidth + 1) + 'px';  // +20 comme tu veux
+    } else {
+        toggleButton.style.left = '14px';
+    }
+}
+function handleButtonClick(button) {
+    // Cacher le bouton cliqué
+    button.style.display = 'none';
+
+    // Trouver le bouton -appName- dans le menu
+    const categoryMenu = document.getElementById('categoryMenu');
+    const buttons = categoryMenu.querySelectorAll('button');
+
+    buttons.forEach(btn => {
+        // Si c'est le bouton -appName-
+        if (btn.textContent.trim() === '-${appName}-') {
+            hiddenButton = btn; // mémoriser ce bouton
+        } else if (btn !== button) {
+            // Réafficher tous les autres boutons (sauf celui qui vient d'être cliqué)
+            btn.style.display = 'inline-block';
+        }
+    });
+
+    // Réafficher le bouton -appName- quand un autre bouton est cliqué (sauf si c'est lui-même)
+    if (hiddenButton && button !== hiddenButton) {
+        hiddenButton.style.display = 'inline-block';
+    }
+
+       updateToggleButtonPosition();
+}
 
 
-         function loadPage(url) {
+        function loadPage(url) {
             document.getElementById('contentFrame').src = url;
         }
-                    
-    
-     document.getElementById('toggleMenuButton').addEventListener('click', function () {
-    const menu = document.getElementById('categoryMenu');
-    const button = document.getElementById('toggleMenuButton');
 
-    menu.classList.toggle('active');
-    button.classList.toggle('active');
+        document.getElementById('toggleMenuButton').addEventListener('click', function () {
+            const menu = document.getElementById('categoryMenu');
+            const button = document.getElementById('toggleMenuButton');
 
-    if (menu.classList.contains('active')) {
-        // Calculer la largeur visible du menu (en px)
-        const menuWidth = menu.getBoundingClientRect().width;
-        // Décaler le bouton à droite du menu + 10px de marge
-        button.style.left = (menuWidth + 10) + 'px';
-    } else {
-        // Menu caché, bouton à sa position initiale
-        button.style.left = '10px';
-    }
-});
+            menu.classList.toggle('active');
+            button.classList.toggle('active');
+
+            if (menu.classList.contains('active')) {
+                const menuWidth = menu.getBoundingClientRect().width;
+                button.style.left = (menuWidth + 20) + 'px';
+            } else {
+                button.style.left = '10px';
+            }
+        });
+
+        
     </script>
     `);
 });
 
 
-
-
-
 // recoit une arborescence de menu créer + envoi fichiers vers ifram view  //
 
-/* Recoit Bouton creer menu  */
+/* Menu Vertical */
 
 app.get('/app/:appName/*', (req, res) => {
     try {
@@ -313,7 +273,6 @@ app.get('/app/:appName/*', (req, res) => {
                         background-color: black;
                         color: white;
                         padding: 20px;
-                        border-radius: 2%;
                         font-family: monospace;
                         font-size: 1rem;
                         overflow-x: auto;
@@ -334,35 +293,45 @@ app.get('/app/:appName/*', (req, res) => {
         const folderStructure = getFolderStructurewithout(appPath);
 
         // 🔧 Fonction récursive pour générer l'arborescence
-const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
-    return structure.map(item => {
+const renderFolder = (structure, currentPath = `${appName}${relativePath}`, level = 0, parentIndex = '') => {
+    return structure.map((item, index) => {
+        const number = parentIndex ? `${parentIndex}.${index + 1}` : `${index + 1}`;
         const newPath = `${currentPath}/${item.name}`;
         const configFilePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'Tech2850', item.name);
 
         let presetButton = '';
         if (fs.existsSync(configFilePath)) {
             presetButton = `
-                <button onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
-                    📌 Commentaires
+                <button class="combutton" onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
+                    📌Com
                 </button>
             `;
         }
 
+        // Classe dynamique selon le niveau de profondeur
+        const levelClass = `level-${level}`;
+
         if (item.type === 'dossier') {
+            const hasChildren = item.contenu && item.contenu.length > 0;
             return `
-                <div class="tree-item">
-                    <span class="toggle" onclick="toggleVisibility(this)">➕</span>
+                <div class="tree-item ${levelClass}">
+                    ${hasChildren
+                        ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
+                               ${number} <span class="toggle-icon">➕</span>
+                           </span>`
+                        : `<span class="toggle-empty"></span>`}
                     <span class="folder">📁 ${item.name}</span>
-                    <div class="hidden tree-children">
-                        ${renderFolder(item.contenu, newPath)}
-                    </div>
+                    ${hasChildren ? `
+                        <div class="hidden tree-children">
+                            ${renderFolder(item.contenu, newPath, level + 1, number)}
+                        </div>` : ''}
                 </div>
             `;
         } else {
             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
             return `
-                <div class="tree-item-comment">
+                <div class="tree-item-comment ${levelClass}">
                     <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
                     ${presetButton}
                 </div>
@@ -372,25 +341,31 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
 };
 
 
+
+
         // === HTML complet ===
         const htmlContent = `
       
       <head>
     <link rel="stylesheet" href="/css/style.css">
+      <script src="/js/menu.js"></script>
+            <script src="/js/addevent.js"></script>
 </head>
 <body>
-
+<div id="top-menu" class="top-menu"></div>
             <div id="container">
 
+<div class="picturename" >
+      <img src="${imageUrl}" style=""/>
+                <div id="">${appName}</div>
 
-                <div id="app-header">${appName}</div>
+          
 
-                <img src="${imageUrl}" style="position: absolute; top: 5px; right: 50px; max-width: 50px; border-radius: 10%;"/>
-
-
-                <button id="toggle-frame">⇤</button>
-
+</div>
+        
+ 
                 <div id="content-frame">
+                       <button id="toggle-frame">⇤</button>
                    ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}
                 </div>
 
@@ -401,120 +376,9 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`) => {
             </div>
 </body>
             <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    const frame = document.getElementById("content-frame");
-                    const button = document.getElementById("toggle-frame");
-                    let isHidden = false;
+            
 
-                    button.addEventListener("click", () => {
-                        frame.style.display = isHidden ? "flex" : "none";
-                        document.getElementById("split-container").classList.toggle("expanded", !isHidden);
-                        button.textContent = isHidden ? "⇤" : "⇥";
-                        isHidden = !isHidden;
-                    });
-                });
-
-               function toggleVisibility(element) {
-            const sublist = element.nextElementSibling.nextElementSibling;
-            if (sublist.classList.contains('hidden')) {
-                sublist.classList.remove('hidden');
-                element.textContent = '➖'; // Icône pour indiquer que la liste est dépliée
-            } else {
-                sublist.classList.add('hidden');
-                element.textContent = '➕'; // Icône pour indiquer que la liste est repliée
-            }
-        }
-
-            function loadPageView(url) {
-    const iframeView = document.getElementById('content-frame-view');
-
-    if (!iframeView) {
-        console.error("⚠️ Iframe 'content-frame-view' introuvable !");
-        return;
-    }
-
-    // Vérifier si l'iframe affiche déjà cette URL et est visible
-    if (iframeView.src.includes(url) && !iframeView.classList.contains('hidden')) {
-        console.log("🔻 Masquage de l'iframe principale");
-        iframeView.classList.add('hidden');  // Cache l'iframe
-        iframeView.src = "about:blank"; // Vide l'iframe
-    } else {
-        console.log("🔺 Affichage de l'iframe principale avec :", url);
-        iframeView.src = url;
-        iframeView.classList.remove('hidden');  // Affiche l'iframe
-
-        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
-        iframeView.onload = function () {
-            const iframeDoc = iframeView.contentDocument || iframeView.contentWindow.document;
-            if (iframeDoc) {
-                const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
-                closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '1px';
-                closeButton.style.background = 'red';
-                closeButton.style.color = 'white';
-                closeButton.style.border = 'none';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.zIndex = '9999';
-
-                closeButton.onclick = () => {
-                    iframeView.classList.add('hidden');
-                    iframeView.src = "about:blank";
-                };
-
-                // Ajouter le bouton au début du body de l'iframe
-                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
-            }
-        };
-    }
-}
-                function loadPageViewComment(url) {
-    const iframeComment = document.getElementById('content-frame-view-comment');
-
-    if (!iframeComment) {
-        console.error("⚠️ Iframe 'content-frame-view-comment' introuvable !");
-        return;
-    }
-
-    // Vérifier si l'iframe affiche déjà cette URL et est visible
-    if (iframeComment.src.includes(url) && !iframeComment.classList.contains('hidden')) {
-        console.log("🔻 Masquage de l'iframe");
-        iframeComment.classList.add('hidden');  // Cache l'iframe
-        iframeComment.src = "about:blank"; // Vide l'iframe pour éviter de recharger inutilement
-    } else {
-        console.log("🔺 Affichage de l'iframe avec :", url);
-        iframeComment.src = url;
-        iframeComment.classList.remove('hidden');  // Affiche l'iframe
-
-        // Attendre que l'iframe charge, puis injecter un bouton "Fermer"
-        iframeComment.onload = function () {
-            const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
-            if (iframeDoc) {
-                const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
-                closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '2px';
-                closeButton.style.background = 'red';
-                closeButton.style.color = 'white';
-                closeButton.style.border = 'none';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.zIndex = '9999';
-
-                closeButton.onclick = () => {
-                    iframeComment.classList.add('hidden');
-                    iframeComment.src = "about:blank";
-                };
-
-                // Ajouter le bouton au début du body de l'iframe
-                iframeDoc.body.insertBefore(closeButton, iframeDoc.body.firstChild);
-            }
-        };
-    }
-}
+          
             </script>
         `;
 

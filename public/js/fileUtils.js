@@ -46,13 +46,17 @@ function getFolderStructurewithout(dirPath) {
         });
 }
 
+//-------------------------------------------------------------------
 
+
+//------------------------------------------------------------------
 
 
 // Export des fonctions
 module.exports = {
     getImagesFromFolder,
     getFolderStructure,
-    getFolderStructurewithout
+    getFolderStructurewithout,
+  
 };
 
