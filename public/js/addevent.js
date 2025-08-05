@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const topMenu = document.getElementById("top-menu");
    const frame = document.getElementById("content-frame");
     const button = document.getElementById("toggle-frame");
+
+    const fullMenu = document.getElementById('full-menu');
+    const foldersOnlyMenu = document.getElementById('folders-only-menu');
+    let isFoldersOnly = false;
     const showButton = document.createElement("button");
        let clickCount = 0;
 
@@ -23,20 +27,20 @@ document.addEventListener("DOMContentLoaded", () => {
     
 
    // Gestion du bouton toggle
-    button.addEventListener("click", () => {
-        clickCount++;
-        if (clickCount === 1) {
-            frame.classList.add("collapsed");
-            button.textContent = "⇥";
-        } else if (clickCount === 2) {
-            frame.classList.remove("collapsed");
-            frame.style.display = "none";
-            button.style.display = "none";
-            showButton.style.display = "block";
-            clickCount = 0;
+button.addEventListener('click', () => {
+        if (!isFoldersOnly) {
+            fullMenu.style.display = 'none';
+            foldersOnlyMenu.style.display = 'block';
+            button.textContent = '⇥'; // ou autre icône
+        } else {
+            foldersOnlyMenu.style.display = 'none';
+            fullMenu.style.display = 'block';
+            button.textContent = '⇤';
         }
+        isFoldersOnly = !isFoldersOnly;
     });
 
+    
     // Réouverture avec "Afficher panneau"
     showButton.addEventListener("click", () => {
         frame.style.display = "block";

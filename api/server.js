@@ -293,8 +293,12 @@ app.get('/app/:appName/*', (req, res) => {
         const folderStructure = getFolderStructurewithout(appPath);
 
         // 🔧 Fonction récursive pour générer l'arborescence
-const renderFolder = (structure, currentPath = `${appName}${relativePath}`, level = 0, parentIndex = '') => {
+
+
+const renderFolder = (structure, currentPath = `${appName}${relativePath}`, level = 0, parentIndex = '', foldersOnly = false) => {
+
     return structure.map((item, index) => {
+        
         const number = parentIndex ? `${parentIndex}.${index + 1}` : `${index + 1}`;
         const newPath = `${currentPath}/${item.name}`;
         const configFilePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'Tech2850', item.name);
@@ -308,7 +312,6 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
             `;
         }
 
-        // Classe dynamique selon le niveau de profondeur
         const levelClass = `level-${level}`;
 
         if (item.type === 'dossier') {
@@ -323,11 +326,24 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
                     <span class="folder">📁 ${item.name}</span>
                     ${hasChildren ? `
                         <div class="hidden tree-children">
-                            ${renderFolder(item.contenu, newPath, level + 1, number)}
+                            ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
                         </div>` : ''}
                 </div>
             `;
         } else {
+           if (foldersOnly) {
+             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
+            const icon = isImage ? '🖼️' : '📃';
+    return `
+        <div class="tree-item-comment ${levelClass}" style="display:none;">
+            <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
+            ${presetButton}
+        </div>
+    `;
+}
+
+
+
             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
             return `
@@ -340,6 +356,9 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
     }).join('');
 };
 
+
+const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
+const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', true);
 
 
 
@@ -363,11 +382,17 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
 
 </div>
         
- 
-                <div id="content-frame">
-                       <button id="toggle-frame">⇤</button>
-                   ${renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`)}
-                </div>
+ <div id="content-frame">
+    <button id="toggle-frame">⇤</button>
+
+    
+    <div id="full-menu">
+        ${fullMenuHTML}
+    </div>
+    <div id="folders-only-menu" style="display:none;">
+        ${foldersOnlyMenuHTML}
+    </div>
+</div>
 
                 <div id="split-container">
                     <iframe id="content-frame-view"></iframe>
@@ -375,11 +400,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
                 </div>
             </div>
 </body>
-            <script>
-            
 
-          
-            </script>
         `;
 
         res.send(htmlContent);

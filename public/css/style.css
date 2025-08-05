@@ -1,7 +1,11 @@
 /* Menu normal */
 
 
+.nodisplay {
 
+display: none;
+
+}
 
 .Panneau {
 
