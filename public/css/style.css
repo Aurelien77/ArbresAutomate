@@ -69,7 +69,7 @@ cursor: pointer;
     background-color: #e3e3e3;
 
     /* Bord métallique plus sombre */
-    border: 2px solid #2a2a2a;
+  /*   border: 2px solid #2a2a2a; */
     border-radius: 0% 5% 5% 0%;
 
     /* Ombre extérieure */
@@ -164,7 +164,6 @@ padding: 0px;
 
 
 
-
    
 .picturename {
   position: absolute; 
@@ -173,7 +172,7 @@ padding: 0px;
   display: flex;
   align-items: center;
   flex-direction: column;
-
+z-index: 501;
   padding: 5px 10px;       
   background-color: #f0f0f0;   
   border-radius: 8px;          
@@ -246,7 +245,8 @@ width:100%;
 .tree-item {
 margin-bottom : 2.5px;
     margin-top : 2.5px;
-
+border: 2px solid black;
+padding: 10px;
 }
 
 
@@ -339,6 +339,7 @@ position: relative;
 
 .combutton:hover {
 cursor: pointer;
+
 }
 
 /* style de Menu horizontale  */

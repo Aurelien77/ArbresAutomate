@@ -49,46 +49,77 @@ app.get('/', (req, res) => {
         }
     });
     const htmlContent = `
+    <head>
+      <title>Arbo|Essences</title>
         <style>
-            .card-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .card {
-                width: 20vw;
-                height: 20vw;
-                margin: 1vw;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                background-color: #ccc;
-                border-radius: 8px;
-                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease-in-out;
-                background-size: cover;
-                background-position: center;
-            }
-      .card h2 {
-    background-color: white;
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5vw;
+    padding: 2vw;
+    border-radius: 1vw;
+ 
+    position: relative;
+  }
+
+  /* On crée un fond overlay SVG en absolute, derrière les cartes */
+  .background-pattern {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; /* clics passent au-dessus */
+    z-index: 0;
+  }
+
+  .card {
+    width: 20vw;
+    height: 20vw;
+    margin: 1vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  
+    border-radius: 1vw;
+    box-shadow:
+      inset 1px 1px 10px #ccd4d0ff,
+      inset -1px -1px 10px #ffffff,
+      3px 3px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1; /* au-dessus du pattern */
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      inset 1px 1px 5px #d9eee3ff,
+      inset -1px -1px 7.5px #ffffff,
+      6px 6px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .card h2 {
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-word;
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: 20%;
     font-size: 1.5rem;
-    color: black;
-    text-shadow: 
-        1px 1px 0 white,
-        -1px 1px 0 white,
-        1px -1px 0 white,
-        -1px -1px 0 white,
-        1px 0 0 white,
-        -1px 0 0 white,
-        0 1px 0 white,
-        0 -1px 0 white;
-    text-decoration: none;
-    display: inline-block; 
-    padding: 0.5rem; 
-     border: 0.2px solid black;
-}
+    color: #333;
+    padding: 0.5rem;
+    border: 0.2px solid #888;
+    text-shadow:
+      1px 1px 0 #f0f0f0,
+      -1px 1px 0 #f0f0f0,
+      1px -1px 0 #f0f0f0,
+      -1px -1px 0 #f0f0f0;
+  }
 .card a {
     display: inline-flex; 
     justify-content: center;
@@ -120,9 +151,12 @@ height:100%;
                 transform: scale(1.05);
             }
         </style>
+        </head>
+        <body>
         <div class="card-container">
             ${cardsHtml}
         </div>
+        </body>
     `;
     res.send(htmlContent);
 });
@@ -281,6 +315,7 @@ app.get('/app/:appName/*', (req, res) => {
                         white-space: pre-wrap;
                         box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
                         border: 1px solid gold;
+                          animation: blink 0.7s infinite;
                     `;
                     res.send(`<pre style="${style}"><code>${data}</code></pre>`);
                 });
@@ -395,7 +430,38 @@ const renderFolder = (
 };
 
 
+function findFirstFile(structure, currentPath = '') {
+    // 1️⃣ Chercher d'abord un fichier directement dans le dossier courant
+    const file = structure.find(item => item.type === 'fichier');
+    if (file) {
+        return `/app/${currentPath}/${file.name}`;
+    }
 
+    // 2️⃣ Sinon, explorer récursivement les dossiers
+    for (const item of structure) {
+        if (item.type === 'dossier' && item.contenu && item.contenu.length > 0) {
+            const nestedFile = findFirstFile(item.contenu, `${currentPath}/${item.name}`);
+            if (nestedFile) return nestedFile;
+        }
+    }
+
+    return null;
+}
+
+const configPath = path.join(__dirname, '../apifolders', appName, 'config2850');
+let firstFileUrl = null;
+
+if (fs.existsSync(configPath)) {
+    // On récupère la structure du dossier config2850
+    const configFolderStructure = getFolderStructurewithout(configPath);
+    // On cherche le premier fichier dans config2850
+    firstFileUrl = findFirstFile(configFolderStructure, `${appName}/config2850`);
+}
+
+if (!firstFileUrl) {
+    // Sinon, on cherche dans le dossier courant (relativePath)
+    firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
+}
 
 const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
 const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', true);
@@ -407,8 +473,13 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
       
       <head>
     <link rel="stylesheet" href="/css/style.css">
+
+
+
       <script src="/js/menu.js"></script>
             <script src="/js/addevent.js"></script>
+
+
 </head>
 <body>
 <div id="top-menu" class="top-menu"></div>
@@ -434,12 +505,11 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
     
     <div id="full-menu">
         ${fullMenuHTML}
-    </div>
-    <div id="folders-only-menu" style="display:none;">
+    </div>   <div id="folders-only-menu" style="display:none;">
         ${foldersOnlyMenuHTML}
     </div>
 </div>
-                    <iframe id="content-frame-view"></iframe>
+                  <iframe id="content-frame-view" src="${firstFileUrl || ''}"></iframe>
                     <iframe id="content-frame-view-comment" class="hidden"></iframe>
                 </div>
             </div>

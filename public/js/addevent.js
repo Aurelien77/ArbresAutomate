@@ -6,11 +6,11 @@ const fullMenu = document.getElementById("full-menu");
 const foldersOnlyMenu = document.getElementById("folders-only-menu");
 const toggleImage = document.getElementById("toggle-image"); // cache / visible
 
-let state = "expanded"; // expanded | reduced | hidden
+let state = "reduced"; // expanded | reduced | hidden
 
 // --- État initial ---
-fullMenu.style.display = 'block';
-foldersOnlyMenu.style.display = 'none';
+fullMenu.style.display = 'none';
+foldersOnlyMenu.style.display = 'block';
 frame.style.display = 'block';
 button.style.display = 'inline-block';
 button.textContent = '⇤';
@@ -193,5 +193,8 @@ const updateTopMenu = (treeItem) => {
         }
     }
 });
+
+
+
 
 
