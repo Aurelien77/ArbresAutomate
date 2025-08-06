@@ -95,8 +95,17 @@ function collectContent(container) {
     return items;
 }
 
-function renderTopMenuItems(items, parentEl) {
+function renderTopMenuItems(items, parentEl, displayedPaths = new Set()) {
     items.forEach(item => {
+        // Utiliser path unique pour éviter les doublons, sinon le nom
+        const uniqueId = item.path || item.name;
+
+        if (displayedPaths.has(uniqueId)) {
+            // Fichier/dossier déjà affiché, on skip
+            return;
+        }
+        displayedPaths.add(uniqueId);
+
         const btnContainer = document.createElement("div");
         btnContainer.className = "menu-item-container";
 
@@ -117,7 +126,7 @@ function renderTopMenuItems(items, parentEl) {
 
         btnContainer.appendChild(btn);
 
-        // 📌 Bouton commentaire
+        // Bouton commentaire
         let commentPath = null;
         if (item.type !== "folder") {
             const treeFiles = document.querySelectorAll(".tree-item-comment");
@@ -147,12 +156,14 @@ function renderTopMenuItems(items, parentEl) {
 
         parentEl.appendChild(btnContainer);
 
-        // 🔁 Si dossier, afficher ses enfants juste après
+        // Si c’est un dossier, on affiche ses enfants (récursivité)
         if (item.children && item.children.length > 0) {
-            renderTopMenuItems(item.children, parentEl);
+            renderTopMenuItems(item.children, parentEl, displayedPaths);
         }
     });
 }
+
+
 
 const updateTopMenu = (treeItem) => {
     const childrenContainer = treeItem.querySelector(".tree-children");
@@ -170,10 +181,12 @@ const updateTopMenu = (treeItem) => {
             children: content
         };
 
+        // Vider le menu avant rendu
         topMenu.innerHTML = "";
         renderTopMenuItems([rootItem], topMenu);
     }
 };
+
 
 
     // Clic sur + (toggle dans l'arborescence)
