@@ -148,3 +148,20 @@ function loadPageViewComment(url) {
         };
     }
 }
+
+
+
+function toggleReducedFolder(el) {
+    const parentDiv = el.parentElement;
+    const childrenContainer = parentDiv.querySelector('.tree-children');
+
+    if (!childrenContainer) return;
+
+    if (childrenContainer.style.display === 'none' || childrenContainer.style.display === '') {
+        childrenContainer.style.display = 'block';
+        el.textContent = el.textContent.replace('📁', '📂');
+    } else {
+        childrenContainer.style.display = 'none';
+        el.textContent = el.textContent.replace('📂', '📁');
+    }
+}

@@ -40,7 +40,6 @@ button.addEventListener('click', () => {
         isFoldersOnly = !isFoldersOnly;
     });
 
-    
     // Réouverture avec "Afficher panneau"
     showButton.addEventListener("click", () => {
         frame.style.display = "block";
