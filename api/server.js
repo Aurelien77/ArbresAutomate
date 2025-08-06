@@ -294,14 +294,32 @@ app.get('/app/:appName/*', (req, res) => {
 
         // 🔧 Fonction récursive pour générer l'arborescence
 
+const renderFolder = (
+    structure,
+    currentPath = `${appName}${relativePath}`,
+    level = 0,
+    parentIndex = '',
+    foldersOnly = false
+) => {
+    let folderCounter = 0;
+    let fileCounter = 0;
 
-const renderFolder = (structure, currentPath = `${appName}${relativePath}`, level = 0, parentIndex = '', foldersOnly = false) => {
+    // 🔑 Trier pour afficher d'abord dossiers puis fichiers
+    const sortedStructure = [...structure].sort((a, b) => {
+        if (a.type === b.type) return 0;
+        return a.type === 'dossier' ? -1 : 1;
+    });
 
-    return structure.map((item, index) => {
-        
-        const number = parentIndex ? `${parentIndex}.${index + 1}` : `${index + 1}`;
+    return sortedStructure.map((item) => {
         const newPath = `${currentPath}/${item.name}`;
-        const configFilePath = path.join(__dirname, '../apifolders', appName, 'config2850', 'Tech2850', item.name);
+        const configFilePath = path.join(
+            __dirname,
+            '../apifolders',
+            appName,
+            'config2850',
+            'Tech2850',
+            item.name
+        );
 
         let presetButton = '';
         if (fs.existsSync(configFilePath)) {
@@ -315,15 +333,20 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
         const levelClass = `level-${level}`;
 
         if (item.type === 'dossier') {
+            folderCounter++;
+            const number = parentIndex ? `${parentIndex}.${folderCounter}` : `${folderCounter}`;
             const hasChildren = item.contenu && item.contenu.length > 0;
+
             return `
                 <div class="tree-item ${levelClass}">
                     ${hasChildren
                         ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
-                               ${number} <span class="toggle-icon">➕</span>
+                               ${number} 
                            </span>`
+
+                           
                         : `<span class="toggle-empty"></span>`}
-                    <span class="folder folder-icon">📁 ${item.name}</span>
+                    <span class="folder folder-icon" > 🎓${item.name}</span>
                     ${hasChildren ? `
                         <div class="hidden tree-children">
                             ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
@@ -331,30 +354,45 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
                 </div>
             `;
         } else {
-           if (foldersOnly) {
+
+            //On set en dispaply none pou renvoyer les liens vers menu
+             if (foldersOnly) {
+                
              const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
     return `
         <div class="tree-item-comment ${levelClass}" style="display:none;">
-            <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
+            <span class="file"> <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
             ${presetButton}
         </div>
     `;
 }
 
-
+            // ✅ Numéroter les fichiers après les dossiers
+            let number = '';
+            if (parentIndex) {
+                fileCounter++;
+                // 🟢 Démarre après les dossiers déjà comptés
+                const offsetNumber = folderCounter + fileCounter;
+                number = `${parentIndex}.${offsetNumber}`;
+            }
 
             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
             const icon = isImage ? '🖼️' : '📃';
+
             return `
                 <div class="tree-item-comment ${levelClass}">
-                    <span class="file">${icon} <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
+                    <span class="file">${number ? number + " " : ""}${icon} 
+                        <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a>
+                    </span>
                     ${presetButton}
                 </div>
             `;
         }
     }).join('');
 };
+
+
 
 
 const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
@@ -374,7 +412,7 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
 <div id="top-menu" class="top-menu"></div>
             <div id="container">
 
-<div class="picturename" >
+<div class="picturename">
 <img id="toggle-image" src="${imageUrl}" style="cursor:pointer; width: 40px; height: 40px;" />
 
                 <div id="">${appName}</div>
@@ -383,7 +421,10 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
 
 </div>
         
- <div id="content-frame">
+
+
+                <div id="split-container">
+                 <div id="content-frame">
   <button id="toggle-frame"
    style="background-image: url('${imageUrl}'); background-size: cover; background-position: center; width: 40px; height: 40px; border: none; cursor: pointer;"></button>
 
@@ -396,8 +437,6 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
         ${foldersOnlyMenuHTML}
     </div>
 </div>
-
-                <div id="split-container">
                     <iframe id="content-frame-view"></iframe>
                     <iframe id="content-frame-view-comment" class="hidden"></iframe>
                 </div>

@@ -167,3 +167,4 @@ function toggleReducedFolder(el) {
         el.textContent = el.textContent.replace('📂', '📁');
     }
 }
+
