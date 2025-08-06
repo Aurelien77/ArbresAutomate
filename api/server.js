@@ -163,7 +163,9 @@ app.get('/arborescence/:appName', (req, res) => {
         <div onclick="window.location.href='/'" id="accueil">
       
           
-   <div>🏠</div>  <div>  Formations    </div>
+   <div>   
+⬜️⬜️
+</div>Apps</div>
         </div>
         
         
