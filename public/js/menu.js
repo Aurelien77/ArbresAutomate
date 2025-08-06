@@ -1,12 +1,12 @@
 
 function toggleVisibility(toggleElement) {
     const currentItem = toggleElement.parentElement;
-    const siblings = Array.from(currentItem.parentElement.children);
+  /*   const siblings = Array.from(currentItem.parentElement.children); */
     const toggleIconElement = toggleElement.querySelector('.toggle-icon');
 if (toggleIconElement) {
   toggleIconElement.textContent = isHidden ? '➖' : '➕';
 }
-    siblings.forEach(sibling => {
+ /*    siblings.forEach(sibling => {
         if (sibling !== currentItem) {
             const childrenDiv = sibling.querySelector('.tree-children');
             if (childrenDiv) {
@@ -18,7 +18,7 @@ if (toggleIconElement) {
                 if (siblingFolderIcon) siblingFolderIcon.textContent = siblingFolderIcon.textContent.replace('📂', '📁');
             }
         }
-    });
+    }); */
 
     const treeChildren = currentItem.querySelector('.tree-children');
     if (!treeChildren) return;
@@ -57,6 +57,11 @@ function loadPageView(url) {
         iframeView.src = url;
         iframeView.classList.remove('hidden');
 
+        // Mise à jour de la progress bar
+        if (typeof setActiveFileByUrl === 'function') {
+            setActiveFileByUrl(url);
+        }
+
         iframeView.onload = function () {
             const iframeDoc = iframeView.contentDocument || iframeView.contentWindow.document;
             if (iframeDoc) {
@@ -89,10 +94,8 @@ function loadPageView(url) {
                         body {
                             display: flex;
                             justify-content: center;
-                           
                             height: 100vh;
                             margin: 0;
-                        
                         }
                         img {
                             max-width: 90%;
@@ -225,5 +228,6 @@ function loadFirstFileOfFolder(fullPath) {
       alert('Erreur lors du chargement du fichier.');
     });
 }
+
 
 

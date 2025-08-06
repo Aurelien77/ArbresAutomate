@@ -208,6 +208,8 @@ app.get('/arborescence/:appName', (req, res) => {
     <iframe id="contentFrame" src="/app/${appName}/"></iframe>
 </body>
     <script>
+
+    
        let hiddenButton = null;
 function updateToggleButtonPosition() {
     const menu = document.getElementById('categoryMenu');
@@ -325,6 +327,21 @@ app.get('/app/:appName/*', (req, res) => {
             }
             return;
         }
+
+function getAllFiles(structure, currentPath = '') {
+  let files = [];
+  for (const item of structure) {
+    if (item.type === 'fichier') {
+      // Ajoute le chemin complet relatif
+      files.push(currentPath ? `${currentPath}/${item.name}` : item.name);
+    } else if (item.type === 'dossier' && item.contenu) {
+      // Appel récursif avec chemin mis à jour
+      files = files.concat(getAllFiles(item.contenu, currentPath ? `${currentPath}/${item.name}` : item.name));
+    }
+  }
+  return files;
+}
+
 
         // === 🟢 Si c'est un dossier ===
         const folderStructure = getFolderStructurewithout(appPath);
@@ -456,16 +473,107 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
 
 const firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
 
+
+function getAllFiles(structure, currentPath = '') {
+  let files = [];
+  for (const item of structure) {
+    if (item.type === 'fichier') {
+      files.push(currentPath ? `${currentPath}/${item.name}` : item.name);
+    } else if (item.type === 'dossier' && item.contenu) {
+      files = files.concat(getAllFiles(item.contenu, currentPath ? `${currentPath}/${item.name}` : item.name));
+    }
+  }
+  return files;
+}
+
+
+
+
+const allFiles = getAllFiles(folderStructure, '');
+
+
+const activeFilePath = relativePath || '';
+
+
+
+const activeIndex = allFiles.findIndex(f => activeFilePath.endsWith(f));
+const activeFileIndex = activeIndex >= 0 ? activeIndex : 0;
+  const totalFiles = allFiles.length;
+
+
+function updateProgressBar() {
+  const percent = ((activeFileIndex + 1) / allFiles.length) * 100;
+  console.log('Progress percent:', percent);
+  const progressBar = document.getElementById('progress-bar');
+  if (!progressBar) {
+    console.error('Progress bar element introuvable');
+    return;
+  }
+  progressBar.style.width = percent + '%';
+
+  if (percent >= 90) {
+    console.log('Rouge');
+    progressBar.style.backgroundColor = 'red';
+  } else if (percent >= 75) {
+    console.log('Orange');
+    progressBar.style.backgroundColor = 'orange';
+  } else {
+    console.log('Vert');
+    progressBar.style.backgroundColor = '#4caf50';
+  }
+}
+
+
+// Appelle cette fonction quand l’utilisateur clique sur un fichier ou dossier
+function setActiveFileByUrl(url) {
+  const index = allFiles.indexOf(url);
+  if (index >= 0) {
+    activeFileIndex = index;
+    updateProgressBar();
+  }
+}
+
         // === HTML complet ===
         const htmlContent = `
       
       <head>
     <link rel="stylesheet" href="/css/style.css">
+<script>
+ const allFiles = ${JSON.stringify(allFiles.map(f => `/app/${appName}/${f}`))};
+  let activeFileIndex = ${activeFileIndex};
+
+  function updateProgressBar(percent) {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percent + '%';
+    progressBar.textContent = Math.round(percent) + '%';
+
+    if (percent >= 90) {
+      progressBar.style.backgroundColor = 'red';
+    } else if (percent >= 75) {
+      progressBar.style.backgroundColor = 'orange';
+    } else {
+      progressBar.style.backgroundColor = '#4caf50';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const percent = ((activeFileIndex + 1) / allFiles.length) * 100;
+    updateProgressBar(percent);
+  });
+
+  function setActiveFileByUrl(url) {
+    const index = allFiles.indexOf(url);
+    if (index >= 0) {
+      activeFileIndex = index;
+      const percent = ((activeFileIndex + 1) / allFiles.length) * 100;
+      updateProgressBar(percent);
+    }
+  }
+  </script>
+  <script src="/js/menu.js"></script>
+  <script src="/js/addevent.js"></script>
 
 
-
-      <script src="/js/menu.js"></script>
-            <script src="/js/addevent.js"></script>
 
 
 </head>
@@ -483,7 +591,10 @@ const firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? 
 </div>
         
 
+<div id="progress-bar-container" style="">
 
+     <div id="progress-bar"></div>
+</div>
                 <div id="split-container">
                  <div id="content-frame">
   <button id="toggle-frame"
