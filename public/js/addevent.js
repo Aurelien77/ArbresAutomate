@@ -1,53 +1,68 @@
 document.addEventListener("DOMContentLoaded", () => {
+ 
     const topMenu = document.getElementById("top-menu");
-   const frame = document.getElementById("content-frame");
+    const frame = document.getElementById("content-frame");
     const button = document.getElementById("toggle-frame");
-
     const fullMenu = document.getElementById('full-menu');
     const foldersOnlyMenu = document.getElementById('folders-only-menu');
-    let isFoldersOnly = false;
-    const showButton = document.createElement("button");
-       let clickCount = 0;
 
- showButton.textContent = "📂 Afficher";
-    showButton.style.position = "absolute";
-    showButton.style.width = "60px";
-    showButton.style.top = "7px";
-    showButton.style.left = "60px";
-    showButton.style.display = "none"; 
-    showButton.style.zIndex = "9999";
-    showButton.style.padding = "5px 10px";
-    showButton.style.background = "#007bff";
-    showButton.style.color = "#fff";
-    showButton.style.border = "none";
-    showButton.style.borderRadius = "5px";
-    showButton.style.cursor = "pointer";
+    // Bouton "Afficher"
+    const showButton = document.createElement("button");
+    showButton.textContent = "📂 Afficher";
+    Object.assign(showButton.style, {
+        position: "absolute",
+        width: "60px",
+        top: "70px",
+        right: "94px",
+        display: "none",
+        zIndex: "9999",
+        padding: "5px 10px",
+        background: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer"
+    });
     document.body.appendChild(showButton);
 
-    
+    let state = "reduced"; 
+    // possible values: "reduced", "expanded", "hidden"
 
-   // Gestion du bouton toggle
-button.addEventListener('click', () => {
-        if (!isFoldersOnly) {
-            fullMenu.style.display = 'none';
-            foldersOnlyMenu.style.display = 'block';
-            button.textContent = '⇥'; // ou autre icône
-        } else {
-            foldersOnlyMenu.style.display = 'none';
+    // Gestion du bouton toggle
+    button.addEventListener('click', () => {
+        if (state === "reduced") {
+            // Ouvrir complètement
             fullMenu.style.display = 'block';
+            foldersOnlyMenu.style.display = 'none';
             button.textContent = '⇤';
+            state = "expanded";
+        } 
+        else if (state === "expanded") {
+            // Masquer complètement
+            frame.style.display = "none";
+            button.style.display = "none";
+            showButton.style.display = "block";
+            state = "hidden";
         }
-        isFoldersOnly = !isFoldersOnly;
     });
 
-    // Réouverture avec "Afficher panneau"
+    // Réafficher panneau (menu réduit)
     showButton.addEventListener("click", () => {
         frame.style.display = "block";
         button.style.display = "block";
         showButton.style.display = "none";
-        clickCount = 0;
-        button.textContent = "⇤";
+
+        fullMenu.style.display = 'none';
+        foldersOnlyMenu.style.display = 'block';
+        button.textContent = '⇥';
+
+        state = "reduced";
     });
+ fullMenu.style.display = 'none';
+    foldersOnlyMenu.style.display = 'block';
+    button.textContent = '⇥';
+
+
 
     // Fonction qui collecte les dossiers/fichiers avec numéro et infos
 function collectContent(container) {
