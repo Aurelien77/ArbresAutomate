@@ -70,7 +70,11 @@ width : 3vw;
     #toggle-frame:hover {
 cursor: pointer;
 }
-
+#toggle-image {
+  position: relative;
+  z-index: 9999;
+ 
+}
 
 
   

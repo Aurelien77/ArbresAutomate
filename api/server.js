@@ -323,7 +323,7 @@ const renderFolder = (structure, currentPath = `${appName}${relativePath}`, leve
                                ${number} <span class="toggle-icon">➕</span>
                            </span>`
                         : `<span class="toggle-empty"></span>`}
-                    <span class="folder">📁 ${item.name}</span>
+                    <span class="folder folder-icon">📁 ${item.name}</span>
                     ${hasChildren ? `
                         <div class="hidden tree-children">
                             ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
@@ -375,7 +375,8 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
             <div id="container">
 
 <div class="picturename" >
-      <img src="${imageUrl}" style=""/>
+<img id="toggle-image" src="${imageUrl}" style="cursor:pointer; width: 40px; height: 40px;" />
+
                 <div id="">${appName}</div>
 
           
@@ -383,7 +384,9 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
 </div>
         
  <div id="content-frame">
-    <button id="toggle-frame">⇤</button>
+  <button id="toggle-frame"
+   style="background-image: url('${imageUrl}'); background-size: cover; background-position: center; width: 40px; height: 40px; border: none; cursor: pointer;"></button>
+
 
     
     <div id="full-menu">

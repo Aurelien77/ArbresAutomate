@@ -1,37 +1,39 @@
 
 function toggleVisibility(toggleElement) {
-    // Récupérer le parent (le div.tree-item) du toggle cliqué
     const currentItem = toggleElement.parentElement;
-
-    // Trouver tous les dossiers au même niveau (frères)
     const siblings = Array.from(currentItem.parentElement.children);
 
     siblings.forEach(sibling => {
         if (sibling !== currentItem) {
-            // Fermer tous les frères : cacher leur .tree-children
             const childrenDiv = sibling.querySelector('.tree-children');
             if (childrenDiv) {
                 childrenDiv.classList.add('hidden');
-                // Mettre l’icône sur + 
                 const toggleIcon = sibling.querySelector('.toggle-icon');
                 if (toggleIcon) toggleIcon.textContent = '➕';
+
+                const siblingFolderIcon = sibling.querySelector('.folder-icon');
+                if (siblingFolderIcon) siblingFolderIcon.textContent = siblingFolderIcon.textContent.replace('📂', '📁');
             }
         }
     });
 
-    // Toggle de l’élément cliqué : ouvrir ou fermer
     const treeChildren = currentItem.querySelector('.tree-children');
     if (!treeChildren) return;
 
     const isHidden = treeChildren.classList.contains('hidden');
+    const folderIcon = currentItem.querySelector('.folder-icon');
+
     if (isHidden) {
         treeChildren.classList.remove('hidden');
         toggleElement.querySelector('.toggle-icon').textContent = '➖';
+        if (folderIcon) folderIcon.textContent = folderIcon.textContent.replace('📁', '📂');
     } else {
         treeChildren.classList.add('hidden');
         toggleElement.querySelector('.toggle-icon').textContent = '➕';
+        if (folderIcon) folderIcon.textContent = folderIcon.textContent.replace('📂', '📁');
     }
 }
+
 
 
 
