@@ -330,7 +330,6 @@ app.get('/app/:appName/*', (req, res) => {
         const folderStructure = getFolderStructurewithout(appPath);
 
         // 🔧 Fonction récursive pour générer l'arborescence
-
 const renderFolder = (
     structure,
     currentPath = `${appName}${relativePath}`,
@@ -341,7 +340,7 @@ const renderFolder = (
     let folderCounter = 0;
     let fileCounter = 0;
 
-    // 🔑 Trier pour afficher d'abord dossiers puis fichiers
+    // Trie dossiers avant fichiers
     const sortedStructure = [...structure].sort((a, b) => {
         if (a.type === b.type) return 0;
         return a.type === 'dossier' ? -1 : 1;
@@ -374,42 +373,43 @@ const renderFolder = (
             const number = parentIndex ? `${parentIndex}.${folderCounter}` : `${folderCounter}`;
             const hasChildren = item.contenu && item.contenu.length > 0;
 
-            return `
-                <div class="tree-item ${levelClass}">
-                    ${hasChildren
-                        ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
-                               ${number} 
-                           </span>`
+            // Ici : récupère le premier fichier dans ce dossier pour charger uniquement ce fichier
+            const firstFileInFolder = hasChildren ? findFirstFile(item.contenu, newPath) : null;
+            const loadUrl = firstFileInFolder || `/app/${newPath}`; // fallback au dossier si aucun fichier
 
-                           
-                        : `<span class="toggle-empty"></span>`}
-                    <span class="folder folder-icon" > 🎓${item.name}</span>
-                    ${hasChildren ? `
-                        <div class="hidden tree-children">
-                            ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
-                        </div>` : ''}
-                </div>
+            return `
+              <div class="tree-item ${levelClass}">
+                ${hasChildren
+                  ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
+                       ${number} 
+                     </span>`
+                  : `<span class="toggle-empty"></span>`}
+                <span class="folder folder-icon" style="cursor:pointer;" onclick="loadPageView('${loadUrl}')">
+                  🎓${item.name}
+                </span>
+
+                ${hasChildren ? `
+                  <div class="hidden tree-children">
+                    ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
+                  </div>` : ''}
+              </div>
             `;
         } else {
+            if (foldersOnly) {
+                const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
+                const icon = isImage ? '🖼️' : '📃';
+                return `
+                    <div class="tree-item-comment ${levelClass}" style="display:none;">
+                        <span class="file"> <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
+                        ${presetButton}
+                    </div>
+                `;
+            }
 
-            //On set en dispaply none pou renvoyer les liens vers menu
-             if (foldersOnly) {
-                
-             const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
-            const icon = isImage ? '🖼️' : '📃';
-    return `
-        <div class="tree-item-comment ${levelClass}" style="display:none;">
-            <span class="file"> <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
-            ${presetButton}
-        </div>
-    `;
-}
-
-            // ✅ Numéroter les fichiers après les dossiers
+            fileCounter++;
             let number = '';
             if (parentIndex) {
-                fileCounter++;
-                // 🟢 Démarre après les dossiers déjà comptés
+                // numéro fichier après dossiers
                 const offsetNumber = folderCounter + fileCounter;
                 number = `${parentIndex}.${offsetNumber}`;
             }
@@ -430,6 +430,7 @@ const renderFolder = (
 };
 
 
+
 function findFirstFile(structure, currentPath = '') {
     // 1️⃣ Chercher d'abord un fichier directement dans le dossier courant
     const file = structure.find(item => item.type === 'fichier');
@@ -448,25 +449,12 @@ function findFirstFile(structure, currentPath = '') {
     return null;
 }
 
-const configPath = path.join(__dirname, '../apifolders', appName, 'config2850');
-let firstFileUrl = null;
 
-if (fs.existsSync(configPath)) {
-    // On récupère la structure du dossier config2850
-    const configFolderStructure = getFolderStructurewithout(configPath);
-    // On cherche le premier fichier dans config2850
-    firstFileUrl = findFirstFile(configFolderStructure, `${appName}/config2850`);
-}
-
-if (!firstFileUrl) {
-    // Sinon, on cherche dans le dossier courant (relativePath)
-    firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
-}
 
 const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
 const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', true);
 
-
+const firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
 
         // === HTML complet ===
         const htmlContent = `
@@ -525,6 +513,32 @@ const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativeP
     }
 });
 
+// Route pour récupérer le premier fichier d'un dossier donné
+app.get('/app/:appName/first-file/*', (req, res) => {
+  try {
+    const { appName } = req.params;
+    const relativeFolderPath = req.params[0] || '';
+    const folderPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativeFolderPath));
+
+    if (!fs.existsSync(folderPath) || !fs.lstatSync(folderPath).isDirectory()) {
+      return res.status(404).json({ error: 'Dossier non trouvé' });
+    }
+
+    // Récupération de la structure pour ce dossier
+    const folderStructure = getFolderStructurewithout(folderPath);
+
+    const firstFile = findFirstFile(folderStructure, `${appName}/${relativeFolderPath}`);
+
+    if (!firstFile) {
+      return res.status(404).json({ error: 'Aucun fichier trouvé dans ce dossier' });
+    }
+
+    res.json({ firstFileUrl: firstFile });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
 
 
 app.listen(3000, () => {

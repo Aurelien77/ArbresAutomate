@@ -130,7 +130,7 @@ background-color: rgba(255, 255, 255,1);
   html {
 border: 0px;
 overflow-x: hidden;
-  overflow-y: hidden;
+
 margin: 0px;
 padding: 0px;
 
@@ -417,7 +417,7 @@ cursor: pointer;
         }
         #contentFrame {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             border: none;
         }
 

@@ -2,7 +2,10 @@
 function toggleVisibility(toggleElement) {
     const currentItem = toggleElement.parentElement;
     const siblings = Array.from(currentItem.parentElement.children);
-
+    const toggleIconElement = toggleElement.querySelector('.toggle-icon');
+if (toggleIconElement) {
+  toggleIconElement.textContent = isHidden ? '➖' : '➕';
+}
     siblings.forEach(sibling => {
         if (sibling !== currentItem) {
             const childrenDiv = sibling.querySelector('.tree-children');
@@ -169,5 +172,58 @@ function toggleReducedFolder(el) {
 }
 
 
+
+
+
+async function openFirstFileInFolder(folderPath) {
+  try {
+    // Appelle une API dédiée pour récupérer le premier fichier du dossier
+    const response = await fetch(`/api/first-file/${encodeURIComponent(folderPath)}`);
+    if (!response.ok) throw new Error('Erreur réseau lors de la récupération du fichier');
+
+    const data = await response.json();
+
+    if (data.fileUrl) {
+      // Met à jour la source de l'iframe pour afficher ce fichier
+      const iframe = document.getElementById('content-frame-view');
+      if (iframe) {
+        iframe.src = data.fileUrl;
+      } else {
+        console.warn('Iframe content-frame-view introuvable');
+      }
+
+      // Met à jour le menu horizontal avec le chemin du dossier sélectionné (à adapter selon besoin)
+      updateTopMenu(folderPath);
+    } else {
+      alert('Aucun fichier trouvé dans ce dossier');
+    }
+  } catch (err) {
+    console.error('Erreur dans openFirstFileInFolder:', err);
+    alert('Erreur lors du chargement du fichier');
+  }
+}
+function loadFirstFileOfFolder(fullPath) {
+  // fullPath = "myApp/folder1/subfolder"
+  const parts = fullPath.split('/');
+  const appName = parts.shift();
+  const folder = parts.join('/');
+
+  fetch(`/app/${appName}/first-file/${folder}`)
+    .then(response => {
+      if (!response.ok) throw new Error('Aucun fichier trouvé');
+      return response.json();
+    })
+    .then(data => {
+      if (data.firstFileUrl) {
+        document.getElementById('content-frame-view').src = data.firstFileUrl;
+      } else {
+        alert('Aucun fichier trouvé dans ce dossier.');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Erreur lors du chargement du fichier.');
+    });
+}
 
 
