@@ -50,36 +50,43 @@ button.addEventListener('click', () => {
     });
 
     // Fonction qui collecte les dossiers/fichiers avec numéro et infos
-const collectContent = (container) => {
+function collectContent(container) {
     const items = [];
+    const children = container.querySelectorAll(":scope > .tree-item, :scope > .tree-item-comment");
 
-    container.querySelectorAll(".tree-item, .tree-item-comment").forEach(item => {
-        const toggle = item.querySelector(".toggle");
-        let number = toggle?.dataset.number || "";
-        const type = item.dataset.type;  // 🔑 récupère vrai type
+    children.forEach(child => {
+        const folderEl = child.querySelector(":scope > .folder");
+        const fileEl = child.querySelector(":scope > .file a");
 
-        if (type === "folder") {
+        if (folderEl) {
+            const toggle = child.querySelector(":scope > .toggle");
+            const number = toggle?.dataset.number || "";
             items.push({
                 number,
-                name: item.querySelector(".folder").textContent.replace("📁", "").trim(),
-                type: "folder"
+                name: folderEl.textContent.replace("📁", "").trim(),
+                type: "folder",
+                path: null
             });
-        } else {
-            const fileLink = item.querySelector(".file a");
-            const fileName = fileLink.textContent.trim();
-            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(fileName);
 
+            // 🔁 Récursif : récupérer les sous-dossiers et fichiers
+            const subContainer = child.querySelector(":scope > .tree-children");
+            if (subContainer) {
+                items.push(...collectContent(subContainer));
+            }
+        } else if (fileEl) {
+            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(fileEl.textContent.trim());
             items.push({
-                number,
-                name: fileName,
+                number: "",
+                name: fileEl.textContent.trim(),
                 type: isImage ? "image" : "file",
-                path: fileLink.getAttribute("onclick")
+                path: fileEl.getAttribute("onclick")
             });
         }
     });
 
     return items;
-};
+}
+
 
 
     // Mise à jour du menu du haut avec numéro
@@ -96,60 +103,71 @@ const updateTopMenu = (treeItem) => {
         }
 
         topMenu.innerHTML = "";
-        content.forEach(item => {
-            const btnContainer = document.createElement("div");
-            btnContainer.className = "menu-item-container";
 
-            // Bouton principal (titre)
-            const btn = document.createElement("button");
-            btn.className = "menu-item";
 
-            let icon = "📄";
-            if (item.type === "folder") icon = "📁";
-            if (item.type === "image") icon = "🖼️";
 
-            btn.innerHTML = `${item.number ? item.number + " " : ""}${icon} ${item.name}`;
+  const foldersOnly = content.filter(item => item.type === "folder");
+let folderCounter = 0;
 
-            if (item.type !== "folder" && item.path) {
-                btn.addEventListener("click", () => {
-                    eval(item.path);
-                });
-            }
+content.forEach(item => {
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "menu-item-container";
 
-            btnContainer.appendChild(btn);
+    const btn = document.createElement("button");
+    btn.className = "menu-item";
 
-            // Ajout du bouton commentaire si présent (créé ici)
-            // Trouver si le bouton commentaire existe dans l'arborescence
-            let commentPath = null;
-            if (item.type !== "folder") {
-                const treeFiles = treeItem.querySelectorAll(".tree-item-comment");
-                treeFiles.forEach(tf => {
-                    const fileSpan = tf.querySelector(".file a");
-                    if (fileSpan && fileSpan.textContent.trim() === item.name) {
-                        const commentBtn = tf.querySelector("button");
-                        if (commentBtn) {
-                            // Extraire l'url de loadPageViewComment du onclick inline
-                            const onclickAttr = commentBtn.getAttribute("onclick");
-                            const match = onclickAttr && onclickAttr.match(/loadPageViewComment\('([^']+)'\)/);
-                            if (match && match[1]) commentPath = match[1];
-                        }
-                    }
-                });
-            }
+    let icon = "📄";
+    if (item.type === "folder") icon = "📁";
+    if (item.type === "image") icon = "🖼️";
 
-            if (commentPath) {
-                const commentBtn = document.createElement("button");
-                commentBtn.textContent = "📌 Com";
-                commentBtn.className = "combutton";
-                commentBtn.style.marginTop = "3px";
-                commentBtn.addEventListener("click", () => {
-                    loadPageViewComment(commentPath);
-                });
-                btnContainer.appendChild(commentBtn);
-            }
+    // ✅ Numéroter uniquement les dossiers
+    let number = "";
+    if (item.type === "folder") {
+        folderCounter++;
+        number = folderCounter;
+    }
 
-            topMenu.appendChild(btnContainer);
+    btn.innerHTML = `${number ? number + " " : ""}${icon} ${item.name}`;
+
+    if (item.type !== "folder" && item.path) {
+        btn.addEventListener("click", () => {
+            eval(item.path);
         });
+    }
+
+    btnContainer.appendChild(btn);
+
+    // 📌 Ajout du bouton commentaire (inchangé)
+    let commentPath = null;
+    if (item.type !== "folder") {
+        const treeFiles = treeItem.querySelectorAll(".tree-item-comment");
+        treeFiles.forEach(tf => {
+            const fileSpan = tf.querySelector(".file a");
+            if (fileSpan && fileSpan.textContent.trim() === item.name) {
+                const commentBtn = tf.querySelector("button");
+                if (commentBtn) {
+                    const onclickAttr = commentBtn.getAttribute("onclick");
+                    const match = onclickAttr && onclickAttr.match(/loadPageViewComment\('([^']+)'\)/);
+                    if (match && match[1]) commentPath = match[1];
+                }
+            }
+        });
+    }
+
+    if (commentPath) {
+        const commentBtn = document.createElement("button");
+        commentBtn.textContent = "📌 Com";
+        commentBtn.className = "combutton";
+        commentBtn.style.marginTop = "3px";
+        commentBtn.addEventListener("click", () => {
+            loadPageViewComment(commentPath);
+        });
+        btnContainer.appendChild(commentBtn);
+    }
+
+    topMenu.appendChild(btnContainer);
+});
+
     }
 };
 

@@ -264,7 +264,7 @@ app.get('/app/:appName/*', (req, res) => {
             const fileType = mime.lookup(appPath);
             const fileExtension = path.extname(appPath).toLowerCase();
 
-            if (['.js', '.css', '.html', '.txt'].includes(fileExtension)) {
+            if (['.js', '.css', '.html', '.txt', '*',].includes(fileExtension)) {
                 // Rendu stylisé
                 fs.readFile(appPath, 'utf-8', (err, data) => {
                     if (err) return res.status(500).send('Erreur lors de la lecture du fichier');
