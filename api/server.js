@@ -171,9 +171,9 @@ app.get('/app/:appName/*', (req, res) => {
           if (err) return res.status(500).send('Erreur lors de la lecture du fichier');
 
           const style = `
-                        background-color: black;
+                        background-color: rgba(237, 237, 241, 0.2);
                         color: white;
-                        padding: 20px;
+                        padding: 10px;
                         font-family: monospace;
                         font-size: 1rem;
                         overflow-x: auto;
@@ -181,6 +181,7 @@ app.get('/app/:appName/*', (req, res) => {
                         box-shadow: 3px 3px 2px 1px rgba(237, 237, 241, 0.2);
                         border: 1px solid gold;
                           animation: blink 0.7s infinite;
+                        margin: 10px;
                     `;
           res.send(`<pre style="${style}"><code>${data}</code></pre>`);
         });

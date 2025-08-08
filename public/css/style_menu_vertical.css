@@ -82,10 +82,14 @@ flex-wrap: wrap;
   html {
 border: 0px;
 overflow-x: hidden;
-
+ overflow-y: auto;
 margin: 0px;
 padding: 0px;
+scrollbar-width: none;
 
+}
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -213,7 +217,7 @@ max-height: 35px;
   height: 100%;  
   overflow-x: hidden;   
   overflow-y: auto;  
-width: 100vw;
+
 
   border-radius: 0% 0% 5% 5%;
   border-bottom: 2px solid rgba(255, 255, 255, 0.2);

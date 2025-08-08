@@ -180,16 +180,26 @@ function loadPageView(url) {
                 const closeButton = iframeDoc.createElement('button');
                 closeButton.textContent = '❌ Fermer';
                 closeButton.style.position = 'fixed';
-                closeButton.style.top = '21px';
+                closeButton.style.top = '11px';
                 closeButton.style.right = '21px';
                 closeButton.style.padding = '5px';
                 closeButton.style.background = 'red';
                 closeButton.style.color = 'white';
                 closeButton.style.border = 'none';
-                closeButton.style.borderRadius = '2%';
+                closeButton.style.borderRadius = '10%';
                 closeButton.style.cursor = 'pointer';
                 closeButton.style.zIndex = '9999';
+closeButton.onmouseover = () => {
+  closeButton.style.boxShadow = '0 0 3px 1px white';
+};
+closeButton.onmouseout = () => {
+  closeButton.style.boxShadow = 'none';
+};
 
+closeButton.onclick = () => {
+  iframeComment.classList.add('hidden');
+  iframeComment.src = "about:blank";
+};
                 closeButton.onclick = () => {
                     iframeView.classList.add('hidden');
                     iframeView.src = "about:blank";
@@ -245,17 +255,29 @@ function loadPageViewComment(url) {
             const iframeDoc = iframeComment.contentDocument || iframeComment.contentWindow.document;
             if (iframeDoc) {
                 const closeButton = iframeDoc.createElement('button');
-                closeButton.textContent = '❌ Fermer';
+                   closeButton.textContent = '❌ Fermer';
                 closeButton.style.position = 'fixed';
-                closeButton.style.top = '20px';
-                closeButton.style.right = '10px';
-                closeButton.style.padding = '2px';
+                closeButton.style.top = '11px';
+                closeButton.style.right = '21px';
+                closeButton.style.padding = '5px';
                 closeButton.style.background = 'red';
                 closeButton.style.color = 'white';
                 closeButton.style.border = 'none';
+                closeButton.style.borderRadius = '10%';
                 closeButton.style.cursor = 'pointer';
                 closeButton.style.zIndex = '9999';
 
+closeButton.onmouseover = () => {
+  closeButton.style.boxShadow = '0 0 3px 1px white';
+};
+closeButton.onmouseout = () => {
+  closeButton.style.boxShadow = 'none';
+};
+
+closeButton.onclick = () => {
+  iframeComment.classList.add('hidden');
+  iframeComment.src = "about:blank";
+};
                 closeButton.onclick = () => {
                     iframeComment.classList.add('hidden');
                     iframeComment.src = "about:blank";
