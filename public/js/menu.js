@@ -1,4 +1,115 @@
 
+// Fonction menu haut vertical
+function loadPage(url) {
+            document.getElementById('contentFrame').src = url;
+        }
+
+
+function handleButtonClick(button) {
+    // Cacher le bouton cliqué
+    button.style.display = 'none';
+
+    // Trouver le bouton -appName- dans le menu
+    const categoryMenu = document.getElementById('categoryMenu');
+    const buttons = categoryMenu.querySelectorAll('button');
+
+    buttons.forEach(btn => {
+        // Si c'est le bouton -appName-
+        if (btn.textContent.trim() === '-${appName}-') {
+            hiddenButton = btn; // mémoriser ce bouton
+        } else if (btn !== button) {
+            // Réafficher tous les autres boutons (sauf celui qui vient d'être cliqué)
+            btn.style.display = 'inline-block';
+        }
+    });
+
+    // Réafficher le bouton -appName- quand un autre bouton est cliqué (sauf si c'est lui-même)
+    if (hiddenButton && button !== hiddenButton) {
+        hiddenButton.style.display = 'inline-block';
+    }
+
+       updateToggleButtonPosition();
+}
+
+
+
+function renderTopMenuItems(items, parentEl, displayedPaths = new Set()) {
+    items.forEach(item => {
+        // Utiliser path unique pour éviter les doublons, sinon le nom
+        const uniqueId = item.path || item.name;
+
+        if (displayedPaths.has(uniqueId)) {
+            // Fichier/dossier déjà affiché, on skip
+            return;
+        }
+        displayedPaths.add(uniqueId);
+
+        const btnContainer = document.createElement("div");
+        btnContainer.className = "menu-item-container";
+
+        const btn = document.createElement("button");
+        btn.className = "menu-item";
+
+        let icon = "📄";
+        if (item.type === "folder") icon = "📁";
+        if (item.type === "image") icon = "🖼️";
+
+        btn.innerHTML = `${item.number ? item.number + " " : ""}${icon} ${item.name}`;
+
+        if (item.type !== "folder" && item.path) {
+            btn.addEventListener("click", () => {
+                eval(item.path);
+            });
+        }
+
+        btnContainer.appendChild(btn);
+
+        // Bouton commentaire
+        let commentPath = null;
+        if (item.type !== "folder") {
+            const treeFiles = document.querySelectorAll(".tree-item-comment");
+            treeFiles.forEach(tf => {
+                const fileSpan = tf.querySelector(".file a");
+                if (fileSpan && fileSpan.textContent.trim() === item.name) {
+                    const commentBtn = tf.querySelector("button");
+                    if (commentBtn) {
+                        const onclickAttr = commentBtn.getAttribute("onclick");
+                        const match = onclickAttr && onclickAttr.match(/loadPageViewComment\('([^']+)'\)/);
+                        if (match && match[1]) commentPath = match[1];
+                    }
+                }
+            });
+        }
+
+        if (commentPath) {
+            const commentBtn = document.createElement("button");
+            commentBtn.textContent = "📌 Com";
+            commentBtn.className = "combutton";
+            commentBtn.style.marginTop = "3px";
+            commentBtn.addEventListener("click", () => {
+                loadPageViewComment(commentPath);
+            });
+            btnContainer.appendChild(commentBtn);
+        }
+
+        parentEl.appendChild(btnContainer);
+
+        // Si c’est un dossier, on affiche ses enfants (récursivité)
+        if (item.children && item.children.length > 0) {
+            renderTopMenuItems(item.children, parentEl, displayedPaths);
+        }
+    });
+}
+
+
+
+
+/* ---------------------------------------------------------------- */
+
+
+
+
+
 function toggleVisibility(toggleElement) {
     const currentItem = toggleElement.parentElement;
   /*   const siblings = Array.from(currentItem.parentElement.children); */
@@ -159,6 +270,48 @@ function loadPageViewComment(url) {
 
 
 
+function collectContent(container) {
+    const items = [];
+    const children = container.querySelectorAll(":scope > .tree-item, :scope > .tree-item-comment");
+
+    children.forEach(child => {
+        const folderEl = child.querySelector(":scope > .folder");
+        const fileEl = child.querySelector(":scope > .file a");
+
+        if (folderEl) {
+            const toggle = child.querySelector(":scope > .toggle");
+            const number = toggle?.dataset.number || "";
+            const folderItem = {
+                number,
+                name: folderEl.textContent.replace("📁", "").trim(),
+                type: "folder",
+                path: null,
+                children: []
+            };
+
+            const subContainer = child.querySelector(":scope > .tree-children");
+            if (subContainer) {
+                folderItem.children = collectContent(subContainer); // ⬅️ garde la hiérarchie
+            }
+
+            items.push(folderItem);
+        } else if (fileEl) {
+            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(fileEl.textContent.trim());
+            const fileNumber = child.querySelector(".file")?.textContent.trim().split(" ")[0] || "";
+            items.push({
+                number: fileNumber,
+                name: fileEl.textContent.trim(),
+                type: isImage ? "image" : "file",
+                path: fileEl.getAttribute("onclick"),
+                children: []
+            });
+        }
+    });
+
+    return items;
+}
+
+
 function toggleReducedFolder(el) {
     const parentDiv = el.parentElement;
     const childrenContainer = parentDiv.querySelector('.tree-children');
@@ -205,6 +358,8 @@ async function openFirstFileInFolder(folderPath) {
     alert('Erreur lors du chargement du fichier');
   }
 }
+
+
 function loadFirstFileOfFolder(fullPath) {
   // fullPath = "myApp/folder1/subfolder"
   const parts = fullPath.split('/');
@@ -228,6 +383,27 @@ function loadFirstFileOfFolder(fullPath) {
       alert('Erreur lors du chargement du fichier.');
     });
 }
+
+//--------------------------------------------------
+
+       let hiddenButton = null;
+function updateToggleButtonPosition() {
+    const menu = document.getElementById('categoryMenu');
+    const toggleButton = document.getElementById('toggleMenuButton');
+    if (menu.classList.contains('active')) {
+        const menuWidth = menu.getBoundingClientRect().width;
+        toggleButton.style.left = (menuWidth + 1) + 'px';  // +20 comme tu veux
+    } else {
+        toggleButton.style.left = '14px';
+    }
+}
+
+
+
+
+
+
+
 
 
 

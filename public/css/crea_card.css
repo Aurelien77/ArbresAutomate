@@ -1,0 +1,99 @@
+
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5vw;
+    padding: 2vw;
+    border-radius: 1vw;
+ 
+    position: relative;
+  }
+
+  /* On crée un fond overlay SVG en absolute, derrière les cartes */
+  .background-pattern {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; /* clics passent au-dessus */
+    z-index: 0;
+  }
+
+  .card {
+    width: 20vw;
+    height: 20vw;
+    margin: 1vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  
+    border-radius: 1vw;
+    box-shadow:
+      inset 1px 1px 10px #ccd4d0ff,
+      inset -1px -1px 10px #ffffff,
+      3px 3px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1; /* au-dessus du pattern */
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      inset 1px 1px 5px #d9eee3ff,
+      inset -1px -1px 7.5px #ffffff,
+      6px 6px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .card h2 {
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-word;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 20%;
+    font-size: 1.5rem;
+    color: #333;
+    padding: 0.5rem;
+    border: 0.2px solid #888;
+    text-shadow:
+      1px 1px 0 #f0f0f0,
+      -1px 1px 0 #f0f0f0,
+      1px -1px 0 #f0f0f0,
+      -1px -1px 0 #f0f0f0;
+  }
+.card a {
+    display: inline-flex; 
+    justify-content: center;
+    flex-direction: column;
+    text-decoration: none;transition: transform 0.3s ease;
+height:100%;
+  max-width:100%;
+}
+            .card p {    
+              border: 0.2px solid black;
+             padding: 0.3em; 
+            background-color:white;
+          border-radius: 20%;
+          width: 100%;
+                font-size: 1rem;
+                  color: black;
+        text-shadow: 
+        1px 1px 0 white,
+        -1px 1px 0white,
+        1px -1px 0 white,
+        -1px -1px 0 white,
+        1px 0 0 white,
+        -1px 0 0 white,
+        0 1px 0 white,
+        0 -1px 0 white;
+     text-decoration: none;
+            }
+            .card:hover {
+                transform: scale(1.05);
+            }
