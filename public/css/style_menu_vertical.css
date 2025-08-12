@@ -183,15 +183,18 @@ max-height: 35px;
  box-shadow: white 1px 1px 5px ;
 }
 .level-0 {
-    background-color: #f0f8ff; 
+    background-color: #65aeee; 
+
 }
+
+
 
 .level-1 {
     background-color: #e6ffe6; 
 }
 
 .level-2 {
-    background-color: #fff0f5; 
+    background-color: #e9cd4f; 
 }
 
 .level-3 {
@@ -266,6 +269,7 @@ margin-bottom : 2.5px;
 border: 2px solid black;
 padding: 10px;
 border-radius: 10%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 

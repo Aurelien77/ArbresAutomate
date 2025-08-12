@@ -224,12 +224,26 @@ appName, structure, currentPath, level = 0, parentIndex = '', foldersOnly = fals
 function getAllFilesWithoutRootFiles(structure, pathPrefix = '', level = 0) {
   let files = [];
 
-  for (const item of structure) {
+  // Appliquer le même tri que dans renderFolder pour level > 0
+  const sortedStructure = level === 0
+    ? (() => {
+        const folders = structure.filter(item => item.type === 'dossier');
+        const files = structure.filter(item => item.type !== 'dossier');
+        return [...folders, ...files];
+      })()
+    : [...structure].sort((a, b) => {
+        if (a.type === b.type) {
+          return a.name.localeCompare(b.name, 'fr', { numeric: true });
+        }
+        return a.type === 'fichier' ? -1 : 1; // fichiers d'abord
+      });
+
+  for (const item of sortedStructure) {
     const fullPath = pathPrefix ? `${pathPrefix}/${item.name}` : item.name;
 
     if (item.type === 'fichier') {
       if (level > 0) {
-        files.push(fullPath); // inclure fichier uniquement s'il est dans un sous-dossier
+        files.push(fullPath);
       }
     } else if (item.type === 'dossier') {
       files = files.concat(getAllFilesWithoutRootFiles(item.contenu, fullPath, level + 1));
@@ -238,6 +252,7 @@ function getAllFilesWithoutRootFiles(structure, pathPrefix = '', level = 0) {
 
   return files;
 }
+
 // Export des fonctions
 module.exports = {
     getImagesFromFolder,

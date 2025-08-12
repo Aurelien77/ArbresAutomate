@@ -58,27 +58,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  const updateTopMenu = (treeItem) => {
-    const childrenContainer = treeItem.querySelector(".tree-children");
+ const updateTopMenu = (treeItem) => {
+  const childrenContainer = treeItem.querySelector(".tree-children");
 
-    if (childrenContainer) {
-      const content = collectContent(childrenContainer);
-      const parentFolder = treeItem.querySelector(".folder")?.textContent.replace("📁", "").trim();
-      const parentNumber = treeItem.querySelector(".toggle")?.dataset.number || "";
+  if (childrenContainer) {
+    let content = collectContent(childrenContainer);
 
-      const rootItem = {
-        number: parentNumber,
-        name: parentFolder,
-        type: "folder",
-        path: null,
-        children: content
-      };
+    // Tri par numéro (si les numéros sont numériques)
+    content.sort((a, b) => {
+      const numA = parseFloat(a.number) || 0;
+      const numB = parseFloat(b.number) || 0;
+      return numA - numB;
+    });
 
-      // Vider le menu avant rendu
-      topMenu.innerHTML = "";
-      renderTopMenuItems([rootItem], topMenu);
-    }
-  };
+    const parentFolder = treeItem
+      .querySelector(".folder")
+      ?.textContent.replace("📁", "")
+      .trim();
+    const parentNumber =
+      treeItem.querySelector(".toggle")?.dataset.number || "";
+
+    const rootItem = {
+      number: parentNumber,
+      name: parentFolder,
+      type: "folder",
+      path: null,
+      children: content
+    };
+
+    // Vider le menu avant rendu
+    topMenu.innerHTML = "";
+    renderTopMenuItems([rootItem], topMenu);
+  }
+};
 
 
 

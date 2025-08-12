@@ -145,8 +145,7 @@ app.get('/app/:appName/*', (req, res) => {
     const { appName } = req.params;
     const relativePath = req.params[0] || '';
     const appPath = path.normalize(path.join(__dirname, '../apifolders', appName, relativePath));
-
-    // 📌 Récupération image (background)
+// 📌 Récupération image (background)
     const imageFolderPath = path.join(__dirname, '../apifolders', appName, 'config2850', 'picture2850');
     const images = getImagesFromFolder(imageFolderPath);
     const imageUrl = images.length > 0
@@ -157,8 +156,7 @@ app.get('/app/:appName/*', (req, res) => {
     if (!fs.existsSync(appPath)) {
       return res.status(404).send('Application ou fichier non trouvé');
     }
-
-    const stats = fs.lstatSync(appPath);
+ const stats = fs.lstatSync(appPath);
 
     // === 🟢 Si c'est un fichier ===  --------------------------------------------------------- Style pour l'affichage du code
     if (stats.isFile()) {
@@ -191,132 +189,135 @@ app.get('/app/:appName/*', (req, res) => {
       }
       return;
     }
-
-   
-
-
-
-
     // 🔧 Fonction récursive pour générer l'arborescence
-    const renderFolder = (
-      structure,
-      currentPath = `${appName}${relativePath}`,
-      level = 0,
-      parentIndex = '',
-      foldersOnly = false
-    ) => {
-      let folderCounter = 0;
-      let fileCounter = 0;
+const renderFolder = (
+  structure,
+  currentPath = `${appName}${relativePath}`,
+  level = 0,
+  parentIndex = '',
+  foldersOnly = false
+) => {
+  let folderCounter = 0;
+  let fileCounter = 0;
+  let itemCounter = 0;
 
-      // Trie dossiers avant fichiers
-      const sortedStructure = [...structure].sort((a, b) => {
-        if (a.type === b.type) return 0;
-        return a.type === 'dossier' ? -1 : 1;
+  // Si on est à la racine : déplacer les fichiers à la fin (en gardant l'ordre d'origine dans chaque groupe)
+  // Sinon (level > 0) : fichiers d'abord, puis dossiers.
+  const sortedStructure = level === 0
+    ? (() => {
+        const folders = structure.filter(item => item.type === 'dossier');
+        const files = structure.filter(item => item.type !== 'dossier');
+        return [...folders, ...files];
+      })()
+    : [...structure].sort((a, b) => {
+        if (a.type === b.type) {
+          return a.name.localeCompare(b.name, 'fr', { numeric: true });
+        }
+        return a.type === 'fichier' ? -1 : 1; // fichiers d'abord
       });
 
-      return sortedStructure.map((item) => {
-        const newPath = `${currentPath}/${item.name}`;
-        const configFilePath = path.join(
-          __dirname,
-          '../apifolders',
-          appName,
-          'config2850',
-          'Tech2850',
-          item.name
-        );
+  return sortedStructure.map((item) => {
+    const newPath = `${currentPath}/${item.name}`;
+    const configFilePath = path.join(
+      __dirname,
+      '../apifolders',
+      appName,
+      'config2850',
+      'Tech2850',
+      item.name
+    );
 
-        let presetButton = '';
-        if (fs.existsSync(configFilePath)) {
-          presetButton = `
-                <button class="combutton" onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
-                    📌Com
-                </button>
-            `;
-        }
+    let presetButton = '';
+    if (fs.existsSync(configFilePath)) {
+      presetButton = `
+        <button class="combutton" onclick="loadPageViewComment('/app/${appName}/config2850/Tech2850/${item.name}')">
+            📌Com
+        </button>
+      `;
+    }
 
-        const levelClass = `level-${level}`;
+    const levelClass = `level-${level}`;
 
-        if (item.type === 'dossier') {
-          folderCounter++;
-          const number = parentIndex ? `${parentIndex}.${folderCounter}` : `${folderCounter}`;
-          const hasChildren = item.contenu && item.contenu.length > 0;
+    // -------------------
+    // Calcul du numéro
+    // -------------------
+    let number = '';
+    if (level === 0) {
+      // À la racine : dossiers numérotés à part (folderCounter),
+      // fichiers numérotés à part (fileCounter) — les fichiers
+      // ne décallent pas la numérotation des dossiers.
+      if (item.type === 'dossier') {
+        folderCounter++;
+        number = parentIndex ? `${parentIndex}.${folderCounter}` : `${folderCounter}`;
+      } else {
+        fileCounter++;
+        number = parentIndex ? `${parentIndex}.${fileCounter}` : `${fileCounter}`;
+      }
+    } else {
+      // Niveau > 0 : numérotation dans l'ordre d'affichage (fichiers d'abord)
+      itemCounter++;
+      number = parentIndex ? `${parentIndex}.${itemCounter}` : `${itemCounter}`;
+    }
 
-          // Ici : récupère le premier fichier dans ce dossier pour charger uniquement ce fichier
-          const firstFileInFolder = hasChildren ? findFirstFile(item.contenu, newPath) : null;
-          const loadUrl = firstFileInFolder || `/app/${newPath}`; // fallback au dossier si aucun fichier
+    // -------------------
+    // Rendu
+    // -------------------
+    if (item.type === 'dossier') {
+      const hasChildren = item.contenu && item.contenu.length > 0;
+      const firstFileInFolder = hasChildren ? findFirstFile(item.contenu, newPath) : null;
+      const loadUrl = firstFileInFolder || `/app/${newPath}`;
 
-          return `
-              <div class="tree-item ${levelClass}">
-                ${hasChildren
-              ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
-                       ${number} 
-                     </span>`
-              : `<span class="toggle-empty"></span>`}
-                <span class="folder folder-icon" style="cursor:pointer;" onclick="loadPageView('${loadUrl}')">
-                  🎓${item.name}
-                </span>
+      return `
+        <div class="tree-item ${levelClass}">
+          ${hasChildren
+            ? `<span class="toggle" data-number="${number}" onclick="toggleVisibility(this)">
+                 ${number} 
+               </span>`
+            : `<span class="toggle-empty"></span>`}
+          <span class="folder folder-icon" style="cursor:pointer;" onclick="loadPageView('${loadUrl}')">
+            🎓${item.name}
+          </span>
 
-                ${hasChildren ? `
-                  <div class="hidden tree-children">
-                    ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
-                  </div>` : ''}
-              </div>
-            `;
-        } else {
-          if (foldersOnly) {
-            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
-            const icon = isImage ? '🖼️' : '📃';
-            return `
-                    <div class="tree-item-comment ${levelClass}" style="display:none;">
-                        <span class="file"> <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
-                        ${presetButton}
-                    </div>
-                `;
-          }
+          ${hasChildren ? `
+            <div class="hidden tree-children">
+              ${renderFolder(item.contenu, newPath, level + 1, number, foldersOnly)}
+            </div>` : ''}
+        </div>
+      `;
+    } else {
+      if (foldersOnly) {
+        const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
+        const icon = isImage ? '🖼️' : '📃';
+        return `
+          <div class="tree-item-comment ${levelClass}" style="display:none;">
+              <span class="file"><a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a></span>
+              ${presetButton}
+          </div>
+        `;
+      }
 
-          fileCounter++;
-          let number = '';
-          if (parentIndex) {
-            // numéro fichier après dossiers
-            const offsetNumber = folderCounter + fileCounter;
-            number = `${parentIndex}.${offsetNumber}`;
-          }
+      const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
+      const icon = isImage ? '🖼️' : '📃';
 
-          const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.name);
-          const icon = isImage ? '🖼️' : '📃';
+      return `
+        <div class="tree-item-comment ${levelClass}">
+          <span class="file">${number ? number + " " : ""}${icon} 
+              <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a>
+          </span>
+          ${presetButton}
+        </div>
+      `;
+    }
+  }).join('');
+};
+ // === 🟢 Si c'est un dossier ===
+const folderStructure = getFolderStructurewithout(appPath);
+const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
+const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', true);
+const firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
+const allFiles = getAllFilesWithoutRootFiles(folderStructure, '')
 
-          return `
-                <div class="tree-item-comment ${levelClass}">
-                    <span class="file">${number ? number + " " : ""}${icon} 
-                        <a href="#" onclick="loadPageView('/app/${newPath}')">${item.name}</a>
-                    </span>
-                    ${presetButton}
-                </div>
-            `;
-        }
-      }).join('');
-    };
-
-
-
-    // === 🟢 Si c'est un dossier ===
-    const folderStructure = getFolderStructurewithout(appPath);
-
-
-    const fullMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', false);
-    const foldersOnlyMenuHTML = renderFolder(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`, 0, '', true);
-
-    const firstFileUrl = findFirstFile(folderStructure, `${appName}${relativePath ? '/' + relativePath : ''}`);
-
-
-
-
-
-
-    const allFiles = getAllFilesWithoutRootFiles(folderStructure, '')
-
-
-  let activeFileIndex;
+let activeFileIndex;
 const activeIndex = allFiles.findIndex(f => firstFileUrl.endsWith(f));
 
 if (activeIndex >= 0) {
@@ -325,11 +326,7 @@ if (activeIndex >= 0) {
   activeFileIndex = -1; // pourcentage 0%
 }
 
-
-
-
-
-    // Appelle cette fonction quand l’utilisateur clique sur un fichier ou dossier
+// Appelle cette fonction quand l’utilisateur clique sur un fichier ou dossier
     function setActiveFileByUrl(url) {
       const index = allFiles.indexOf(url);
       if (index >= 0) {
